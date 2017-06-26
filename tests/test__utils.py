@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """Tests for generic utilities"""
-import os
-assert os.getcwd() is None
-
 
 from compilertools._utils import always_str_list, import_class, BaseClass
 
