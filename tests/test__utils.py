@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for generic utilities"""
 import os
-assert os.path.abspath(os.curdir) is None
+assert os.path.abspath(os.curdir()) is None
 
 
 from compilertools._utils import always_str_list, import_class, BaseClass
