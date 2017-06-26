@@ -57,7 +57,7 @@ class Compiler(CompilerBase):
                           import_if=('avx' in cpu.features and
                                      cpu.system_support_avx)),
                  self.Arg(),
-                 ],
+                ],
 
                 # CPU Generic vendor/brand optimisations
                 [self.Arg(args='-mtune=intel',
@@ -65,7 +65,7 @@ class Compiler(CompilerBase):
                           import_if=cpu.vendor == 'GenuineIntel'),
 
                  self.Arg(import_if=cpu.vendor != 'GenuineIntel'),
-                 ]
+                ]
             ]
 
         elif arch == 'x86':
@@ -115,7 +115,7 @@ class Compiler(CompilerBase):
                           import_if='sse' in cpu.features),
 
                  self.Arg(args='-mfpmath=387'),
-                 ],
+                ],
 
                 # CPU Generic vendor/brand optimisations
                 [self.Arg(args='-mtune=intel',
@@ -123,7 +123,7 @@ class Compiler(CompilerBase):
                           import_if=cpu.vendor == 'GenuineIntel'),
 
                  self.Arg(import_if=cpu.vendor != 'GenuineIntel'),
-                 ]
+                ]
             ]
 
         return args

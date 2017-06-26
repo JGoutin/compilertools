@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Core functionalities"""
 
-# TODO: pytest
-
 from compilertools.compilers import get_compiler
 from compilertools._utils import always_str_list
 

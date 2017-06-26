@@ -3,7 +3,7 @@
 
 from os.path import splitext
 
-__all__ = ['get_compile_args', 'get_compiler']
+__all__ = ['use_openmp_pragma', 'use_openacc_pragma', 'use_cilkplus_pragma']
 
 
 def _any_line_startwith(sources, criterion):

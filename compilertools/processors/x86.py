@@ -88,11 +88,11 @@ class Processor(ProcessorBase):
                     'de',               # 02: Debugging Extensions
                     'pse',              # 03: Page Size Extension
                     'tsc',              # 04: Time Stamp Counter
-                    'msr',              # 05: Model-Specific Registers RDMSR/WRMSR @IgnorePep8
+                    'msr',              # 05: Model-Specific Registers RDMSR/WRMSR
                     'pae',              # 06: Physical Address Extensions
                     'mce',              # 07: Machine Check Exception
                     'cx8',              # 08: Compare-and-exchange 8 byte
-                    'apic',             # 09: Onboard Advanced Programmable Interrupt Controller @IgnorePep8
+                    'apic',             # 09: Onboard Advanced Programmable Interrupt Controller
                     None,               # 10: ?
                     'sep',              # 11: SYSENTER and SYSEXIT
                     'mtrr',             # 12: Memory Type Range Registers
@@ -105,13 +105,13 @@ class Processor(ProcessorBase):
                     'clfl',             # 19: CLFLUSH
                     None,               # 20: ?
                     'dtes',             # 21: Debug Trace and EMON Store MSRs
-                    'acpi',             # 22: Thermal Monitor and Software Controlled Clock Facilities @IgnorePep8
+                    'acpi',             # 22: Thermal Monitor and Software Controlled Clock Facilities
                     'mmx',              # 23: MMX
                     'fxsr',             # 24: FXSAVE/FXRESTOR
                     'sse',              # 25: Streaming SIMD Extensions
                     'sse2',             # 26: Streaming SIMD Extensions 2
                     'ss',               # 27: Self-Snoop
-                    'htt',              # 28: Max APIC IDs reserved field is Valid @IgnorePep8
+                    'htt',              # 28: Max APIC IDs reserved field is Valid
                     'tm1',              # 29: Thermal Monitor
                     'ia64',             # 30: IA64 processor emulating x86
                     'pbe'),             # 31: Pending Break Enable
@@ -126,7 +126,7 @@ class Processor(ProcessorBase):
                     'smx',              # 06: Safer Mode Extensions
                     'est',              # 07: Enhanced SpeedStep Technology
                     'tm2',              # 08: Thermal Monitor 2
-                    'ssse3',            # 09: Supplemental Streaming SIMD Extensions 3 @IgnorePep8
+                    'ssse3',            # 09: Supplemental Streaming SIMD Extensions 3
                     'cid',              # 10: L1 Context ID
                     'sdbg',             # 11: Silicon Debug interface
                     'fma3',             # 12: Fused Multiply–Add 3
@@ -154,31 +154,31 @@ class Processor(ProcessorBase):
                     'fsgsbase',         # 00: Access to base of %fs and %gs
                     'tsc_adjust',       # 01: Time Stamp counter Adjustment
                     'sgx',              # 02: Software Guard Extensions
-                    'bmi1',             # 03: Bit Manipulation Instruction Set 1 @IgnorePep8
-                    'hle',              # 04: Transactional Synchronization Extensions @IgnorePep8
+                    'bmi1',             # 03: Bit Manipulation Instruction Set 1
+                    'hle',              # 04: Transactional Synchronization Extensions
                     'avx2',             # 05: Advanced Vector Extensions 2
                     'fpdp',             # 06: Floating Point Data Pointer
-                    'smep',             # 07: Supervisor-Mode Execution Prevention @IgnorePep8
-                    'bmi2',             # 08: Bit Manipulation Instruction Set 2 @IgnorePep8
+                    'smep',             # 07: Supervisor-Mode Execution Prevention
+                    'bmi2',             # 08: Bit Manipulation Instruction Set 2
                     'erms',             # 09: Enhanced REP MOVSB/STOSB
                     'invpcid',          # 10: INVPCID
-                    'rtm',              # 11: Transactional Synchronization Extensions @IgnorePep8
-                    'pqm',              # 12: Platform Quality of Service Monitoring @IgnorePep8
+                    'rtm',              # 11: Transactional Synchronization Extensions
+                    'pqm',              # 12: Platform Quality of Service Monitoring
                     'fpcsds',           # 13: Deprecate FPU CS and FPU DS
                     'mpx',              # 14: Memory Protection Extensions
-                    'pqe',              # 15: Platform Quality of Service Enforcement @IgnorePep8
+                    'pqe',              # 15: Platform Quality of Service Enforcement
                     'avx512f',          # 16: AVX-512 Foundation
                     'avx512dq',         # 17: AVX-512 Doubleword and Quadword
                     'rdseed',           # 18: RDSEED
-                    'adx',              # 19: Multi-Precision Add-Carry Instruction Extensions @IgnorePep8
+                    'adx',              # 19: Multi-Precision Add-Carry Instruction Extensions
                     'smap',             # 20: Supervisor Mode Access Prevention
-                    'avx512ifma',       # 21: AVX-512 Integer Fused Multiply-Add @IgnorePep8
+                    'avx512ifma',       # 21: AVX-512 Integer Fused Multiply-Add
                     'pcommit',          # 22: PCOMMIT
                     'clflushopt',       # 23: CLFLUSHOPT
                     'clwb',             # 24: CLWB
                     'pt',               # 25: Intel Processor Trace
                     'avx512pf',         # 26: AVX-512 Prefetch
-                    'avx512er',         # 27: AVX-512 Exponential and Reciprocal @IgnorePep8
+                    'avx512er',         # 27: AVX-512 Exponential and Reciprocal
                     'avx512cd',         # 28: AVX-512 Conflict Detection
                     'sha',              # 29: Secure Hash Algorithm extensions
                     'avx512bw',         # 30: AVX-512 Byte and Word
@@ -188,7 +188,7 @@ class Processor(ProcessorBase):
                     'prefetchwt1',      # 00: PREFETCHWT1
                     'avx512vbmi',       # 01: AVX-512 Vector Bit Manipulation
                     'umip',             # 02: User-mode Instruction Prevention
-                    'pku',              # 03: Memory Protection Keys for User-mode pages @IgnorePep8
+                    'pku',              # 03: Memory Protection Keys for User-mode pages
                     'ospke',            # 04: PKU enabled by OS
                     None,               # 05: ?
                     None,               # 06: ?
@@ -199,7 +199,7 @@ class Processor(ProcessorBase):
                     None,               # 11: ?
                     None,               # 12: ?
                     None,               # 13: ?
-                    'avx512vpopcntdq',  # 14: AVX-512 Vector Population Count D/Q @IgnorePep8
+                    'avx512vpopcntdq',  # 14: AVX-512 Vector Population Count D/Q
                     None,               # 15: ?
                     'va57',             # 16: CR4.VA57
                     None,               # 17: ?
@@ -222,7 +222,7 @@ class Processor(ProcessorBase):
                     None,               # 00: ?
                     None,               # 01: ?
                     'avx512qvnniw',     # 02: AVX-512 Neural Network
-                    'avx512qfma',       # 03: AVX-512 Multiply Accumulation Single precision @IgnorePep8
+                    'avx512qfma',       # 03: AVX-512 Multiply Accumulation Single precision
                     None,               # 04: ?
                     None,               # 05: ?
                     None,               # 06: ?
@@ -263,7 +263,7 @@ class Processor(ProcessorBase):
                     'pae',              # 06: Physical Address Extension
                     'mce',              # 07: Machine Check Exception
                     'cx8',              # 08: CMPXCHG8
-                    'apic',             # 09: Advanced Programmable Interrupt Controller @IgnorePep8
+                    'apic',             # 09: Advanced Programmable Interrupt Controller
                     None,               # 10: ?
                     'sep',              # 11: SYSCALL and SYSRET
                     'mtrr',             # 12: Memory Type Range Registers
@@ -311,7 +311,7 @@ class Processor(ProcessorBase):
                     None,               # 20: ?
                     'tbm',              # 21: Trailing Bit Manipulation
                     'topx',             # 22: Topology Extensions
-                    'pcx_core',         # 23: Core performance counter extensions @IgnorePep8
+                    'pcx_core',         # 23: Core performance counter extensions
                     'pcx_nb',           # 24: NB performance counter extensions
                     None,               # 25: ?
                     'dbx',              # 26: Data breakpoint extensions

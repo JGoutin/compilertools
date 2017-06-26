@@ -88,7 +88,7 @@ class Compiler(CompilerBase):
 
              self.Arg(import_if=arch == 'amd64' or self.version < 11.0,
                       build_if=arch == 'amd64' or self.version < 11.0),
-             ],
+            ],
 
             # CPU Generic vendor/brand optimisations
             [self.Arg(args='/favor:ATOM',
@@ -112,7 +112,7 @@ class Compiler(CompilerBase):
 
              self.Arg(import_if=(cpu.vendor not in ('GenuineIntel',
                                                     'AuthenticAMD'))),
-             ]
+            ]
         ]
 
         return args
