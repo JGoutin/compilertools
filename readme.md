@@ -1,3 +1,5 @@
-This module help to use and distributes optimized Python modules by helping optimizing compilers arguments.
+[![Build status](https://ci.appveyor.com/api/projects/status/khsf4rjrjo78xcmm?svg=true)](https://ci.appveyor.com/project/JGoutin/compilertools)
 
-This is experimental module.
+This module help to build and distributes optimized Python extensions by optimizing compilers options.
+
+*This is experimental module*
