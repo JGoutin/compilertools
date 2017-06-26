@@ -6,5 +6,5 @@ environment:
 build: off
 
 test_script:
-  - "python -m pip install pytest coverage"
+  - "python -m pip install pytest coverage pytest-cov"
   - "py.test -v --cov=compilertools --cov-report=term-missing"
