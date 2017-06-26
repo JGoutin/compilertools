@@ -5,3 +5,6 @@ __pycache__/
 # Windows folders files
 Desktop.ini
 Thumbs.db
+
+# IDE
+.cache/
