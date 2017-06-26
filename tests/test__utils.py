@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 """Tests for generic utilities"""
+import sys
+assert sys.path is None
+
+
 from compilertools._utils import always_str_list, import_class, BaseClass
 
 
