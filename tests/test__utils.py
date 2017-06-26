@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
 """Tests for generic utilities"""
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import os
+assert os.getcwd() is None
+
+>>>>>>> a25a744... Update test__utils.py
+=======
+>>>>>>> 2d8b244... Update test__utils.py
 
 from compilertools._utils import always_str_list, import_class, BaseClass
 
