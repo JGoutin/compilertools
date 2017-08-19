@@ -20,10 +20,10 @@ It is compatible with any existing modules and don't need to change any line of 
 
 Make optimized ".so"/".pyd" for each architecture and name files with tagged suffixes : 
 
->Example:
->module.avx2.cp36-win_amd64.pyd -> Optimized variant for AVX2 SIMD Extensions
->module.avx.cp36-win_amd64.pyd -> Optimized variant for AVX SIMD Extensions
->module.cp36-win_amd64.pyd -> Classic hightly-compatible variant
+Example:
+* module.avx2.cp36-win_amd64.pyd -> Optimized variant for AVX2 SIMD Extensions
+* module.avx.cp36-win_amd64.pyd -> Optimized variant for AVX SIMD Extensions
+* module.cp36-win_amd64.pyd -> Classic hightly-compatible variant
 
 These optimized files must be packaged in the same wheel when distributing (Don't need to create a wheel by variant).
 
