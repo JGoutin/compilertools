@@ -6,14 +6,15 @@ from copy import deepcopy
 
 try:
     # Import Setuptools if available for enabling its distutils patches
-    import setuptools  # @UnusedImport
+    import setuptools
 except ImportError:
     pass
 
 from distutils.sysconfig import get_config_var
 from distutils.command.build_ext import build_ext
 
-from compilertools._core import suffixe_from_args, get_compile_args, get_compiler
+from compilertools._core import (
+    suffixe_from_args, get_compile_args, get_compiler)
 from compilertools import _src_files
 
 
@@ -22,7 +23,7 @@ __all__ = ['get_build_compile_args', 'get_build_link_args', 'CONFIG']
 
 # Building configuration
 CONFIG = {
-    # Disable Extools optimisations
+    # Disable optimisations
     'disabled': False,
 
     # Compile optimized for current machine only
