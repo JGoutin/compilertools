@@ -6,6 +6,8 @@
 #       auto-add to C/C++ sources
 # https://developer.numscale.com/boost.simd/documentation/develop/quickstart.html#win-compilation
 
+# TODO : Use of '/arch:IA32' (MSVC11+) ?
+
 import sys
 from compilertools.compilers import CompilerBase
 
@@ -82,12 +84,7 @@ class Compiler(CompilerBase):
                       import_if='sse' in cpu.features and arch == 'x86',
                       build_if=arch == 'x86'),
 
-             self.Arg(args='/arch:IA32',
-                      import_if=arch == 'x86' and self.version >= 11.0,
-                      build_if=arch == 'x86' and self.version >= 11.0),
-
-             self.Arg(import_if=arch == 'amd64' or self.version < 11.0,
-                      build_if=arch == 'amd64' or self.version < 11.0),
+             self.Arg(),
             ],
 
             # CPU Generic vendor/brand optimisations
