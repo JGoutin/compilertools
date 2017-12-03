@@ -3,22 +3,31 @@
 
 from os.path import splitext
 from itertools import product
+from compilertools._config_build import CONFIG_BUILD
 
-__all__ = ['use_openmp_pragma', 'use_openacc_pragma', 'use_cilkplus_pragma']
+__all__ = []
 
 
 def _any_line_startwith(sources, criterion):
     """Detect if any line in source files start with a specific string.
 
-    sources: list of str, sources files paths
+    sources: str or list of str, sources files paths
     criterion: dict with keys equal to lower case file extension, and
-        value equal to lower case startwith string criterion."""
+        value equal to a list of lower case startwith string criterion."""
+    # Make sure arguments are iterables
+    if isinstance(sources, str):
+        sources = (sources,)
+
+    # Check files for criterions
     for source in sources:
-        startswith = criterion.get(splitext(source)[1].lower(), '')
-        if not startswith:
+        # Select criterions based on file extension
+        startswiths = criterion.get(splitext(source)[1].lower(), '')
+        if not startswiths:
             continue
+
+        # Check criterions
         with open(source, 'rt') as file:
-            for line in file:
+            for line, startswith in product(file, startswiths):
                 if line.lstrip().lower().startswith(startswith):
                     return True
     return False
@@ -36,33 +45,30 @@ def _ignore_api(compiler, api):
     return True
 
 
-def _startwith_exts(c=None, fortran=None):
+def _startwith_exts(**startswiths_dict):
     """
     Returne a dict with file extensions as key and startswith as values.
 
-    c: Startswith for C/C++.
-    fortran: Startswith for Fortran.
+    startswiths_dict: dict with key as lower case language and value as list
+        of startswith values.
     """
     startwith_exts = {}
 
-    def insert(startswiths, exts):
-        """startwith_exts inserter"""
+    get_extensions = CONFIG_BUILD.get('extensions', {}).get
+    for key in startswiths_dict:
+        startswiths = startswiths_dict[key]
+        exts = get_extensions(key, [])
+
         if startswiths is None:
-            return
+            continue
 
         # Make sure arguments are iterables
         if isinstance(startswiths, str):
             startswiths = (startswiths,)
 
-        if isinstance(exts, str):
-            exts = (exts,)
-
         # Insert Data
-        for startswith, ext in product(startswiths, exts):
-            startwith_exts[ext] = startswith
-
-    insert(c, ('.c', '.cpp', '.cxx', '.cc', '.c++', '.cp'))
-    insert(fortran, ('.f', '.for', '.f90', '.f95', '.f03', '.f08', '.f15'))
+        for ext in exts:
+            startwith_exts[ext] = startswiths
 
     return startwith_exts
 
@@ -77,36 +83,3 @@ def _use_api_pragma(sources, compiler, api, **startswith):
     if _ignore_api(compiler, api):
         return False
     return _any_line_startwith(sources, _startwith_exts(**startswith))
-
-
-def use_openmp_pragma(sources, compiler=None):
-    """Check C/C++/Fortran sources for openMP preprocessors.
-
-    sources: sources files to check.
-    compiler: If specified, check if compiler is compatible with this
-    API first and return immediatly False if not."""
-    return _use_api_pragma(
-        sources, compiler, 'openmp',
-        c='#pragma omp ', fortran=('!$omp ', 'c$omp ', '*$omp '))
-
-
-def use_openacc_pragma(sources, compiler=None):
-    """Check C/C++/Fortran sources for OpenACC preprocessors.
-
-    sources: sources files to check.
-    compiler: If specified, check if compiler is compatible with this
-    API first and return immediatly False if not."""
-    return _use_api_pragma(
-        sources, compiler, 'openacc',
-        c='#pragma acc ', fortran=('!$acc ', 'c$acc ', '*$acc '))
-
-
-def use_cilkplus_pragma(sources, compiler=None):
-    """Check C/C++/Fortran sources for Intel® Cilk™ Plus preprocessors.
-
-    sources: sources files to check.
-    compiler: If specified, check if compiler is compatible with this
-    API first and return immediatly False if not."""
-    return _use_api_pragma(
-        sources, compiler, 'opencilkplus',
-        c='#pragma simd ', fortran='!dir$ simd ')

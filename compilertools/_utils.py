@@ -2,6 +2,7 @@
 """Generic utilities"""
 import sys
 from importlib import import_module
+from collections.abc import MutableMapping
 
 __all__ = ['always_str_list', 'import_class', 'BaseClass']
 
@@ -33,9 +34,23 @@ def import_class(package_name, module_name, class_name, default_class):
         return default_class
 
 
-class BaseClass:
+class BaseClass(MutableMapping):
     """Base class for data storage classes"""
 
     def __init__(self):
-        self._attributes = {}
-        self._get_attr = self._attributes.get
+        self._items = {}
+
+    def __getitem__(self, key):
+        return self._items.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        return self._items.__setitem__(key, value)
+
+    def __delitem__(self, key):
+        return self._items.__delitem__(key)
+
+    def __len__(self):
+        return self._items.__len__()
+
+    def __iter__(self):
+        return self._items.__iter__()

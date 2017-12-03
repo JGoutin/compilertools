@@ -2,9 +2,9 @@
 """X86 Processors"""
 # For more X86 CPUID informations : http://www.sandpile.org/x86/cpuid.htm
 
-# TODO : implement more CPUID (Other feature flags, L2 caches, ...)
+# TODO: implement more CPUID (Other feature flags, L2 caches, ...)
 
-# TODO : 0x80000001, select value based on CPU name for bit that have 2
+# TODO: 0x80000001, select value based on CPU name for bit that have 2
 # possibles flags
 
 # TODO: replace x86cpu with pure Python solution ? :
@@ -26,10 +26,10 @@ class Processor(ProcessorBase):
             # CPUID functions
             from x86cpu import cpuid, cpuinfo  # @UnresolvedImport
             self.cpuid = cpuid
-            self._attributes['os_supports_avx'] = cpuinfo.info.supports_avx
+            self['os_supports_avx'] = cpuinfo.info.supports_avx
 
             # Cache values for not querry CPUID each time
-            self._attributes['cpuid_max_extended'] = (
+            self['cpuid_max_extended'] = (
                 self.cpuid(0x80000000)['eax'])
             self._cpuid_vendor_id()
             self._cpuid_brand()
@@ -38,14 +38,14 @@ class Processor(ProcessorBase):
     @property
     def cpuid_highest_extended_function(self):
         """Highest CPUID Extended Function"""
-        return self._get_attr('cpuid_max_extended', 0)
+        return self.get('cpuid_max_extended', 0)
 
     @property
     def system_support_avx(self):
         """True if operating system support AVX.
 
         AVX can't be used if CPU support AVX but not operating system."""
-        return self._get_attr('os_supports_avx', False)
+        return self.get('os_supports_avx', False)
 
     @staticmethod
     def _uint_to_str(*uints):
@@ -60,8 +60,7 @@ class Processor(ProcessorBase):
     def _cpuid_vendor_id(self):
         """Update current CPU's manufacturer ID from CPUID"""
         reg = self.cpuid(0)
-        self._attributes['vendor'] = self._uint_to_str(
-            reg['ebx'], reg['edx'], reg['ecx'])
+        self['vendor'] = self._uint_to_str(reg['ebx'], reg['edx'], reg['ecx'])
 
     def _cpuid_brand(self):
         """Update current CPU's brand from CPUID"""
@@ -72,7 +71,7 @@ class Processor(ProcessorBase):
         for avx in (0x80000002, 0x80000003, 0x80000004):
             reg = self.cpuid(avx)
             brand_list += [reg['eax'], reg['ebx'], reg['ecx'], reg['edx']]
-        self._attributes['brand'] = self._uint_to_str(*brand_list)
+        self['brand'] = self._uint_to_str(*brand_list)
 
     def _cpuid_feature_flags(self):
         """Update current CPU's features flags from CPUID"""
@@ -105,7 +104,7 @@ class Processor(ProcessorBase):
                     'clfl',             # 19: CLFLUSH
                     None,               # 20: ?
                     'dtes',             # 21: Debug Trace and EMON Store MSRs
-                    'acpi',             # 22: Thermal Monitor and Software Controlled Clock Facilities
+                    'acpi',             # 22: Thermal Monitor & Software Controlled Clock Facilities
                     'mmx',              # 23: MMX
                     'fxsr',             # 24: FXSAVE/FXRESTOR
                     'sse',              # 25: Streaming SIMD Extensions
@@ -336,4 +335,4 @@ class Processor(ProcessorBase):
                         add_flag(feature)
 
         # Return flags
-        self._attributes['features'] = flags
+        self['features'] = flags

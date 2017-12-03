@@ -41,8 +41,10 @@ def suffixe_from_args(args, extension='', return_empty_suffixes=False):
             elif return_empty_suffixes:
                 for ext in always_str_list(extension):
                     suffixes.append(ext)
-        elif suffix or return_empty_suffixes:
-            suffixes.append(suffix)
+        elif suffix:
+            suffixes.append('.%s' % suffix)
+        elif return_empty_suffixes:
+            suffixes.append('')
 
     # Return with same form as input
     return suffixes

@@ -17,7 +17,7 @@ ARCH_SUFFIXES = suffixe_from_args(get_compile_args(current_machine=True),
 
 def update_extensions_suffixes(compiler):
     """Update file extensions suffixes compatibles with current machine
-    with ones froms specified compiler.
+    with ones from a specified compiler.
 
     compiler: compiler name."""
     suffixes = suffixe_from_args(
