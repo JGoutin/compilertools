@@ -1,23 +1,32 @@
 # -*- coding: utf-8 -*-
 """Tests for generic utilities"""
-from compilertools._utils import always_str_list, import_class, BaseClass
 
 
 def test_baseclass():
     """"Test BaseClass"""
+    from compilertools._utils import BaseClass
+
     # Instanciate
     baseclass = BaseClass()
 
-    # Tests attributes dictionary
-    baseclass._attributes['exists'] = 1
-    assert baseclass._get_attr('exists') == 1
-    assert baseclass._get_attr('not_exists', 1) == 1
+    # Tests items access
+    baseclass['exists'] = 1
+    assert len(baseclass) == 1
+    assert baseclass['exists'] == 1
+
+    for key in baseclass:
+        assert baseclass[key] == baseclass._items[key]
+
+    del baseclass['exists']
+    assert baseclass.get('exists') is None
 
 
 def tests_import_class():
     """"Test import_class"""
+    from compilertools._utils import import_class
 
     class Dummy():
+        """Dummy class"""
         pass
 
     class_exists = import_class(
@@ -38,5 +47,7 @@ def tests_import_class():
 
 def tests_always_str_list():
     """"Test always_str_list"""
+    from compilertools._utils import always_str_list
+
     assert always_str_list(['0', '1']) == ['0', '1']
     assert always_str_list('0') == ('0',)

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-""" Microsoft Visual C++ Compiler"""
+"""Microsoft Visual C++ Compiler"""
 # https://docs.microsoft.com/cpp/build/reference/c-cpp-building-reference
 
 # TODO: boost.simd "#BOOST_SIMD_ASSUME_{SIMD_EXT}" preprocessor symbols
 #       auto-add to C/C++ sources
 # https://developer.numscale.com/boost.simd/documentation/develop/quickstart.html#win-compilation
 
-# TODO : Use of '/arch:IA32' (MSVC11+) ?
+# TODO: Use of '/arch:IA32' (MSVC11+) ?
 
 import sys
 from compilertools.compilers import CompilerBase
@@ -23,16 +23,18 @@ class Compiler(CompilerBase):
         # Compiler version
         self._get_build_version()
 
-        # Arguments
-        self._attributes['fast_fpmath'] = '/fp:fast'
-        self._attributes['openmp_compile'] = '/openmp'
+        # Options
+        self['option']['fast_fpmath'] = {'compile': '/fp:fast'}
+
+        # API
+        self['api']['openmp'] = {'compile': '/openmp'}
 
     def _get_build_version(self):
         """Update ompiler version with the one that was used to build Python.
         """
         if 'MSC v.' not in sys.version:
             # Assume compiler is MSVC6
-            self._attributes['version'] = 6.0
+            self['version'] = 6.0
             return
 
         version_str = sys.version.split('MSC v.')[1].split(' ', 1)[0]
@@ -41,7 +43,7 @@ class Compiler(CompilerBase):
             # 13.0 was skipped
             version += 1.0
         version += float()
-        self._attributes['version'] = version
+        self['version'] = version
 
     def compile_args_matrix(self, arch):
         """Return Microsoft Visual C++ compiler options availables for the

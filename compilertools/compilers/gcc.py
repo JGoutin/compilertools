@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" GNU Compiler Collection"""
+"""GNU Compiler Collection"""
 # https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html
 
 
@@ -14,13 +14,21 @@ class Compiler(CompilerBase):
     def __init__(self):
         CompilerBase.__init__(self)
 
-        # Arguments
-        self._attributes['fast_fpmath'] = '-Ofast'
-        self._attributes['openmp_compile'] = '-fopenmp'
-        self._attributes['openmp_link'] = '-fopenmp'
-        self._attributes['openacc_compile'] = '-fopenacc'
-        self._attributes['cilkplus_compile'] = '-fcilkplus -lcilkrts'
-        self._attributes['cilkplus_link'] = '-fcilkplus -lcilkrts'
+        # Options
+        self['option']['fast_fpmath'] = {
+            'compile': '-Ofast'}
+
+        # API
+        self['api']['openmp'] = {
+            'compile': '-fopenmp',
+            'link': '-fopenmp'}
+
+        self['api']['openacc'] = {
+            'compile': '-fopenacc'}
+
+        self['api']['cilkplus'] = {
+            'compile': '-fcilkplus -lcilkrts',
+            'link': '-fcilkplus -lcilkrts'}
 
     def compile_args_matrix(self, arch):
         """Return GCC compiler options availables for the

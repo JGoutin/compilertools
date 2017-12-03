@@ -3,6 +3,7 @@
 from itertools import product
 from collections import namedtuple, OrderedDict
 from compilertools._utils import import_class, BaseClass
+from compilertools._config import CONFIG
 from compilertools.processors import get_processor, get_arch
 
 __all__ = ['CompilerBase', 'get_compiler']
@@ -22,8 +23,7 @@ def get_compiler(compiler=None):
         compiler = get_default_compiler()
 
     # Aliases for compilers names
-    if compiler in ('mingw32', 'cygwin'):
-        compiler = 'gcc'
+    compiler = CONFIG.get('compiler_alias', {}).get(compiler, compiler)
 
     # Return compiler
     return import_class('compilers', compiler, 'Compiler', CompilerBase)()
@@ -49,6 +49,11 @@ class CompilerBase(BaseClass):
        build_if: Condition that must be True for cimpile file with
            this argument and the current compiler (Ex compiler version).
            Default value is True.""")
+
+    def __init__(self):
+        BaseClass.__init__(self)
+        self['api'] = {}
+        self['option'] = {}
 
     def get_arch_and_cpu(self, arch=None, current_machine=False):
         """Return arch and update CPU linked to compiler
@@ -77,7 +82,7 @@ class CompilerBase(BaseClass):
         return self._order_args_matrix(self.compile_args_matrix(arch),
                                        current_machine, current_compiler)
 
-    def compile_args_matrix(self, arch):  # @UnusedVariable
+    def compile_args_matrix(self, arch):
         """Return compiler arguments availables for the specified CPU
         architecture as a matrix.
 
@@ -92,7 +97,9 @@ class CompilerBase(BaseClass):
 
         # Compute argments
         args = self.compile_args(arch, current_machine=True)
-        return args[args.keys()[0]]
+        if not args:
+            return []
+        return args[list(args)[0]]
 
     @staticmethod
     def _order_args_matrix(args_matrix, current_machine=False,
@@ -151,48 +158,20 @@ class CompilerBase(BaseClass):
     @property
     def version(self):
         """Compiler version"""
-        return self._get_attr('version', 0.0)
+        return self.get('version', 0.0)
 
     def support_api(self, api):
         """Check if compiler support specific API.
 
-        api: API name ('openmp', 'openacc', 'cilkplus')"""
-        if ('%s_compile' % api in self._attributes or
-                '%s_link' % api in self._attributes):
+        api: API name ('openmp', ...)"""
+        if api in self['api']:
             return True
         return False
 
-    @property
-    def openmp_compile_arg(self):
-        """Compiler argument for openMP"""
-        return self._get_attr('openmp_compile', '')
+    def support_option(self, option):
+        """Check if compiler support specific option.
 
-    @property
-    def openmp_link_arg(self):
-        """Linker argument for openMP"""
-        return self._get_attr('openmp_link', '')
-
-    @property
-    def openacc_compile_arg(self):
-        """Compiler argument for OpenACC"""
-        return self._get_attr('openacc_compile', '')
-
-    @property
-    def openacc_link_arg(self):
-        """Linker argument for OpenACC"""
-        return self._get_attr('openacc_link', '')
-
-    @property
-    def cilkplus_compile_arg(self):
-        """Compiler argument for Intel® Cilk™ Plus"""
-        return self._get_attr('cilkplus_compile', '')
-
-    @property
-    def cilkplus_link_arg(self):
-        """Linker argument for Intel® Cilk™ Plus"""
-        return self._get_attr('cilkplus_link', '')
-
-    @property
-    def fast_fpmath_compile_arg(self):
-        """Compiler argument for Fast floating point calculations"""
-        return self._get_attr('fast_fpmath', '')
+        api: Option name ('fast_fpmath',...)"""
+        if option in self['option']:
+            return True
+        return False

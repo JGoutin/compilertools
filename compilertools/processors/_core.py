@@ -3,6 +3,7 @@
 
 from platform import machine
 from compilertools._utils import import_class, BaseClass
+from compilertools._config import CONFIG
 
 __all__ = ['ProcessorBase', 'get_processor', 'get_arch']
 
@@ -17,11 +18,7 @@ def get_arch(arch=None):
     arch = arch.lower()
 
     # Aliases for architectures names
-    if arch in ('x86_64', 'x86-64', 'em64t', 'x64', 'win-amd64'):
-        return 'amd64'
-
-    elif arch in ('i386', 'ia32', 'win32'):
-        return 'x86'
+    arch = CONFIG.get('arch_alias', {}).get(arch, arch)
 
     return arch
 
@@ -40,24 +37,24 @@ class ProcessorBase(BaseClass):
 
     def __init__(self, current_machine=False):
         BaseClass.__init__(self)
-        self._attributes['current_machine'] = current_machine
+        self['current_machine'] = current_machine
 
     @property
     def vendor(self):
         """CPU manufacturer"""
-        return self._get_attr('vendor', '')
+        return self.get('vendor', '')
 
     @property
     def brand(self):
         """CPU brand"""
-        return self._get_attr('brand', '')
+        return self.get('brand', '')
 
     @property
     def features(self):
         """CPU features"""
-        return self._get_attr('features', [])
+        return self.get('features', [])
 
     @property
     def is_current_machine(self):
         """Return True is CPU is from current machine"""
-        return self._get_attr('current_machine', False)
+        return self.get('current_machine', False)
