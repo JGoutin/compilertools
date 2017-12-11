@@ -3,7 +3,7 @@ environment:
         - PYTHON: "C:\\Python36-x64"
         - PYTHON: "C:\\Python36"
         - PYTHON: "C:\\Python35-x64"
-        - PYTHON: "C:\\Python34-x64"
+        - PYTHON: "C:\\Python35"
 platform: 
     - x64
     - x86
@@ -13,8 +13,6 @@ matrix:
         - PYTHON: "C:\\Python36-x64"
           platform: x86
         - PYTHON: "C:\\Python35-x64"
-          platform: x86
-        - PYTHON: "C:\\Python34-x64"
           platform: x86
 
 build: off

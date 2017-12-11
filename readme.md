@@ -81,7 +81,7 @@ Enable or disable fast-math compiler option.
 
 ### Python compatibility
 
-* Python 3.4 minimum.
+* Python 3.5 minimum.
 
 ## Work in progress
 
