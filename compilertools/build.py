@@ -6,6 +6,7 @@ from copy import deepcopy as _deepcopy
 
 from distutils.sysconfig import get_config_var as _get_config_var
 from distutils.command.build_ext import build_ext as _build_ext
+from distutils.util import get_platform as _get_platform
 
 from compilertools._config_build import CONFIG_BUILD
 from compilertools._core import (
@@ -36,6 +37,8 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
         ext_suffix = _get_config_var('EXT_SUFFIX')
     if current_machine is None:
         current_machine = CONFIG_BUILD['current_machine']
+    if arch is None:
+        arch = _get_platform()
 
     # Compiler and base arguments
     build_args = {}
