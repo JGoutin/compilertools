@@ -65,19 +65,19 @@ Enable or disable fast-math compiler option.
 
 ### Supported compilers
 
-* GCC [Work in progress]
+* GCC
 * Microsoft Visual C++
 
 ### Supported processors
 
 * x86
-* amd64 (x86-64)
+* x86-64
 
 ### Build tools compatiblity
 
 * distutils
 * setuptools
-* numpy.distutils [Planned: maybe already OK, but actually not tested]
+* numpy.distutils
 
 ### Python compatibility
 
@@ -86,26 +86,26 @@ Enable or disable fast-math compiler option.
 ## Work in progress
 
 * Module core : Done
-* MSVC on Windows amd64, configuration and test : Done
-* GCC on Linux amd64, configuration and test : Work in progress
-* openMP detection and configuration : Done
-* openACC detection and configuration : Done but untested
-* Intel Cilk Plus detection and configuration : Done but untested
-* Unit test (pytest) and continuous integration : Work in progress
+* Microsoft Visual C++ compiler support : Done
+* GNU Compiler Collection support : Work in progress
+* openMP autodetection: Done
+* openACC autodetection: Done but untested
+* Intel Cilk Plus autodetection: Done but untested
+* Unit test (pytest): Done
+* Continuous integration: Work in progress
 * x86/amd64 CPUID : Partial, actually based on external library, but maybe better to internalise this, and if possible, in pure Python.
+* Extended configuration: Done
 
 ## Ideas & possibles futures features
 
-* Tags selection at build time (Actually always use all tags available). And create a default tag pre-selection for supporting most current configurations.
 * Ability to auto-enable "Current-architecture optimized compilation" with *pip* when installing from sources.
 * Ability to force the use of an API (openMP, ...)
-* Add it as an option *setuptools* (or eventually merge it in *setuptools*).
+* Add it as an option in *setuptools* (or eventually merge it in *setuptools*).
 * Since this module get many informations on CPU, give possibility to users to access them easily as a dict.
 
 ## Help aprecied
 
 * Tweak of GCC compilers options.
 * x86 CPUID implementation.
-* Add support for more compilers (Intel, ...). The aim is to support all compilers availables with *distutils* and *numpy.distutils*.
+* Add support for more compilers (Intel, Clang, ...). The aim is to support all compilers availables with *distutils* and *numpy.distutils*.
 * Add support for more processors (ARM, ARM64, ...).
-* Add support for Python 2.7, eventually.
