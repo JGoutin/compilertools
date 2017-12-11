@@ -21,7 +21,7 @@ build: off
 
 install:
     - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-    - "python -m pip install pytest coverage pytest-cov coveralls[yaml] x86cpu"
+    - "python -m pip install pytest coverage pytest-cov coveralls[yaml] x86cpu numpy cython"
 
 test_script:
     - "py.test -v --cov=compilertools --cov-report=term-missing"
