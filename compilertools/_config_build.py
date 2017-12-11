@@ -3,12 +3,19 @@
 
 # Default configuration
 CONFIG_BUILD = {
-    # Disable optimisations
+    # Disable compilertools's optimization while building
     'disabled': False,
 
     # Compile optimized for current machine only
     # (If not compile for a cluster of possibles machines)
     'current_machine': False,
+
+    # Disabled suffixes in files matrix definition.
+    # Complete this set to not build files for a specific architecture.
+    # This does not affect current machine builds.
+    'disabled_suffixes': {
+        'sse', 'ssse3', 'sse4_1', 'intel_atom'
+        },
 
     # Enable compilers options
     'option': {

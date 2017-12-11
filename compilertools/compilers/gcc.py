@@ -3,16 +3,16 @@
 # https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html
 
 
-from compilertools.compilers import CompilerBase
+from compilertools.compilers import CompilerBase as _CompilerBase
 
 __all__ = ['Compiler']
 
 
-class Compiler(CompilerBase):
+class Compiler(_CompilerBase):
     """GNU Compiler Collection"""
 
     def __init__(self):
-        CompilerBase.__init__(self)
+        _CompilerBase.__init__(self)
 
         # Options
         self['option']['fast_fpmath'] = {
@@ -30,18 +30,16 @@ class Compiler(CompilerBase):
             'compile': '-fcilkplus -lcilkrts',
             'link': '-fcilkplus -lcilkrts'}
 
-    def compile_args_matrix(self, arch):
+    def _compile_args_matrix(self, arch, cpu):
         """Return GCC compiler options availables for the
         specified CPU architecture.
 
         arch: CPU Architecture str."""
-        cpu = self._cpu
-
         # Generic optimisation
         args = [[self.Arg(args=['-flto', '-O3'])]]
 
         # Architecture specific optimisations
-        if arch == 'amd64':
+        if arch == 'x86_64':
             args += [
                 # CPU Generic optimisations
                 [self.Arg(args='-m64')],
@@ -51,7 +49,7 @@ class Compiler(CompilerBase):
                           suffix='avx512',
                           import_if=('avx512f' in cpu.features and
                                      'avx512cd' in cpu.features and
-                                     cpu.system_support_avx)),
+                                     cpu.os_supports_avx)),
 
                  self.Arg(args=['-mavx2', '-mavx', '-msse4.2', '-msse4.1',
                                 '-mssse3', '-msse2', '-msse'],
@@ -63,7 +61,7 @@ class Compiler(CompilerBase):
                                 '-msse2', '-msse'],
                           suffix='avx',
                           import_if=('avx' in cpu.features and
-                                     cpu.system_support_avx)),
+                                     cpu.os_supports_avx)),
                  self.Arg(),
                 ],
 
@@ -72,7 +70,7 @@ class Compiler(CompilerBase):
                           suffix='intel',
                           import_if=cpu.vendor == 'GenuineIntel'),
 
-                 self.Arg(import_if=cpu.vendor != 'GenuineIntel'),
+                 self.Arg(),
                 ]
             ]
 
@@ -86,13 +84,13 @@ class Compiler(CompilerBase):
                                 '-msse4.1', '-mssse3', '-msse2', '-msse'],
                           suffix='avx2',
                           import_if=('avx2' in cpu.features and
-                                     cpu.system_support_avx)),
+                                     cpu.os_supports_avx)),
 
                  self.Arg(args=['-mfpmath=sse', '-mavx', '-msse4.2',
                                 '-msse4.1', '-mssse3', '-msse2', '-msse'],
                           suffix='avx',
                           import_if=('avx' in cpu.features and
-                                     cpu.system_support_avx)),
+                                     cpu.os_supports_avx)),
 
                  self.Arg(args=['-mfpmath=sse', '-msse4.2', '-msse4.1',
                                 '-mssse3', '-msse2', '-msse'],
@@ -130,27 +128,24 @@ class Compiler(CompilerBase):
                           suffix='intel',
                           import_if=cpu.vendor == 'GenuineIntel'),
 
-                 self.Arg(import_if=cpu.vendor != 'GenuineIntel'),
+                 self.Arg(),
                 ]
             ]
 
         return args
 
-    def compile_args_current_machine(self):
+    def _compile_args_current_machine(self, arch, cpu):
         """Return auto-optimised compiler arguments for current machine"""
-        arch = self.get_arch_and_cpu()
-        cpu = self._cpu
-
         # Base native optimisation
         args = ['-march=native -flto']
 
         # Arch specific optimizations
         if arch == 'x86':
             args.append('-m32')
-            if cpu.has_feature('sse'):
+            if 'sse' in cpu.features:
                 args.append('-mfpmath=sse')
 
-        elif arch == 'amd64':
+        elif arch == 'x86_64':
             args.append('-m64')
 
         return ' '.join(args)

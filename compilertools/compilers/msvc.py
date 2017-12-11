@@ -8,17 +8,16 @@
 
 # TODO: Use of '/arch:IA32' (MSVC11+) ?
 
-import sys
-from compilertools.compilers import CompilerBase
+from compilertools.compilers import CompilerBase as _CompilerBase
 
 __all__ = ['Compiler']
 
 
-class Compiler(CompilerBase):
+class Compiler(_CompilerBase):
     """Microsoft Visual C++"""
 
     def __init__(self):
-        CompilerBase.__init__(self)
+        _CompilerBase.__init__(self)
 
         # Compiler version
         self._get_build_version()
@@ -30,14 +29,17 @@ class Compiler(CompilerBase):
         self['api']['openmp'] = {'compile': '/openmp'}
 
     def _get_build_version(self):
-        """Update ompiler version with the one that was used to build Python.
+        """Update compiler version with the one that was used to build Python.
         """
-        if 'MSC v.' not in sys.version:
+        from platform import python_compiler
+        version_str = python_compiler()
+
+        if 'MSC v.' not in version_str:
             # Assume compiler is MSVC6
             self['version'] = 6.0
             return
 
-        version_str = sys.version.split('MSC v.')[1].split(' ', 1)[0]
+        version_str = version_str.split('MSC v.')[1].split(' ', 1)[0]
         version = float('.'.join((version_str[:-2], version_str[-2:]))) - 6.0
         if int(version) >= 13:
             # 13.0 was skipped
@@ -45,18 +47,12 @@ class Compiler(CompilerBase):
         version += float()
         self['version'] = version
 
-    def compile_args_matrix(self, arch):
+    def _compile_args_matrix(self, arch, cpu):
         """Return Microsoft Visual C++ compiler options availables for the
         specified CPU architecture.
 
         arch: CPU Architecture str."""
-        cpu = self._cpu
-
-        # Fix arch name
-        if '_' in arch:
-            # Cross compilation, get only target arch
-            arch = arch.rsplit('_', 1)[1]
-
+        # Compute carguments
         args = [
             # Generic optimisation
             [self.Arg(args=['/O2', '/GL'])],
@@ -65,14 +61,14 @@ class Compiler(CompilerBase):
             [self.Arg(args='/arch:AVX2',
                       suffix='avx2',
                       import_if=('avx2' in cpu.features and
-                                 cpu.system_support_avx and
+                                 cpu.os_supports_avx and
                                  self.version >= 12.0),
                       build_if=self.version >= 12.0),
 
              self.Arg(args='/arch:AVX',
                       suffix='avx',
                       import_if=('avx' in cpu.features and
-                                 cpu.system_support_avx and
+                                 cpu.os_supports_avx and
                                  self.version >= 10.0),
                       build_if=self.version >= 10.0),
 
@@ -100,17 +96,16 @@ class Compiler(CompilerBase):
              self.Arg(args='/favor:INTEL64',
                       suffix='intel',
                       import_if=(cpu.vendor == 'GenuineIntel' and
-                                 arch == 'amd64'),
-                      build_if=arch == 'amd64'),
+                                 arch == 'x86_64'),
+                      build_if=arch == 'x86_64'),
 
              self.Arg(args='/favor:AMD64',
                       suffix='amd',
                       import_if=(cpu.vendor == 'AuthenticAMD' and
-                                 arch == 'amd64'),
-                      build_if=arch == 'amd64'),
+                                 arch == 'x86_64'),
+                      build_if=arch == 'x86_64'),
 
-             self.Arg(import_if=(cpu.vendor not in ('GenuineIntel',
-                                                    'AuthenticAMD'))),
+             self.Arg(),
             ]
         ]
 

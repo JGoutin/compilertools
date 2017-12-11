@@ -11,16 +11,18 @@
 #       https://github.com/flababah/cpuid.py/blob/master/cpuid.py
 #       https://github.com/workhorsy/py-cpuinfo/blob/master/cpuinfo/cpuinfo.py
 
-from compilertools.processors import ProcessorBase
+from compilertools.processors import ProcessorBase as _ProcessorBase
 
 __all__ = ['Processor']
 
 
-class Processor(ProcessorBase):
+class Processor(_ProcessorBase):
     """x86 CPU"""
 
     def __init__(self, current_machine=False):
-        ProcessorBase.__init__(self, current_machine)
+        _ProcessorBase.__init__(self, current_machine)
+        self._default['os_supports_avx'] = False
+        self._default['cpuid_highest_extended_function'] = 0
 
         if current_machine:
             # CPUID functions
@@ -29,23 +31,11 @@ class Processor(ProcessorBase):
             self['os_supports_avx'] = cpuinfo.info.supports_avx
 
             # Cache values for not querry CPUID each time
-            self['cpuid_max_extended'] = (
+            self['cpuid_highest_extended_function'] = (
                 self.cpuid(0x80000000)['eax'])
             self._cpuid_vendor_id()
             self._cpuid_brand()
             self._cpuid_feature_flags()
-
-    @property
-    def cpuid_highest_extended_function(self):
-        """Highest CPUID Extended Function"""
-        return self.get('cpuid_max_extended', 0)
-
-    @property
-    def system_support_avx(self):
-        """True if operating system support AVX.
-
-        AVX can't be used if CPU support AVX but not operating system."""
-        return self.get('os_supports_avx', False)
 
     @staticmethod
     def _uint_to_str(*uints):

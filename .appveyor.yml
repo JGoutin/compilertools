@@ -1,0 +1,31 @@
+environment:
+    matrix:
+        - PYTHON: "C:\\Python36-x64"
+        - PYTHON: "C:\\Python36"
+        - PYTHON: "C:\\Python35-x64"
+        - PYTHON: "C:\\Python34-x64"
+platform: 
+    matrix:
+        - x64
+        - x86
+matrix:
+    fast_finish: true
+    exclude:
+        - PYTHON: "C:\\Python36-x64"
+          platform: x86
+        - PYTHON: "C:\\Python35-x64"
+          platform: x86
+        - PYTHON: "C:\\Python34-x64"
+          platform: x86
+
+build: off
+
+install:
+    - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+    - "python -m pip install pytest coverage pytest-cov coveralls[yaml] x86cpu"
+
+test_script:
+    - "py.test -v --cov=compilertools --cov-report=term-missing"
+    
+after_test:
+    - "coveralls"

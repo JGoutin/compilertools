@@ -7,5 +7,5 @@ def tests_config():
     from compilertools._config import CONFIG
 
     # Check sections presence and type
-    assert isinstance(CONFIG.get('arch_alias'), Mapping)
-    assert isinstance(CONFIG.get('compiler_alias'), Mapping)
+    assert isinstance(CONFIG.get('architectures'), Mapping)
+    assert isinstance(CONFIG.get('compilers'), Mapping)

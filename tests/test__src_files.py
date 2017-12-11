@@ -9,38 +9,44 @@ def tests_any_line_startwith():
     from compilertools._src_files import _any_line_startwith
 
     with TemporaryDirectory() as tmp:
-        # Create file
+        # Create dummy files
         files = [join(tmp, 'file.ext1'), join(tmp, 'file.ext2')]
         with open(files[0], 'wt') as file:
             file.write("\nazerty\n\tuiop\nqsdfgh\n")
         with open(files[1], 'wt') as file:
             file.write("\tWXCVBN\nUIOP\n   JKLM\n")
 
-        # Test files content
-        assert _any_line_startwith(files, {
-            '.ext1': 'uiop'})
-        assert _any_line_startwith(files, {
-            '.ext2': 'uiop'})
-        assert not _any_line_startwith(files, {
-            '.ext3': 'uiop'})
-        assert not _any_line_startwith(files, {
-            '.ext1': 'wxcvbn', '.ext2': 'azerty'})
-        assert _any_line_startwith(files, {
-            '.ext1': ['uiop', 'qsd']})
+        # Test existing files content
+        assert _any_line_startwith(files,{'.ext1': 'uiop'})
 
-        # str argument
-        assert _any_line_startwith(files[0], {
-            '.ext1': 'uiop'})
+        # Test ignore case
+        assert _any_line_startwith(files, {'.ext2': 'uiop'})
+
+        # Test non existing file
+        assert not _any_line_startwith(files, {'.ext3': 'uiop'})
+
+        # Test non existing file content
+        assert not _any_line_startwith(
+            files, {'.ext1': 'wxcvbn', '.ext2': 'azerty'})
+
+        # Test content list
+        assert _any_line_startwith(files, {'.ext1': ['uiop', 'qsd']})
+
+        # Test str argument auto-conversion
+        assert _any_line_startwith(files[0], {'.ext1': 'uiop'})
 
 def tests_ignore_api():
     """Test _ignore_api"""
     from compilertools.compilers import CompilerBase
     from compilertools._src_files import _ignore_api
+    
+    # Create compiler
+    compiler = CompilerBase()
 
+    # No compiler
     assert _ignore_api(None, 'test') is False
 
     # API not supported
-    compiler = CompilerBase()
     assert _ignore_api(compiler, 'test') is True
 
     # API supported (compiler)
@@ -52,9 +58,11 @@ def tests_startwith_exts():
     from compilertools._src_files import _startwith_exts
 
     # List arguments
-    result = _startwith_exts(c=['c1', 'c2'], fortran=['fortran'])
+    result = _startwith_exts(c=['c1', 'c2'], fortran=['fortran'],
+                             not_exists=['not_exists'])
     assert list(result['.c']) == ['c1', 'c2']
     assert list(result['.f']) == ['fortran']
+    assert [key for key in result if 'not_exists' in result[key]] == []
 
     # str or None arguments
     result = _startwith_exts(c='c', fortran=None)
@@ -68,6 +76,7 @@ def tests_use_api_pragma():
     from os.path import join
     from compilertools.compilers import CompilerBase
     from compilertools._src_files import _use_api_pragma
+    compiler = CompilerBase()
 
     with TemporaryDirectory() as tmp:
         # Create file
@@ -78,7 +87,6 @@ def tests_use_api_pragma():
             file.write("\tytreza\n\tuiop\nqsdfgh\n")
 
         # API not supported by compiler
-        compiler = CompilerBase()
         assert _use_api_pragma(files, compiler, 'test', c='azerty') is False
 
         # API supported and file using it

@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
 """Building functions"""
 
-from functools import wraps
-from copy import deepcopy
+from functools import wraps as _wraps
+from copy import deepcopy as _deepcopy
 
-try:
-    # Import Setuptools if available for enabling its distutils patches
-    import setuptools
-except ImportError:
-    pass
-
-from distutils.sysconfig import get_config_var
-from distutils.command.build_ext import build_ext
+from distutils.sysconfig import get_config_var as _get_config_var
+from distutils.command.build_ext import build_ext as _build_ext
 
 from compilertools._config_build import CONFIG_BUILD
 from compilertools._core import (
@@ -19,7 +13,8 @@ from compilertools._core import (
 from compilertools._src_files import _use_api_pragma
 
 
-__all__ = ['get_build_compile_args', 'get_build_link_args', 'CONFIG_BUILD']
+__all__ = ['get_build_compile_args', 'get_build_link_args', 'CONFIG_BUILD',
+           'get_compile_args', 'get_compiler', 'suffixe_from_args']
 
 
 def get_build_compile_args(compiler=None, arch=None, current_machine=None,
@@ -38,9 +33,9 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
     """
     # Default values
     if ext_suffix is None:
-        ext_suffix = get_config_var('EXT_SUFFIX')
+        ext_suffix = _get_config_var('EXT_SUFFIX')
     if current_machine is None:
-        current_machine = CONFIG_BUILD.get('current_machine', False)
+        current_machine = CONFIG_BUILD['current_machine']
 
     # Compiler and base arguments
     build_args = {}
@@ -52,9 +47,21 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
 
     # Args for multiple machines
     else:
+        disabled_suffixes = CONFIG_BUILD['disabled_suffixes']
         args = get_compile_args(compiler, arch, current_compiler=True)
-        suffixes = suffixe_from_args(args, ext_suffix, True)
-        for arg, suffix in zip(args.values(), suffixes):
+
+        # Filter disabled suffixes and remove file to not build.
+        # Don't filter at a previous stage, because we need to remove them
+        # only for building and not on current machine
+        for suffixes in set(args):
+            for suffix in suffixes.split('-'):
+                if suffix in disabled_suffixes:
+                    del args[suffixes]
+                    break
+
+        # Add to build arguments
+        for arg, suffix in zip(args.values(),
+                               suffixe_from_args(args, ext_suffix, True)):
             build_args[suffix] = arg
 
     # Extend args with special options
@@ -62,11 +69,11 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
 
     if use_api:
         # Add API args
-        _add_args(compiler, build_args, 'api', 'compile', use_api)
+        _add_args(compiler, arg_ext, 'api', 'compile', use_api)
 
     if use_option:
         # Add options args
-        _add_args(compiler, build_args, 'option', 'compile', use_option)
+        _add_args(compiler, arg_ext, 'option', 'compile', use_option)
 
     if arg_ext:
         for suffix in build_args:
@@ -109,9 +116,24 @@ def _add_args(compiler, arg_list, arg_cat, arg_type, args_names):
     arg_type: 'link' or 'compile'.
     args_names: list of args names to use."""
     for name in args_names:
-        arg = compiler.get(arg_cat, {}).get(arg_type, {}).get(name)
-        if arg:
-            arg_list.append(arg)
+        try:
+            arg_list.append(compiler[arg_cat][name][arg_type])
+        except KeyError:
+            continue
+
+
+class _String(str):
+    """str with "parent_extension" extra attribute"""
+    parent_extension = None
+
+    @_wraps(str.split)
+    def split(self, *args, **kwargs):
+        """Split String, but keep "parent_extension" attribute"""
+        splitted = str.split(self, *args, **kwargs)
+        for i, string in enumerate(splitted):
+            splitted[i] = _String(string)
+            splitted[i].parent_extension = self.parent_extension
+        return splitted
 
 
 def _update_extension(self, ext):
@@ -120,20 +142,21 @@ def _update_extension(self, ext):
 
     self: build_ext instance
     ext: Extension instance from build_ext.extensions"""
-    if CONFIG_BUILD.get('disabled', False):
+    if CONFIG_BUILD['disabled']:
         return [ext]
 
     compiler = get_compiler(self.compiler.compiler_type)
 
     # Options list
-    config_options = CONFIG_BUILD.get('option', {})
+    config_options = CONFIG_BUILD['option']
     option_list = [option for option in config_options
                    if config_options[option]]
 
     # API detection
     api_list = []
-    for api in CONFIG_BUILD.get('api', {}):
-        if _use_api_pragma(ext.sources, compiler, api, **CONFIG_BUILD['api'][api]):
+    config_api = CONFIG_BUILD['api']
+    for api in config_api:
+        if _use_api_pragma(ext.sources, compiler, api, **config_api[api]):
             api_list.append(api)
 
     # Optimized arguments
@@ -156,13 +179,13 @@ def _update_extension(self, ext):
         compile_args = args[suffix]
 
         # Create an Extension copy
-        ext._compilertools_updated = True
+        ext.compilertools_updated = True
         if suffix:
-            ext_copy = deepcopy(ext)
-            ext_copy._compilertools_extended_suffix = '.' + suffix
-            # String deepcopy, for extension identification based only on this
-            # poor info in "_patch_get_ext_filename"
-            ext_copy.name = (ext.name + ' ')[:-1]
+            ext_copy = _deepcopy(ext)
+            ext_copy.compilertools_extended_suffix = suffix
+            # Use a str subclass to add ability to store extension reference
+            ext_copy.name = _String(ext.name)
+            ext_copy.name.parent_extension = ext_copy
         else:
             ext_copy = ext
 
@@ -182,54 +205,104 @@ def _update_extension(self, ext):
 # with wrapping
 
 def _patch_build_extension(build_extension):
-    """Patch build_ext.build_extension for run it as many time as needed for
+    """Decorate build_ext.build_extension for run it as many time as needed for
     newly updated extensions"""
-    @wraps(build_extension)
+    if build_extension.__module__.startswith('compilertools.'):
+        return build_extension
+
+    @_wraps(build_extension)
     def patched(self, ext):
+        """Patched build_extension"""
         # Already updated, only need to build
-        if hasattr(ext, '_compilertools_updated'):
+        if hasattr(ext, 'compilertools_updated'):
             return build_extension(self, ext)
 
         # Not updated, update and build
         for updated_ext in _update_extension(self, ext):
             build_extension(self, updated_ext)
 
+    patched.__module__ = 'compilertools.%s' % patched.__module__
     return patched
 
 
 def _patch_get_ext_filename(get_ext_filename):
-    """Patch build_ext.get_ext_filename for return the filename with our
+    """Decorate build_ext.get_ext_fullname for return the filename with our
     suffixes"""
-    @wraps(get_ext_filename)
+    if get_ext_filename.__module__.startswith('compilertools.'):
+        return get_ext_filename
+
+    @_wraps(get_ext_filename)
     def patched(self, ext_name):
-        # Find extension linked to name, and eventually extended suffix
-        extended = ''
-        for ext in self.extensions:
-            # This function don't give link to Extension, we only have the
-            # name. For find extensions, we need to check if the name is the
-            # the one from the extension. But, for this we need to first be
-            # sure each name have a different ID
-            # (see _update_extension "String Deepcopy")
-            if ext_name is ext.name:
-                if hasattr(ext, '_compilertools_extended_suffix'):
-                    extended = ext._compilertools_extended_suffix.replace(
-                        '.', '#')
-                    ext_name = ext_name + extended
-                break
+        """Patched get_ext_filename"""
+        # Get extension linked to name, and eventually extended suffix
+        try:
+            extended = ext_name.parent_extension.compilertools_extended_suffix
+        except AttributeError:
+            extended = ''
 
-        # Use classic function to find filename
-        ext_filename = get_ext_filename(self, ext_name)
-
-        # Clean up name and return
+        # Return extended name
         if extended:
-            ext_filename = ext_filename.replace('#', '.')
-        return ext_filename
+            # Replace "." by "#" for avoiding repacement by "/" in
+            # "get_ext_filename"
+            return get_ext_filename(
+                self, '%s%s' % (
+                    ext_name, extended.replace('.', '#'))).replace('#', '.')
+
+        # Return not extended name
+        return get_ext_filename(self, ext_name)
+
+    patched.__module__ = 'compilertools.%s' % patched.__module__
+    return patched
+
+
+def _patch_get_ext_fullname(get_ext_fullname):
+    """Decorate build_ext.get_ext_fullname for _String type conservation"""
+    if get_ext_fullname.__module__.startswith('compilertools.'):
+        return get_ext_fullname
+
+    @_wraps(get_ext_fullname)
+    def patched(self, ext_name):
+        """Patched get_ext_fullname"""
+        # Get full name
+        full_name = get_ext_fullname(self, ext_name)
+
+        # Keep type if changed
+        if isinstance(ext_name, _String) and not isinstance(full_name, _String):
+            full_name = _String(full_name)
+            full_name.parent_extension = ext_name.parent_extension
+
+        return full_name
+
+    patched.__module__ = 'compilertools.%s' % patched.__module__
+    return patched
+
+
+def _patch___new__(__new__):
+    """Patch "build_ext.__new__" for helping patching subclasses.
+
+    This is needed when subclass totally override methods without calling
+    parent's methods inside them.
+
+    (This is the case in "numpy.distutils")."""
+
+    def patched(cls, _):
+        """Patched __new__"""
+        # Patch methods if not already patched
+        cls.build_extension = _patch_build_extension(cls.build_extension)
+        cls.get_ext_filename = _patch_get_ext_filename(cls.get_ext_filename)
+        cls.get_ext_fullname = _patch_get_ext_fullname(cls.get_ext_fullname)
+
+        # Instanciate
+        return __new__(cls)
 
     return patched
 
 
 # Apply monkey-patches to distutils
-build_ext.build_extension = _patch_build_extension(
-    build_ext.build_extension)
-build_ext.get_ext_filename = _patch_get_ext_filename(
-    build_ext.get_ext_filename)
+_build_ext.build_extension = _patch_build_extension(
+    _build_ext.build_extension)
+_build_ext.get_ext_filename = _patch_get_ext_filename(
+    _build_ext.get_ext_filename)
+_build_ext.get_ext_fullname = _patch_get_ext_fullname(
+    _build_ext.get_ext_fullname)
+_build_ext.__new__ = _patch___new__(_build_ext.__new__)

@@ -1,3 +1,36 @@
 # -*- coding: utf-8 -*-
 """Tests for GNU Compiler Collection"""
-# TODO: tests
+
+
+def tests_compiler_base():
+    """Test Compiler"""
+    from compilertools.compilers._core import _get_arch_and_cpu
+    from compilertools.compilers.gcc import Compiler
+
+    # Initialize compiler
+    compiler = Compiler()
+
+    # Initialize system configurations
+    arch_x86, cpu_x86 = _get_arch_and_cpu('x86')
+    arch_amd64, cpu_amd64 = _get_arch_and_cpu('x86_64')
+
+    # Test _compile_args_matrix
+    assert compiler._compile_args_matrix(arch_x86, cpu_x86)
+    assert compiler._compile_args_matrix(arch_amd64, cpu_amd64)
+
+    # Test _compile_args_current_machine with x86
+    args = compiler._compile_args_current_machine(arch_x86, cpu_x86)
+    assert args
+    assert '-march=native' in args
+
+    # Check retun a result also with amd64 
+    assert compiler._compile_args_current_machine(arch_amd64, cpu_amd64)
+
+    # Check -mfpmath with or without SSE
+    cpu_x86['features'] = ['sse']
+    args = compiler._compile_args_current_machine(arch_x86, cpu_x86)
+    assert '-mfpmath=sse' in args
+
+    cpu_x86['features'] = []
+    args = compiler._compile_args_current_machine(arch_x86, cpu_x86)
+    assert '-mfpmath=sse' not in args

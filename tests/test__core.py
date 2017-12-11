@@ -1,6 +1,12 @@
 # -*- coding: utf-8 -*-
 """Test for core functionalities"""
 
+def tests_version():
+    """Test __version__ presence and format"""
+    from compilertools import __version__
+    from distutils.version import StrictVersion
+    assert StrictVersion(__version__)
+
 
 def tests_get_compile_args():
     """Test get_compile_args"""
@@ -8,36 +14,24 @@ def tests_get_compile_args():
     from compilertools._core import get_compile_args
     from compilertools.compilers import CompilerBase
 
+    # Create a compiler
     class Compiler(CompilerBase):
         """Dummy Compiler"""
 
-        def compile_args_matrix(self, arch):
+        def _compile_args_matrix(self, arch, cpu):
             """Return test args matrix"""
             return [
-
                 [self.Arg(args=['--generic'])],
-
-                [self.Arg(args='--inst1',
-                          suffix='inst1'),
-
-                 self.Arg(args='--inst2',
-                          suffix='inst2',
+                [self.Arg(args='--inst1', suffix='inst1'),
+                 self.Arg(args='--inst2', suffix='inst2',
                           # Not compatible with current compiler
                           build_if=False),
-
-                 self.Arg(),
-                ],
-
+                 self.Arg()],
                 # Compatible only with a specific arch
-                [self.Arg(args='--arch1',
-                          suffix='arch1',
+                [self.Arg(args='--arch1', suffix='arch1',
                           import_if=(arch == 'arch1')),
-
-                 self.Arg(args='--arch2',
-                          suffix='arch2',
-                          import_if=(arch == 'arch2')),
-                ]
-            ]
+                 self.Arg(args='--arch2', suffix='arch2',
+                          import_if=(arch == 'arch2'))]]
 
     compiler = Compiler()
 
@@ -76,11 +70,18 @@ def tests_suffixe_from_args():
                         ('suffixe2', ['-arg1', '-arg3']),
                         ('', ['-arg1'])])
 
+    # Default
     assert suffixe_from_args(args) == [
         '.suffixe1', '.suffixe2']
+
+    # With extension
     assert suffixe_from_args(args, '.pyd') == [
         '.suffixe1.pyd', '.suffixe2.pyd']
+
+    # With empty suffixes
     assert suffixe_from_args(args, return_empty_suffixes=True) == [
         '.suffixe1', '.suffixe2', '']
+
+    # With extension and emtpy suffixes
     assert suffixe_from_args(args, '.pyd', True) == [
         '.suffixe1.pyd', '.suffixe2.pyd', '.pyd']

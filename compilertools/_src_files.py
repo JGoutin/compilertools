@@ -21,8 +21,9 @@ def _any_line_startwith(sources, criterion):
     # Check files for criterions
     for source in sources:
         # Select criterions based on file extension
-        startswiths = criterion.get(splitext(source)[1].lower(), '')
-        if not startswiths:
+        try:
+            startswiths = criterion[splitext(source)[1].lower()]
+        except KeyError:
             continue
 
         # Check criterions
@@ -40,7 +41,7 @@ def _ignore_api(compiler, api):
 
     compiler: Compiler to check.
     api: API to check the compiler support."""
-    if compiler is None or compiler.support_api(api):
+    if compiler is None or api in compiler['api']:
         return False
     return True
 
@@ -54,12 +55,15 @@ def _startwith_exts(**startswiths_dict):
     """
     startwith_exts = {}
 
-    get_extensions = CONFIG_BUILD.get('extensions', {}).get
+    config_extensions = CONFIG_BUILD['extensions']
     for key in startswiths_dict:
         startswiths = startswiths_dict[key]
-        exts = get_extensions(key, [])
-
         if startswiths is None:
+            continue
+
+        try:
+            exts = config_extensions[key]
+        except KeyError:
             continue
 
         # Make sure arguments are iterables

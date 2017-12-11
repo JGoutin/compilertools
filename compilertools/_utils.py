@@ -35,13 +35,27 @@ def import_class(package_name, module_name, class_name, default_class):
 
 
 class BaseClass(MutableMapping):
-    """Base class for data storage classes"""
+    """Base class for data storage classes
+    with default values and attribute access"""
 
     def __init__(self):
         self._items = {}
+        self._default = {}
 
     def __getitem__(self, key):
-        return self._items.__getitem__(key)
+        try:
+            return self._items.__getitem__(key)
+        except KeyError:
+            return self._default.__getitem__(key)
+
+    def __getattr__(self, name):
+        try:
+            return self._items.__getitem__(name)
+        except KeyError:
+            try:
+                return self._default.__getitem__(name)
+            except KeyError:
+                raise AttributeError
 
     def __setitem__(self, key, value):
         return self._items.__setitem__(key, value)

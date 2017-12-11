@@ -1,0 +1,15 @@
+language: python
+
+python:
+    - "3.4"
+    - "3.5"
+    - "3.6"
+ 
+install:
+    - "python -m pip install pytest coverage pytest-cov coveralls[yaml] x86cpu"
+
+script:
+    - "py.test -v --cov=compilertools --cov-report=term-missing"
+
+after_success:
+    - "coveralls"

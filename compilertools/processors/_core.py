@@ -17,8 +17,22 @@ def get_arch(arch=None):
         arch = machine()
     arch = arch.lower()
 
+    arch_dict = CONFIG['architectures']
+
+    # If cross compilation, keep only target architecture
+    if '_' in arch:
+        current, target =  arch.split('_', 1)
+        if current in arch_dict and target in arch_dict:
+            arch = target
+
+    # Prefixed architecture name ('linux-x86_64', 'win-amd64', ...)
+    if arch not in arch_dict and '-' in arch:
+        name = arch.rsplit('-', 1)[1]
+        if name in arch_dict:
+            arch = name
+
     # Aliases for architectures names
-    arch = CONFIG.get('arch_alias', {}).get(arch, arch)
+    arch = arch_dict.get(arch, arch)
 
     return arch
 
@@ -38,23 +52,7 @@ class ProcessorBase(BaseClass):
     def __init__(self, current_machine=False):
         BaseClass.__init__(self)
         self['current_machine'] = current_machine
-
-    @property
-    def vendor(self):
-        """CPU manufacturer"""
-        return self.get('vendor', '')
-
-    @property
-    def brand(self):
-        """CPU brand"""
-        return self.get('brand', '')
-
-    @property
-    def features(self):
-        """CPU features"""
-        return self.get('features', [])
-
-    @property
-    def is_current_machine(self):
-        """Return True is CPU is from current machine"""
-        return self.get('current_machine', False)
+        self._default['current_machine'] = False
+        self._default['vendor'] = ''
+        self._default['brand'] = ''
+        self._default['features'] = []

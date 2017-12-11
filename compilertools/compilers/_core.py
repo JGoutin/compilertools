@@ -23,10 +23,75 @@ def get_compiler(compiler=None):
         compiler = get_default_compiler()
 
     # Aliases for compilers names
-    compiler = CONFIG.get('compiler_alias', {}).get(compiler, compiler)
+    compiler = CONFIG.get('compilers', {}).get(compiler, compiler)
 
     # Return compiler
     return import_class('compilers', compiler, 'Compiler', CompilerBase)()
+
+
+def _get_arch_and_cpu(arch=None, current_machine=False):
+    """Return arch and update CPU linked to compiler
+
+    arch: if None, use current computer arch, else use specified"""
+    # Get Architecture
+    arch = get_arch(arch)
+
+    # Get CPU
+    return arch, get_processor(arch, current_machine=current_machine)
+
+
+def _order_args_matrix(args_matrix, current_machine=False,
+                       current_compiler=False):
+    """Convert args matrix to args ordered dict {suffix: arg}
+
+    args_matrix : result from self._compile_args_matrix or
+        self._link_args_matrix
+    current_machine : If True, return only arguments compatibles with
+        current machine (conditions from "import_if").
+    current_compiler : If True, return only arguments compatibles with
+        current compiler (conditions from "build_if")."""
+
+    # Create args combinations from args matrix
+    args_combinations = OrderedDict()
+    for args in product(*args_matrix):
+        args_list = []
+        suffix_list = []
+        is_compatible = True
+        for arg in args:
+            # Import conditions
+            if current_machine:
+                is_compatible = not(
+                    not arg.import_if or not is_compatible)
+
+            # Build condition
+            if current_compiler:
+                is_compatible = not(
+                    not arg.build_if or not is_compatible)
+
+            # Don't add incompatible args
+            if not is_compatible:
+                break
+
+            # Get argument
+            arg_arg = arg.args
+            if arg_arg:
+                if isinstance(arg_arg, str):
+                    args_list.append(arg_arg)
+                else:
+                    args_list.extend(arg_arg)
+
+            # Get suffix
+            arg_suffix = arg.suffix
+            if arg_suffix:
+                suffix_list.append(arg_suffix.
+                                   replace('.', '_').
+                                   replace('-', '_'))
+
+        # Add compatibles args
+        if is_compatible:
+            args_combinations['-'.join(suffix_list)] = args_list
+
+    return args_combinations
 
 
 class CompilerBase(BaseClass):
@@ -46,7 +111,7 @@ class CompilerBase(BaseClass):
            compiled with this argument (ex architecture compatibility).
            Default value is True.
 
-       build_if: Condition that must be True for cimpile file with
+       build_if: Condition that must be True for compile file with
            this argument and the current compiler (Ex compiler version).
            Default value is True.""")
 
@@ -54,17 +119,33 @@ class CompilerBase(BaseClass):
         BaseClass.__init__(self)
         self['api'] = {}
         self['option'] = {}
+        self._default['version'] = 0.0
 
-    def get_arch_and_cpu(self, arch=None, current_machine=False):
-        """Return arch and update CPU linked to compiler
+    def _compile_args_matrix(self, arch, cpu):
+        """Return compiler arguments availables for the specified CPU
+        architecture as a matrix.
 
-        arch: if None, use current computer arch, else use specified"""
-        # Get Architecture
-        arch = get_arch(arch)
+        Override for define matrix.
 
-        # Get CPU
-        self._cpu = get_processor(arch, current_machine=current_machine)
-        return get_arch(arch)
+        arch: CPU Architecture str.
+        cpu: Processor instance"""
+        raise NotImplementedError
+
+    def _compile_args_current_machine(self, arch, cpu):
+        """Define optimized arguments for current machine.
+
+        By default, get the best options from compile_args method.
+
+        Override for define another behavior.
+
+        arch: CPU Architecture str
+        cpu: Processor instance"""
+        args = _order_args_matrix(
+            self._compile_args_matrix(arch, cpu), current_machine=True)
+
+        if not args:
+            return []
+        return args[list(args)[0]]
 
     def compile_args(self, arch=None, current_machine=False,
                      current_compiler=False):
@@ -75,103 +156,13 @@ class CompilerBase(BaseClass):
             current machine (conditions from "import_if").
         current_compiler : If True, return only arguments compatibles with
             current compiler (conditions from "build_if")."""
-        # Update arch and CPU
-        arch = self.get_arch_and_cpu(arch, current_machine=current_machine)
-
-        # Compute argments
-        return self._order_args_matrix(self.compile_args_matrix(arch),
-                                       current_machine, current_compiler)
-
-    def compile_args_matrix(self, arch):
-        """Return compiler arguments availables for the specified CPU
-        architecture as a matrix.
-
-        arch: CPU Architecture str."""
-        return []
+        return _order_args_matrix(
+            self._compile_args_matrix(
+                *_get_arch_and_cpu(arch, current_machine=current_machine)),
+                     current_machine, current_compiler)
 
     def compile_args_current_machine(self):
-        """Return compiler arguments optimised by compiler for current
+        """Return compiler arguments optimized by compiler for current
         machine"""
-        # Update arch and CPU
-        arch = self.get_arch_and_cpu(current_machine=True)
-
-        # Compute argments
-        args = self.compile_args(arch, current_machine=True)
-        if not args:
-            return []
-        return args[list(args)[0]]
-
-    @staticmethod
-    def _order_args_matrix(args_matrix, current_machine=False,
-                           current_compiler=False):
-        """Convert args matrix to args ordered dict {suffix: arg}
-
-        args_matrix : result from self._compile_args_matrix or
-            self._link_args_matrix
-        current_machine : If True, return only arguments compatibles with
-            current machine (conditions from "import_if").
-        current_compiler : If True, return only arguments compatibles with
-            current compiler (conditions from "build_if")."""
-
-        # Create args combinations from args matrix
-        args_combinations = OrderedDict()
-        for args in product(*args_matrix):
-            args_list = []
-            suffix_list = []
-            is_compatible = True
-            for arg in args:
-                # Import conditions
-                if current_machine:
-                    is_compatible = not(
-                        not arg.import_if or not is_compatible)
-
-                # Build condition
-                if current_compiler:
-                    is_compatible = not(
-                        not arg.build_if or not is_compatible)
-
-                # Don't add incompatible args
-                if not is_compatible:
-                    break
-
-                # Get argument
-                arg_arg = arg.args
-                if arg_arg:
-                    if isinstance(arg_arg, str):
-                        args_list.append(arg_arg)
-                    else:
-                        args_list.extend(arg_arg)
-
-                # Get suffix
-                arg_suffix = arg.suffix
-                if arg_suffix:
-                    suffix_list.append(arg_suffix.
-                                       replace('.', '_').
-                                       replace('-', '_'))
-
-            # Add compatibles args
-            if is_compatible:
-                args_combinations['-'.join(suffix_list)] = args_list
-
-        return args_combinations
-
-    @property
-    def version(self):
-        """Compiler version"""
-        return self.get('version', 0.0)
-
-    def support_api(self, api):
-        """Check if compiler support specific API.
-
-        api: API name ('openmp', ...)"""
-        if api in self['api']:
-            return True
-        return False
-
-    def support_option(self, option):
-        """Check if compiler support specific option.
-
-        api: Option name ('fast_fpmath',...)"""
-        if option in self['option']:
-            return True
-        return False
+        return self._compile_args_current_machine(
+            *_get_arch_and_cpu(current_machine=True))

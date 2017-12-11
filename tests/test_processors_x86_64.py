@@ -12,11 +12,14 @@ def tests_processor():
         from pytest import skip
         skip("Current processor is not x86-64")
 
-    # Test CPUID
-    # TODO: test
-
     # Test instanciation
     from compilertools.processors.x86_64 import Processor
     processor = Processor(current_machine=True)
-
     assert processor.features
+
+    # Test CPUID
+    reg = processor.cpuid(0)
+    assert reg.get('eax')
+    assert reg.get('edx')
+    assert reg.get('ecx')
+    assert reg.get('ebx')

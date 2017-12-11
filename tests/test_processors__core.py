@@ -12,11 +12,17 @@ def tests_get_arch():
 
     # Current arch
     arch = machine().lower()
-    assert get_arch() == CONFIG['arch_alias'].get(arch, arch)
+    assert get_arch() == CONFIG['architectures'].get(arch, arch)
 
     # Test aliases
-    for arch in CONFIG['arch_alias']:
-        assert get_arch(arch) == CONFIG['arch_alias'][arch]
+    for arch in CONFIG['architectures']:
+        assert get_arch(arch) == CONFIG['architectures'][arch]
+
+    # Test cross compilation
+    assert get_arch('x86_amd64') == 'x86_64'
+
+    # Test prefixed architecture
+    assert get_arch('linux-x86_64') == 'x86_64'
 
 
 def tests_get_processor():
@@ -34,10 +40,11 @@ def tests_get_processor():
         if file.startswith('_'):
             continue
         name = splitext(file)[0]
+
         processor = get_processor(name, current_machine=current_machine)
         assert (processor.__class__.__module__ ==
                 'compilertools.processors.%s' % name)
-        assert processor.is_current_machine is current_machine
+        assert processor.current_machine is current_machine
 
 
 def tests_processor_base():
@@ -46,10 +53,10 @@ def tests_processor_base():
 
     # Test current machine
     processor = ProcessorBase()
-    assert processor.is_current_machine is False
+    assert processor.current_machine is False
 
     processor = ProcessorBase(current_machine=True)
-    assert processor.is_current_machine is True
+    assert processor.current_machine is True
 
     # Test properties
     assert processor.vendor == ''
