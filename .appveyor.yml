@@ -6,8 +6,8 @@ environment:
         - PYTHON: "C:\\Python34-x64"
 platform: 
     matrix:
-        - x64
-        - x86
+        - "x64"
+        - "x86"
 matrix:
     fast_finish: true
     exclude:
