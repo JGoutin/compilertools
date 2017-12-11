@@ -55,7 +55,7 @@ class Compiler(_CompilerBase):
                                 '-mssse3', '-msse2', '-msse'],
                           suffix='avx2',
                           import_if=('avx2' in cpu.features and
-                                     cpu.system_support_avx)),
+                                     cpu.os_supports_avx)),
 
                  self.Arg(args=['-mavx', '-msse4.2', '-msse4.1', '-mssse3',
                                 '-msse2', '-msse'],
