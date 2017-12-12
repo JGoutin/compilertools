@@ -10,6 +10,26 @@ def tests_compiler_base():
     # Initialize compiler
     compiler = Compiler()
 
+    # Test _get_build_version
+    # Monkey patch platform.python_compiler for
+    # forcing its value
+    version = ''
+
+    def dummy_compiler():
+        return version
+
+    platform_python_compiler = platform.python_compiler
+    platform.python_compiler = dummy_compiler
+
+    # Check not existing version
+    compiler._get_build_version()
+    assert compiler.version == 0.0
+
+    # Check existing version
+    version = 'GCC 6.3.1 64bit'
+    compiler._get_build_version()
+    assert compiler.version == 6.3
+
     # Initialize system configurations
     arch_x86, cpu_x86 = _get_arch_and_cpu('x86')
     arch_amd64, cpu_amd64 = _get_arch_and_cpu('x86_64')
