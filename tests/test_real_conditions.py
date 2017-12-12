@@ -58,6 +58,10 @@ def _build_and_import(
     # This import also enable compilertools build patches
     from compilertools.build import get_build_compile_args
     from compilertools.imports import ARCH_SUFFIXES
+    from compilertools._config_build import CONFIG_BUILD
+
+    # Compile all possibilities
+    CONFIG_BUILD['disabled_suffixes'].clear()
 
     # Build
     with TemporaryDirectory() as tmp:

@@ -14,7 +14,7 @@ CONFIG_BUILD = {
     # Complete this set to not build files for a specific architecture.
     # This does not affect current machine builds.
     'disabled_suffixes': {
-        'sse', 'ssse3', 'sse4_1', 'intel_atom'
+        'sse', 'ssse3', 'sse4_1', 'intel_atom', 'intel', 'amd'
         },
 
     # Enable compilers options
