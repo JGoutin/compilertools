@@ -4,6 +4,7 @@
 
 def tests_compiler_base():
     """Test Compiler"""
+    import platform
     from compilertools.compilers._core import _get_arch_and_cpu
     from compilertools.compilers.gcc import Compiler
 
