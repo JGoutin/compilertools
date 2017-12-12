@@ -55,3 +55,6 @@ def tests_compiler_base():
     cpu_x86['features'] = []
     args = compiler._compile_args_current_machine(arch_x86, cpu_x86)
     assert '-mfpmath=sse' not in args
+
+    # Clean up
+    platform.python_compiler = platform_python_compiler
