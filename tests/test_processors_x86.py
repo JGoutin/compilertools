@@ -64,6 +64,7 @@ def tests_processor_nocpu():
             """EAX"""
             return registers[self._eax]['edx']
 
+    x86_cpuid = x86.Cpuid
     x86.Cpuid = Cpuid
 
     # Tests _uint_to_str
@@ -96,6 +97,9 @@ def tests_processor_nocpu():
     assert processor.features == {
         '3dnow!', 'ahf64', 'avx512vl', 'fpu', 'fsgsbase', 'hv', 'pbe',
         'prefetchwt1', 'sse3'}
+
+    # Cleaning
+    x86.Cpuid = x86_Cpuid
 
 
 def tests_processor():
