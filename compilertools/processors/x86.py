@@ -420,15 +420,11 @@ class Cpuid:
 
         finally:
             # Free memory
-            try:
-                if is_windows:
-                    lib.VirtualFree(address, 0, 0x8000)
-                    pass
-                else:
-                    mprotect(address, size, 1 | 2)
-                    lib.free(c_void_p(address))
-            except Exception:
-                pass
+            if is_windows:
+                lib.VirtualFree(c_ulong(address), 0, 0x8000)
+            else:
+                mprotect(address, size, 1 | 2)
+                lib.free(c_void_p(address))
         return result
 
     @property
