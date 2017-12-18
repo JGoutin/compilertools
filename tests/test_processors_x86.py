@@ -99,7 +99,7 @@ def tests_processor_nocpu():
         'prefetchwt1', 'sse3'}
 
     # Cleaning
-    x86.Cpuid = x86_Cpuid
+    x86.Cpuid = x86_cpuid
 
 
 def tests_processor():
