@@ -16,10 +16,3 @@ def tests_processor():
     from compilertools.processors.x86_64 import Processor
     processor = Processor(current_machine=True)
     assert processor.features
-
-    # Test CPUID
-    reg = processor.cpuid(0)
-    assert reg.get('eax')
-    assert reg.get('edx')
-    assert reg.get('ecx')
-    assert reg.get('ebx')

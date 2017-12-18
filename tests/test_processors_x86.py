@@ -4,6 +4,7 @@
 def tests_processor_nocpu():
     """Tests Processor methods that don't need a real x86 CPU"""
     from compilertools.processors.x86 import Processor
+    from compilertools.processors import x86
     processor = Processor()
 
     # Test properties
@@ -36,11 +37,34 @@ def tests_processor_nocpu():
                      'ecx': encoded, 'edx': encoded},
         }
 
-    def cpuid(avx):
+    class Cpuid():
         """Dummy CPUID function"""
-        return registers[avx]
+        
+        def __init__(self, eax, ecx=None):
+            self._eax = eax
+            self._ecx = ecx
 
-    processor.cpuid = cpuid
+        @property
+        def eax(self):
+            """EAX"""
+            return registers[self._eax]['eax']
+
+        @property
+        def ebx(self):
+            """EAX"""
+            return registers[self._eax]['ebx']
+
+        @property
+        def ecx(self):
+            """EAX"""
+            return registers[self._eax]['ecx']
+
+        @property
+        def edx(self):
+            """EAX"""
+            return registers[self._eax]['edx']
+
+    x86.Cpuid = Cpuid
 
     # Tests _uint_to_str
     assert Processor._uint_to_str(
@@ -88,9 +112,25 @@ def tests_processor():
     processor = Processor(current_machine=True)
     assert processor.features
 
-    # Test CPUID
-    reg = processor.cpuid(0)
-    assert reg.get('eax', 0)
-    assert reg.get('edx', 0)
-    assert reg.get('ecx', 0)
-    assert reg.get('ebx', 0)
+ 
+def tests_cpuid():
+    """Test cpuid"""
+    try:
+        from x86cpu import cpuid as cpuid_ref
+    except ImportError:
+        from pytest import skip
+        skip("x86cpu package not installed")
+    from compilertools.processors.x86 import Cpuid
+    
+    for eax, ecx in (
+            (0, 0), (1, 0), (2, 0), (3, 0),
+            (4, 0), (7, 0), (0x80000000, 0),
+            (0x80000001, 0), (0x80000002, 0),
+            (0x80000003, 0), (0x80000004, 0)):
+
+        ref = cpuid_ref(eax, ecx)
+        cpuid = Cpuid(eax, ecx)
+        assert cpuid.eax == ref['eax']
+        assert cpuid.ecx == ref['ecx']
+        assert cpuid.ebx == ref['ebx']
+        assert cpuid.edx == ref['edx']

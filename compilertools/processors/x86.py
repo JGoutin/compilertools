@@ -26,16 +26,13 @@ class Processor(_ProcessorBase):
 
         if current_machine:
             # CPUID functions
-            from x86cpu import cpuid, cpuinfo  # @UnresolvedImport
-            self.cpuid = cpuid
-            self['os_supports_avx'] = cpuinfo.info.supports_avx
-
-            # Cache values for not querry CPUID each time
             self['cpuid_highest_extended_function'] = (
-                self.cpuid(0x80000000)['eax'])
+                Cpuid(0x80000000).eax)
             self._cpuid_vendor_id()
             self._cpuid_brand()
             self._cpuid_feature_flags()
+            self['os_supports_avx'] = (
+                'xsave' in self['features'] and 'osxsave' in self['features'])
 
     @staticmethod
     def _uint_to_str(*uints):
@@ -49,8 +46,8 @@ class Processor(_ProcessorBase):
 
     def _cpuid_vendor_id(self):
         """Update current CPU's manufacturer ID from CPUID"""
-        reg = self.cpuid(0)
-        self['vendor'] = self._uint_to_str(reg['ebx'], reg['edx'], reg['ecx'])
+        reg = Cpuid(0)
+        self['vendor'] = self._uint_to_str(reg.ebx, reg.edx, reg.ecx)
 
     def _cpuid_brand(self):
         """Update current CPU's brand from CPUID"""
@@ -59,8 +56,8 @@ class Processor(_ProcessorBase):
 
         brand_list = []
         for avx in (0x80000002, 0x80000003, 0x80000004):
-            reg = self.cpuid(avx)
-            brand_list += [reg['eax'], reg['ebx'], reg['ecx'], reg['edx']]
+            reg = Cpuid(avx)
+            brand_list += [reg.eax, reg.ebx, reg.ecx, reg.edx]
         self['brand'] = self._uint_to_str(*brand_list)
 
     def _cpuid_feature_flags(self):
@@ -314,10 +311,10 @@ class Processor(_ProcessorBase):
         flags = set()
         add_flag = flags.add
         for avx in sorted(feature_bits_desc):
-            reg = self.cpuid(avx)
+            reg = Cpuid(avx)
             reg_desc = feature_bits_desc[avx]
             for exx in reg_desc:
-                bits = reg[exx]
+                bits = getattr(reg, exx)
                 for bit, feature in enumerate(reg_desc[exx]):
                     if feature is None:
                         continue
@@ -326,3 +323,130 @@ class Processor(_ProcessorBase):
 
         # Return flags
         self['features'] = flags
+
+
+class Cpuid:
+    """Get Processor CPUID
+    eax_value: EAX register value
+    ecx_value: ECX register value"""
+    def __init__(self, eax_value=0, ecx_value=0):
+        # Define bytecode base
+        bytecode = []
+        for reg, value in ((0x0, eax_value), (0x1, ecx_value)):
+            if value == 0:
+                # Set to 0 (XOR reg, reg)
+                bytecode += (
+                    # XOR
+                    b'\x31',
+                    # reg, reg
+                    (0b11000000 | reg | (reg << 3)).to_bytes(1, 'little'))
+            else:
+                # set other value (MOV reg, value)
+                bytecode += (
+                    # MOV reg,
+                    (0b10111000 | reg).to_bytes(1, 'little'),
+                    # Value
+                    (value).to_bytes(4, 'little'))
+
+        self._bytecode_base = b''.join(
+            bytecode +
+            # CPUID
+            [b'\x0F\xA2'])
+
+    def _get_cpuid(self, reg):
+        """Get specified register CPUID result.
+        reg: Register address"""
+        from platform import system
+        from ctypes import (
+            c_void_p, c_size_t, c_ulong, c_uint32, c_int,
+            CFUNCTYPE, memmove)
+
+        # Complete bytecode with result address and RET
+        bytecode = [self._bytecode_base]
+
+        if reg != 0x0:
+            # MOV EAX, reg
+            bytecode += [
+                # MOV
+                b'\x89',
+                # EAX, reg
+                (0b11000000 | (reg << 3)).to_bytes(1, 'little')]
+
+        bytecode = b''.join(
+            bytecode +
+            # RET
+            [b'\xC3'])
+
+        # Execute bytecode
+        is_windows = system() == 'Windows'
+
+        size = len(bytecode)
+        if size < 0x1000:
+            size = 0x1000
+
+        try:
+            # Allocate memory
+            if is_windows:
+                from ctypes import windll
+                lib = windll.kernel32
+                valloc = lib.VirtualAlloc
+                valloc.argtypes = [c_void_p, c_size_t, c_ulong, c_ulong]
+                args = (None, size, 0x1000, 0x40)
+            else:
+                from ctypes import cdll
+                lib = cdll.LoadLibrary(None)
+                valloc = lib.valloc
+                valloc.argtypes = [c_size_t]
+                args = (c_size_t(size), )
+
+            valloc.restype = c_void_p
+            address = valloc(*args)
+            if address == 0:
+                raise RuntimeError('Failed to allocate memory')
+
+            if not is_windows:
+                # Set memory executable
+                mprotect = lib.mprotect
+                mprotect.restype = c_int
+                mprotect.argtypes = [c_void_p, c_size_t, c_int]
+                if mprotect(address, size, 1 | 2 | 4) != 0:
+                    raise RuntimeError('Failed to memory protect')
+
+            # Copy bytecode to memory
+            memmove(address, bytecode, size)
+
+            # Create and execute function
+            result = CFUNCTYPE(c_uint32)(address)()
+
+        finally:
+            # Free memory
+            try:
+                if is_windows:
+                    lib.VirtualFree(address, 0, 0x8000)
+                    pass
+                else:
+                    mprotect(address, size, 1 | 2)
+                    lib.free(c_void_p(address))
+            except Exception:
+                pass
+        return result
+
+    @property
+    def eax(self):
+        """Get EAX register CPUID result"""
+        return self._get_cpuid(0x0)
+
+    @property
+    def ebx(self):
+        """Get EBX register CPUID result"""
+        return self._get_cpuid(0x3)
+
+    @property
+    def ecx(self):
+        """Get ECX register CPUID result"""
+        return self._get_cpuid(0x1)
+
+    @property
+    def edx(self):
+        """Get EDX register CPUID result"""
+        return self._get_cpuid(0x2)

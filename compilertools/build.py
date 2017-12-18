@@ -309,3 +309,17 @@ _build_ext.get_ext_filename = _patch_get_ext_filename(
 _build_ext.get_ext_fullname = _patch_get_ext_fullname(
     _build_ext.get_ext_fullname)
 _build_ext.__new__ = _patch___new__(_build_ext.__new__)
+
+
+# Initialize configuration
+def _init_build_config():
+    """Try to detect if running from PIP, and then assume we need to
+    compile for current machine."""
+    if not isinstance(CONFIG_BUILD['current_machine'], bool):
+        from os.path import basename, dirname
+        CONFIG_BUILD['current_machine'] = (
+            True if basename(dirname(__file__)).startswith('pip-‌​') else
+            False)
+
+_init_build_config()
+del _init_build_config

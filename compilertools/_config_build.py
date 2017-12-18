@@ -8,7 +8,10 @@ CONFIG_BUILD = {
 
     # Compile optimized for current machine only
     # (If not compile for a cluster of possibles machines)
-    'current_machine': False,
+    # True or False for manually set value;
+    #'autodetect' for automatically set value to True if build from
+    # PIP
+    'current_machine': 'autodetect',
 
     # Disabled suffixes in files matrix definition.
     # Complete this set to not build files for a specific architecture.

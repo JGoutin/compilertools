@@ -7,7 +7,6 @@ def tests_compiler_base():
     import platform
     from compilertools.compilers._core import _get_arch_and_cpu
     from compilertools.compilers.msvc import Compiler
-    compiler = Compiler()
 
     # Test _get_build_version
     # Monkey patch platform.python_compiler for
@@ -20,9 +19,11 @@ def tests_compiler_base():
     platform_python_compiler = platform.python_compiler
     platform.python_compiler = dummy_compiler
 
+    compiler = Compiler()
+    
     # Check not existing version
     compiler._get_build_version()
-    assert compiler.version == 6.0
+    assert compiler.version == 0.0
 
     # Check existing version
     version = 'MSC v.1800 64 bit'

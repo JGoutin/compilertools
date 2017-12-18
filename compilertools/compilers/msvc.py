@@ -35,8 +35,6 @@ class Compiler(_CompilerBase):
         version_str = python_compiler()
 
         if 'MSC v.' not in version_str:
-            # Assume compiler is MSVC6
-            self['version'] = 6.0
             return
 
         version_str = version_str.split('MSC v.')[1].split(' ', 1)[0]
