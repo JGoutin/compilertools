@@ -87,14 +87,13 @@ Enable or disable fast-math compiler option.
 
 * Module core : Done
 * Microsoft Visual C++ compiler support : Done
-* GNU Compiler Collection support : Work in progress
-* openMP autodetection: Done
-* openACC autodetection: Done but untested
-* Intel Cilk Plus autodetection: Done but untested
+* GNU Compiler Collection support : Done
+* API autodetection: Done (openMP, opeenACC, Intel Cilk Plus)
 * Unit test (pytest): Done
-* Continuous integration: Work in progress
-* x86/amd64 CPUID : Partial, actually based on external library, but maybe better to internalise this, and if possible, in pure Python.
+* Continuous integration: Done
+* x86/amd64 CPUID : Done
 * Extended configuration: Done
+* PIP autodetection: Done but untested
 
 ## Ideas & possibles futures features
 
@@ -103,9 +102,8 @@ Enable or disable fast-math compiler option.
 * Add it as an option in *setuptools* (or eventually merge it in *setuptools*).
 * Since this module get many informations on CPU, give possibility to users to access them easily as a dict.
 
-## Help aprecied
+## How to contribute ?
 
-* Tweak of GCC compilers options.
-* x86 CPUID implementation.
+* Tweak compilers options.
 * Add support for more compilers (Intel, Clang, ...). The aim is to support all compilers availables with *distutils* and *numpy.distutils*.
 * Add support for more processors (ARM, ARM64, ...).

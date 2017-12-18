@@ -7,10 +7,6 @@
 # TODO: 0x80000001, select value based on CPU name for bit that have 2
 # possibles flags
 
-# TODO: replace x86cpu with pure Python solution ? :
-#       https://github.com/flababah/cpuid.py/blob/master/cpuid.py
-#       https://github.com/workhorsy/py-cpuinfo/blob/master/cpuinfo/cpuinfo.py
-
 from compilertools.processors import ProcessorBase as _ProcessorBase
 
 __all__ = ['Processor']
