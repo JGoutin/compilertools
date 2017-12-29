@@ -61,7 +61,8 @@ def _build_and_import(
     from compilertools._config_build import CONFIG_BUILD
 
     # Compile all possibilities
-    CONFIG_BUILD['disabled_suffixes'].clear()
+    CONFIG_BUILD['suffixes_includes'].clear()
+    CONFIG_BUILD['suffixes_excludes'].clear()
 
     # Build
     with TemporaryDirectory() as tmp:

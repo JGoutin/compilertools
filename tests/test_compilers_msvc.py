@@ -39,5 +39,5 @@ def tests_compiler_base():
     platform.python_compiler = platform_python_compiler
 
     # Test _compile_args_matrix
-    arch, cpu = _get_arch_and_cpu('x86')
+    arch, cpu = _get_arch_and_cpu('x86_32')
     assert compiler._compile_args_matrix(arch, cpu)

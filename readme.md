@@ -59,9 +59,9 @@ Requierement:
 
 Search in source files for API *pragma* preprocessor calls and enable compiler and linker options if needed.
 
-#### Fast-math mode
+#### Extra generic compilers options
 
-Enable or disable fast-math compiler option.
+Enable or disable generic extra compiler options like fast math.
 
 ### Supported compilers
 
@@ -70,7 +70,7 @@ Enable or disable fast-math compiler option.
 
 ### Supported processors
 
-* x86
+* x86-32
 * x86-64
 
 ### Build tools compatiblity
@@ -91,19 +91,15 @@ Enable or disable fast-math compiler option.
 * API autodetection: Done (openMP, opeenACC, Intel Cilk Plus)
 * Unit test (pytest): Done
 * Continuous integration: Done
-* x86/amd64 CPUID : Done
+* x86 CPUID : Done
 * Extended configuration: Done
-* PIP autodetection: Done but untested
+* PIP autodetection: Done
+* Documentation with sphinx and readthedoc: To do
 
 ## Ideas & possibles futures features
 
-* Ability to auto-enable "Current-architecture optimized compilation" with *pip* when installing from sources.
 * Ability to force the use of an API (openMP, ...)
 * Add it as an option in *setuptools* (or eventually merge it in *setuptools*).
 * Since this module get many informations on CPU, give possibility to users to access them easily as a dict.
-
-## How to contribute ?
-
-* Tweak compilers options.
 * Add support for more compilers (Intel, Clang, ...). The aim is to support all compilers availables with *distutils* and *numpy.distutils*.
 * Add support for more processors (ARM, ARM64, ...).

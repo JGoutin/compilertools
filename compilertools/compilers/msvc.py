@@ -72,13 +72,13 @@ class Compiler(_CompilerBase):
 
              self.Arg(args='/arch:SSE2',
                       suffix='sse2',
-                      import_if='sse2' in cpu.features and arch == 'x86',
-                      build_if=arch == 'x86'),
+                      import_if='sse2' in cpu.features and arch == 'x86_32',
+                      build_if=arch == 'x86_32'),
 
              self.Arg(args='/arch:SSE',
                       suffix='sse',
-                      import_if='sse' in cpu.features and arch == 'x86',
-                      build_if=arch == 'x86'),
+                      import_if='sse' in cpu.features and arch == 'x86_32',
+                      build_if=arch == 'x86_32'),
 
              self.Arg(),
             ],

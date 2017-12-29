@@ -97,7 +97,7 @@ class Compiler(_CompilerBase):
                 ]
             ]
 
-        elif arch == 'x86':
+        elif arch == 'x86_32':
             args += [
                 # CPU Generic optimisations
                 [self.Arg(args='-m32')],
@@ -114,6 +114,12 @@ class Compiler(_CompilerBase):
                           import_if=(self.version >= 4.4 and
                                      'avx' in cpu.features and
                                      cpu.os_supports_avx)),
+
+                 self.Arg(args=['-mfpmath=sse', '-msse4'],
+                          suffix='sse4',
+                          import_if=('sse4.1' in cpu.features and
+                                     'sse4.2' in cpu.features),
+                          build_if=self.version >= 4.3),
 
                  self.Arg(args=['-mfpmath=sse', '-msse4.2'],
                           suffix='sse4_2',
@@ -167,7 +173,7 @@ class Compiler(_CompilerBase):
         args = ['-march=native -flto']
 
         # Arch specific optimizations
-        if arch == 'x86':
+        if arch == 'x86_32':
             args.append('-m32')
             if 'sse' in cpu.features and self.version >= 3.1:
                 args.append('-mfpmath=sse')

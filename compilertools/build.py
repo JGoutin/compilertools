@@ -36,7 +36,7 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
     if ext_suffix is None:
         ext_suffix = _get_config_var('EXT_SUFFIX')
     if current_machine is None:
-        current_machine = CONFIG_BUILD['current_machine']
+        current_machine = _find_if_current_machine()
     if arch is None:
         arch = _get_platform()
 
@@ -50,7 +50,19 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
 
     # Args for multiple machines
     else:
-        disabled_suffixes = CONFIG_BUILD['disabled_suffixes']
+        include = CONFIG_BUILD['suffixes_includes']
+        if not include:
+            exclude = CONFIG_BUILD['suffixes_excludes']
+
+            def filter_suffix(suffix):
+                """Filter by exclusion"""
+                return suffix in exclude
+
+        else:
+            def filter_suffix(suffix):
+                """Filter by inclusion"""
+                return suffix not in include
+
         args = get_compile_args(compiler, arch, current_compiler=True)
 
         # Filter disabled suffixes and remove file to not build.
@@ -58,7 +70,7 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
         # only for building and not on current machine
         for suffixes in set(args):
             for suffix in suffixes.split('-'):
-                if suffix in disabled_suffixes:
+                if filter_suffix(suffix):
                     del args[suffixes]
                     break
 
@@ -70,13 +82,11 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
     # Extend args with special options
     arg_ext = []
 
-    if use_api:
-        # Add API args
-        _add_args(compiler, arg_ext, 'api', 'compile', use_api)
+    # Add API args
+    _add_args(compiler, arg_ext, 'api', 'compile', use_api)
 
-    if use_option:
-        # Add options args
-        _add_args(compiler, arg_ext, 'option', 'compile', use_option)
+    # Add options args
+    _add_args(compiler, arg_ext, 'option', 'compile', use_option)
 
     if arg_ext:
         for suffix in build_args:
@@ -100,13 +110,11 @@ def get_build_link_args(compiler=None, use_api=None, use_option=None):
     # Extend args with special options
     build_args = []
 
-    if use_api:
-        # Add API args
-        _add_args(compiler, build_args, 'api', 'link', use_api)
+    # Add API args
+    _add_args(compiler, build_args, 'api', 'link', use_api)
 
-    if use_option:
-        # Add options args
-        _add_args(compiler, build_args, 'option', 'link', use_option)
+    # Add options args
+    _add_args(compiler, build_args, 'option', 'link', use_option)
 
     return build_args
 
@@ -118,11 +126,24 @@ def _add_args(compiler, arg_list, arg_cat, arg_type, args_names):
     arg_cat: 'api' or 'option'
     arg_type: 'link' or 'compile'.
     args_names: list of args names to use."""
-    for name in args_names:
-        try:
-            arg_list.append(compiler[arg_cat][name][arg_type])
-        except KeyError:
-            continue
+    if args_names:
+        for name in args_names:
+            try:
+                arg_list.append(compiler[arg_cat][name][arg_type])
+            except KeyError:
+                continue
+
+
+def _find_if_current_machine():
+    """Check configuration and if current machine is not specified,
+    try to set it."""
+    current_machine = CONFIG_BUILD['current_machine']
+    if not isinstance(current_machine, bool):
+        # Check if running from PIP
+        from sys import argv
+        from os.path import basename, dirname
+        return basename(dirname(argv[0])).startswith('pip-‌​')
+    return current_machine
 
 
 class _String(str):
@@ -309,17 +330,3 @@ _build_ext.get_ext_filename = _patch_get_ext_filename(
 _build_ext.get_ext_fullname = _patch_get_ext_fullname(
     _build_ext.get_ext_fullname)
 _build_ext.__new__ = _patch___new__(_build_ext.__new__)
-
-
-# Initialize configuration
-def _init_build_config():
-    """Try to detect if running from PIP, and then assume we need to
-    compile for current machine."""
-    if not isinstance(CONFIG_BUILD['current_machine'], bool):
-        from os.path import basename, dirname
-        CONFIG_BUILD['current_machine'] = (
-            True if basename(dirname(__file__)).startswith('pip-‌​') else
-            False)
-
-_init_build_config()
-del _init_build_config

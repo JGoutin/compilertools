@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Tests for x86 CPU"""
+"""Tests for x86-32 CPU"""
 
 def tests_processor_nocpu():
-    """Tests Processor methods that don't need a real x86 CPU"""
-    from compilertools.processors.x86 import Processor
-    from compilertools.processors import x86
+    """Tests Processor methods that don't need a real x86_32 CPU"""
+    from compilertools.processors.x86_32 import Processor
+    from compilertools.processors import x86_32
     processor = Processor()
 
     # Test properties
@@ -64,8 +64,8 @@ def tests_processor_nocpu():
             """EAX"""
             return registers[self._eax]['edx']
 
-    x86_cpuid = x86.Cpuid
-    x86.Cpuid = Cpuid
+    x86_cpuid = x86_32.Cpuid
+    x86_32.Cpuid = Cpuid
 
     # Tests _uint_to_str
     assert Processor._uint_to_str(
@@ -99,7 +99,7 @@ def tests_processor_nocpu():
         'prefetchwt1', 'sse3'}
 
     # Cleaning
-    x86.Cpuid = x86_cpuid
+    x86_32.Cpuid = x86_cpuid
 
 
 def tests_processor():
@@ -107,12 +107,12 @@ def tests_processor():
     # Check architecture and skip if not compatible
     from compilertools.processors import get_arch
 
-    if get_arch() != 'x86':
+    if get_arch() != 'x86_32':
         from pytest import skip
-        skip("Current processor is not x86")
+        skip("Current processor is not x86_32")
 
     # Test instanciation
-    from compilertools.processors.x86 import Processor
+    from compilertools.processors.x86_32 import Processor
     processor = Processor(current_machine=True)
     assert processor.features
 

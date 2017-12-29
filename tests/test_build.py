@@ -70,15 +70,18 @@ def tests_get_build_compile_args():
         compiler, 'arch1', use_option=['option_name']) == {
             '.arch1%s' % ext_suffix: ['--arch1', '--option-compile']}
 
-    # Test disabling suffixes
+    # Test filtering suffixes
     assert get_build_compile_args(compiler, 'arch2') == {
         '.arch2%s' % ext_suffix: ['--arch2'],
         '.arch2_opt%s' % ext_suffix: ['--arch2_opt']}
-    CONFIG_BUILD['disabled_suffixes'].add('arch2_opt')
+    CONFIG_BUILD['suffixes_excludes'].add('arch2_opt')
     assert get_build_compile_args(compiler, 'arch2') == {
         '.arch2%s' % ext_suffix: ['--arch2']}
-    CONFIG_BUILD['disabled_suffixes'].remove('arch2_opt')
-
+    CONFIG_BUILD['suffixes_excludes'].remove('arch2_opt')
+    CONFIG_BUILD['suffixes_includes'].add('arch2')
+    assert get_build_compile_args(compiler, 'arch2') == {
+        '.arch2%s' % ext_suffix: ['--arch2']}
+    CONFIG_BUILD['suffixes_includes'].remove('arch2')
 
 def tests_get_build_link_args():
     """Test get_build_link_args"""
@@ -107,6 +110,30 @@ def tests_get_build_link_args():
     assert get_build_link_args(
         compiler, use_option=['option_name']) == ['--option-link']
 
+
+def tests_find_if_current_machine():
+    """Test _find_if_current_machine"""
+    from sys import argv
+    from compilertools.build import _find_if_current_machine
+    from compilertools._config_build import CONFIG_BUILD
+
+    # Set by configuration
+    CONFIG_BUILD['current_machine'] = False
+    assert _find_if_current_machine() is False
+    CONFIG_BUILD['current_machine'] = True
+    assert _find_if_current_machine() is True
+
+    # Pip detection
+    file = argv[0]
+    CONFIG_BUILD['current_machine'] = 'autodetect'
+    argv[0] = 'dir/not_current_machine/file.py'
+    assert _find_if_current_machine() is False
+    argv[0] = 'dir/pip-‌​current_machine/file.py'
+    assert _find_if_current_machine() is True
+
+    # Cleaning
+    argv[0] = file
+    CONFIG_BUILD['current_machine'] = False
 
 def tests_add_args():
     """Test _add_args"""

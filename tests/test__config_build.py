@@ -10,4 +10,5 @@ def tests_config_build():
     assert isinstance(CONFIG_BUILD.get('option'), Mapping)
     assert isinstance(CONFIG_BUILD.get('api'), Mapping)
     assert isinstance(CONFIG_BUILD.get('extensions'), Mapping)
-    assert isinstance(CONFIG_BUILD.get('disabled_suffixes'), Container)
+    assert isinstance(CONFIG_BUILD.get('suffixes_includes'), Container)
+    assert isinstance(CONFIG_BUILD.get('suffixes_excludes'), Container)

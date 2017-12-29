@@ -8,18 +8,19 @@ CONFIG = {
     # Key is name or alias
     # Value is name to use
     'architectures': {
-        # ARM
-        'arm': 'arm',
+        # ARM_32
+        'arm': 'arm_32',
 
-        # ARM64
-        'arm64': 'arm64',
+        # ARM_64
+        'arm64': 'arm_64',
 
-        # x86
-        'x86': 'x86',
-        'i386': 'x86',
-        'i686': 'x86',
-        'ia32': 'x86',
-        'win32': 'x86',
+        # x86_32
+        'x86_32': 'x86_32',
+        'x86': 'x86_32',
+        'i386': 'x86_32',
+        'i686': 'x86_32',
+        'ia32': 'x86_32',
+        'win32': 'x86_32',
 
         # x86_64
         'x86_64': 'x86_64',

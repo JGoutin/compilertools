@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""X86 Processors"""
+"""X86-32 Processors"""
 # For more X86 CPUID informations : http://www.sandpile.org/x86/cpuid.htm
 
 # TODO: implement more CPUID (Other feature flags, L2 caches, ...)
@@ -13,7 +13,7 @@ __all__ = ['Processor']
 
 
 class Processor(_ProcessorBase):
-    """x86 CPU"""
+    """x86-32 CPU"""
 
     def __init__(self, current_machine=False):
         _ProcessorBase.__init__(self, current_machine)

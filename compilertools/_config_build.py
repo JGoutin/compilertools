@@ -13,11 +13,18 @@ CONFIG_BUILD = {
     # PIP
     'current_machine': 'autodetect',
 
-    # Disabled suffixes in files matrix definition.
-    # Complete this set to not build files for a specific architecture.
+    # Enabled suffixes in files matrix definition.
+    # If this set is not empty, include only suffixes specified
+    # inside it.
     # This does not affect current machine builds.
-    'disabled_suffixes': {
-        'sse', 'ssse3', 'sse4_1', 'intel_atom', 'intel', 'amd'
+    'suffixes_includes': set(),
+
+    # Disabled suffixes in files matrix definition.
+    # If 'suffixes_includes' is empty, complete this set to not 
+    # build files for a specific architecture.
+    # This does not affect current machine builds.
+    'suffixes_excludes': {
+        'sse', 'ssse3', 'sse4_1', 'sse4_2', 'intel_atom', 'intel', 'amd'
         },
 
     # Enable compilers options
