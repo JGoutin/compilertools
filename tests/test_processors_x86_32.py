@@ -124,7 +124,7 @@ def tests_cpuid():
     except ImportError:
         from pytest import skip
         skip("x86cpu package not installed")
-    from compilertools.processors.x86 import Cpuid
+    from compilertools.processors.x86_32 import Cpuid
     
     for eax, ecx in (
             (0, 0), (1, 0), (2, 0), (3, 0),
