@@ -193,7 +193,7 @@ def _update_extension(self, ext):
 
     # Update link arguments
     ext.extra_link_args = (
-        get_build_link_args(compiler,use_api=api_list, use_option=option_list)
+        get_build_link_args(compiler, use_api=api_list, use_option=option_list)
         + (ext.extra_link_args or []))
 
     # Update Extensions and build

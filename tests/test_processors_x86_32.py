@@ -5,16 +5,6 @@ def tests_processor_nocpu():
     """Tests Processor methods that don't need a real x86_32 CPU"""
     from compilertools.processors.x86_32 import Processor
     from compilertools.processors import x86_32
-    processor = Processor()
-
-    # Test properties
-    assert processor.cpuid_highest_extended_function == 0
-    processor['cpuid_highest_extended_function'] = 0x80000000
-    assert processor.cpuid_highest_extended_function == 0x80000000
-
-    assert processor.os_supports_avx is False
-    processor['os_supports_avx'] = True
-    assert processor.os_supports_avx is True
 
     # Initialise dummy CPUID
     string = 'Test'
@@ -37,9 +27,9 @@ def tests_processor_nocpu():
                      'ecx': encoded, 'edx': encoded},
         }
 
-    class Cpuid():
+    class Cpuid(x86_32.Cpuid):
         """Dummy CPUID function"""
-        
+
         def __init__(self, eax, ecx=None):
             self._eax = eax
             self._ecx = ecx
@@ -67,36 +57,55 @@ def tests_processor_nocpu():
     x86_cpuid = x86_32.Cpuid
     x86_32.Cpuid = Cpuid
 
-    # Tests _uint_to_str
-    assert Processor._uint_to_str(
+    # Tests registers_to_str
+    assert x86_32.Cpuid.registers_to_str(
         encoded, encoded, encoded) == string * 3
 
-    # Test _cpuid_vendor_id (With dummy CPUID)
-    processor._cpuid_vendor_id()
+    #Test default values
+    processor = Processor()
+    assert processor.current_machine is False
+    assert processor.vendor is ''
+    assert processor.cpuid_highest_extended_function == 0
+    assert processor.brand is ''
+    assert processor.os_supports_avx is False
+    assert processor.features == []
+
+    # Initialize processor as current one
+    processor = Processor(current_machine=True)
+    assert processor.current_machine is True
+
+    # Test cpuid_highest_extended_function
+    assert processor.cpuid_highest_extended_function == flags
+
+    # Test vendor (With dummy CPUID)
     assert processor.vendor == string * 3
 
-    # Test no _cpuid_brand (With dummy CPUID)
+    # Test no brand (With dummy CPUID)
     processor['cpuid_highest_extended_function'] = 0x80000000
-    processor._cpuid_brand()
     assert processor.brand is ''
 
-    # Test _cpuid_brand (With dummy CPUID)
+    # Test brand (With dummy CPUID)
     processor['cpuid_highest_extended_function'] = 0x80000004
-    processor._cpuid_brand()
+    del processor['brand']
     assert processor.brand == string * 12
 
-    # Test limited _cpuid_feature_flags (With dummy CPUID)
+    # Test limited features (With dummy CPUID)
     processor['cpuid_highest_extended_function'] = 0x80000000
-    processor._cpuid_feature_flags()
     assert processor.features == {
         'prefetchwt1', 'pbe', 'fpu', 'hv', 'fsgsbase', 'avx512vl', 'sse3'}
 
-    # Test full _cpuid_feature_flags (With dummy CPUID)
+    # Test full features (With dummy CPUID)
     processor['cpuid_highest_extended_function'] = 0x80000001
-    processor._cpuid_feature_flags()
+    del processor['features']
     assert processor.features == {
         '3dnow!', 'ahf64', 'avx512vl', 'fpu', 'fsgsbase', 'hv', 'pbe',
         'prefetchwt1', 'sse3'}
+
+    # Test os_support_avx
+    assert processor.os_supports_avx is False
+    del processor['os_supports_avx']
+    processor['features'].update(('xsave', 'osxsave'))
+    assert processor.os_supports_avx is True
 
     # Cleaning
     x86_32.Cpuid = x86_cpuid
@@ -116,7 +125,7 @@ def tests_processor():
     processor = Processor(current_machine=True)
     assert processor.features
 
- 
+
 def tests_cpuid():
     """Test cpuid"""
     try:
@@ -125,7 +134,7 @@ def tests_cpuid():
         from pytest import skip
         skip("x86cpu package not installed")
     from compilertools.processors.x86_32 import Cpuid
-    
+
     for eax, ecx in (
             (0, 0), (1, 0), (2, 0), (3, 0),
             (4, 0), (7, 0), (0x80000000, 0),

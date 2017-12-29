@@ -17,7 +17,7 @@ def tests_any_line_startwith():
             file.write("\tWXCVBN\nUIOP\n   JKLM\n")
 
         # Test existing files content
-        assert _any_line_startwith(files,{'.ext1': 'uiop'})
+        assert _any_line_startwith(files, {'.ext1': 'uiop'})
 
         # Test ignore case
         assert _any_line_startwith(files, {'.ext2': 'uiop'})
@@ -39,7 +39,7 @@ def tests_ignore_api():
     """Test _ignore_api"""
     from compilertools.compilers import CompilerBase
     from compilertools._src_files import _ignore_api
-    
+
     # Create compiler
     compiler = CompilerBase()
 

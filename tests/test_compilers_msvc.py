@@ -14,25 +14,25 @@ def tests_compiler_base():
     version = ''
 
     def dummy_compiler():
+        """platform.python_compiler"""
         return version
 
     platform_python_compiler = platform.python_compiler
     platform.python_compiler = dummy_compiler
 
     compiler = Compiler()
-    
+
     # Check not existing version
-    compiler._get_build_version()
     assert compiler.version == 0.0
 
     # Check existing version
     version = 'MSC v.1800 64 bit'
-    compiler._get_build_version()
+    del compiler['version']
     assert compiler.version == 12.0
 
     # Check 13.0 skipped
     version = 'MSC v.1900 64 bit'
-    compiler._get_build_version()
+    del compiler['version']
     assert compiler.version == 14.0
 
     # Clean up

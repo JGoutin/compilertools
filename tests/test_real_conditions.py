@@ -87,8 +87,8 @@ def _build_and_import(
             message = exception.args[0]
             # Excepted exception if compiler not found
             if ('Unable to find vcvarsall.bat' in message or
-                ('Microsoft Visual C++ ' in message and
-                 ' is required.' in message)):
+                    ('Microsoft Visual C++ ' in message and
+                     ' is required.' in message)):
                 from pytest import xfail
                 xfail(message)
 

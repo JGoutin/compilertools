@@ -159,7 +159,7 @@ class CompilerBase(BaseClass):
         return _order_args_matrix(
             self._compile_args_matrix(
                 *_get_arch_and_cpu(arch, current_machine=current_machine)),
-                     current_machine, current_compiler)
+            current_machine, current_compiler)
 
     def compile_args_current_machine(self):
         """Return compiler arguments optimized by compiler for current

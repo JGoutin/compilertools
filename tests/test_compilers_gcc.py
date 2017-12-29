@@ -23,12 +23,11 @@ def tests_compiler_base():
     platform.python_compiler = dummy_compiler
 
     # Check not existing version
-    compiler._get_build_version()
     assert compiler.version == 0.0
 
     # Check existing version
     version = 'GCC 6.3.1 64bit'
-    compiler._get_build_version()
+    del compiler['version']
     assert compiler.version == 6.3
 
     # Initialize system configurations

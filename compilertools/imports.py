@@ -36,7 +36,7 @@ update_extensions_suffixes(None)
 class _ExtensionFileFinder(_MetaPathFinder):
     """Path finder for extensions with architecture specific optimizations"""
 
-    def find_spec(self, fullname, path=None, *args, **kwargs):
+    def find_spec(self, fullname, *args, path=None, **kwargs):
         """Find module spec using new arch specific suffixes"""
         for suffixe in ARCH_SUFFIXES:
             # Search for each suffixe

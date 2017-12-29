@@ -20,33 +20,29 @@ class Processor(_ProcessorBase):
         self._default['os_supports_avx'] = False
         self._default['cpuid_highest_extended_function'] = 0
 
-        if current_machine:
-            # CPUID functions
-            self['cpuid_highest_extended_function'] = (
-                Cpuid(0x80000000).eax)
-            self._cpuid_vendor_id()
-            self._cpuid_brand()
-            self._cpuid_feature_flags()
-            self['os_supports_avx'] = (
-                'xsave' in self['features'] and 'osxsave' in self['features'])
+    @_ProcessorBase._memoized_property
+    def cpuid_highest_extended_function(self):
+        """CPUID highest extended function"""
+        if not self.current_machine:
+            return
 
-    @staticmethod
-    def _uint_to_str(*uints):
-        """Convert unsigned integers from CPUID register to ASCII string
+        return Cpuid(0x80000000).eax
 
-        uints: list of unsigned integers to concatenate and convert to string.
-        """
-        from struct import pack
-        return pack('<%s' % ('I' * len(uints)),
-                    *uints).decode('ASCII').strip('\x00 ')
+    @_ProcessorBase._memoized_property
+    def vendor(self):
+        """CPU's manufacturer ID from CPUID"""
+        if not self.current_machine:
+            return
 
-    def _cpuid_vendor_id(self):
-        """Update current CPU's manufacturer ID from CPUID"""
         reg = Cpuid(0)
-        self['vendor'] = self._uint_to_str(reg.ebx, reg.edx, reg.ecx)
+        return Cpuid.registers_to_str(reg.ebx, reg.edx, reg.ecx)
 
-    def _cpuid_brand(self):
-        """Update current CPU's brand from CPUID"""
+    @_ProcessorBase._memoized_property
+    def brand(self):
+        """CPU's brand from CPUID"""
+        if not self.current_machine:
+            return
+
         if self.cpuid_highest_extended_function < 0x80000004:
             return
 
@@ -54,14 +50,18 @@ class Processor(_ProcessorBase):
         for avx in (0x80000002, 0x80000003, 0x80000004):
             reg = Cpuid(avx)
             brand_list += [reg.eax, reg.ebx, reg.ecx, reg.edx]
-        self['brand'] = self._uint_to_str(*brand_list)
+        return Cpuid.registers_to_str(*brand_list)
 
-    def _cpuid_feature_flags(self):
-        """Update current CPU's features flags from CPUID"""
+    @_ProcessorBase._memoized_property
+    def features(self):
+        """CPU's features flags from CPUID"""
         # feature bits description
         # feature_bits_desc: {avx_number: registers_dict}
         # registers_dict: {register_name: [feature_list]}
         # feature_list: bits ordered features list in register
+        if not self.current_machine:
+            return
+
         feature_bits_desc = {
             1: {
                 'edx': (             # 1 EDX: Intel Standard features
@@ -318,7 +318,15 @@ class Processor(_ProcessorBase):
                         add_flag(feature)
 
         # Return flags
-        self['features'] = flags
+        return flags
+
+    @_ProcessorBase._memoized_property
+    def os_supports_avx(self):
+        """CPUID highest extended function"""
+        if not self.current_machine:
+            return
+
+        return 'xsave' in self['features'] and 'osxsave' in self['features']
 
 
 class Cpuid:
@@ -442,3 +450,13 @@ class Cpuid:
     def edx(self):
         """Get EDX register CPUID result"""
         return self._get_cpuid(0x2)
+
+    @staticmethod
+    def registers_to_str(*uints):
+        """Convert unsigned integers from CPUID register to ASCII string
+
+        uints: list of unsigned integers to concatenate and convert to string.
+        """
+        from struct import pack
+        return pack('<%s' % ('I' * len(uints)),
+                    *uints).decode('ASCII').strip('\x00 ')

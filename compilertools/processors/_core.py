@@ -21,7 +21,7 @@ def get_arch(arch=None):
 
     # If cross compilation, keep only target architecture
     if '_' in arch:
-        current, target =  arch.split('_', 1)
+        current, target = arch.split('_', 1)
         if current in arch_dict and target in arch_dict:
             arch = target
 

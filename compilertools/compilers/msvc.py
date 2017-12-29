@@ -19,17 +19,15 @@ class Compiler(_CompilerBase):
     def __init__(self):
         _CompilerBase.__init__(self)
 
-        # Compiler version
-        self._get_build_version()
-
         # Options
         self['option']['fast_fpmath'] = {'compile': '/fp:fast'}
 
         # API
         self['api']['openmp'] = {'compile': '/openmp'}
 
-    def _get_build_version(self):
-        """Update compiler version with the one that was used to build Python.
+    @_CompilerBase._memoized_property
+    def version(self):
+        """Compiler version that was used to build Python.
         """
         from platform import python_compiler
         version_str = python_compiler()
@@ -42,8 +40,7 @@ class Compiler(_CompilerBase):
         if int(version) >= 13:
             # 13.0 was skipped
             version += 1.0
-        version += float()
-        self['version'] = version
+        return version
 
     def _compile_args_matrix(self, arch, cpu):
         """Return Microsoft Visual C++ compiler options availables for the

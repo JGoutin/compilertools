@@ -3,6 +3,7 @@
 import sys
 from importlib import import_module
 from collections.abc import MutableMapping
+from functools import wraps
 
 __all__ = ['always_str_list', 'import_class', 'BaseClass']
 
@@ -36,26 +37,68 @@ def import_class(package_name, module_name, class_name, default_class):
 
 class BaseClass(MutableMapping):
     """Base class for data storage classes
-    with default values and attribute access"""
+    with default values, attribute/item access
+    and memoization"""
 
     def __init__(self):
         self._items = {}
         self._default = {}
 
+    @staticmethod
+    def _memoized_property(class_property):
+        """Property decorator with memoization"""
+
+        @property
+        @wraps(class_property)
+        def _property(self):
+            key = class_property.__name__
+
+            # Try getting cached value from dict
+            try:
+                return self._items.__getitem__(key)
+            except KeyError:
+                pass
+
+            # Update value from property
+            value = class_property(self)
+
+            if value is None:
+                # If None, try getting a default value
+                try:
+                    value = self._default.__getitem__(key)
+                except KeyError:
+                    pass
+
+            self._items[key] = value
+            return value
+        return _property
+
     def __getitem__(self, key):
+        # Try getting from dict
         try:
             return self._items.__getitem__(key)
         except KeyError:
-            return self._default.__getitem__(key)
+            pass
+
+        # Try getting from attributes
+        if hasattr(self, key):
+            return getattr(self, key)
+
+        # Try getting from default values
+        return self._default.__getitem__(key)
 
     def __getattr__(self, name):
+        # Try getting from dict
         try:
             return self._items.__getitem__(name)
         except KeyError:
-            try:
-                return self._default.__getitem__(name)
-            except KeyError:
-                raise AttributeError
+            pass
+
+        # Try getting from default values
+        try:
+            return self._default.__getitem__(name)
+        except KeyError:
+            raise AttributeError
 
     def __setitem__(self, key, value):
         return self._items.__setitem__(key, value)

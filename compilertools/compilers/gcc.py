@@ -14,9 +14,6 @@ class Compiler(_CompilerBase):
     def __init__(self):
         _CompilerBase.__init__(self)
 
-        # Compiler version
-        self._get_build_version()
-
         # Options
         self['option']['fast_fpmath'] = {
             'compile': '-Ofast'}
@@ -33,23 +30,20 @@ class Compiler(_CompilerBase):
             'compile': '-fcilkplus -lcilkrts',
             'link': '-fcilkplus -lcilkrts'}
 
-
-    def _get_build_version(self):
-        """Update compiler version with the one that was used to build Python.
+    @_CompilerBase._memoized_property
+    def version(self):
+        """Compiler version that was used to build Python.
         """
         from platform import python_compiler
         version_str = python_compiler()
 
         if 'GCC' not in version_str:
-            self['version'] = 0.0
             return
 
         version_str = version_str.split(' ', 2)[1]
 
         # Keep only major and minor
-        version = float(version_str.rsplit('.', 1)[0])
-        self['version'] = version
-
+        return float(version_str.rsplit('.', 1)[0])
 
     def _compile_args_matrix(self, arch, cpu):
         """Return GCC compiler options availables for the

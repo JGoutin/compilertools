@@ -20,7 +20,7 @@ CONFIG_BUILD = {
     'suffixes_includes': set(),
 
     # Disabled suffixes in files matrix definition.
-    # If 'suffixes_includes' is empty, complete this set to not 
+    # If 'suffixes_includes' is empty, complete this set to not
     # build files for a specific architecture.
     # This does not affect current machine builds.
     'suffixes_excludes': {
@@ -48,7 +48,7 @@ CONFIG_BUILD = {
         'cilkplus': {
             'c': '#pragma simd ',
             'fortran': '!dir$ simd '}
-            },
+        },
 
     # Sources files extensions for code analysis
     'extensions': {

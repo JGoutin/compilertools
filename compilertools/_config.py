@@ -28,7 +28,7 @@ CONFIG = {
         'amd64': 'x86_64',
         'em64t': 'x86_64',
         'x64': 'x86_64',
-            },
+        },
 
     # Compilers
     # Key is name or alias
@@ -42,5 +42,5 @@ CONFIG = {
 
         # MSVC
         'msvc': 'msvc',
-            },
+        },
     }

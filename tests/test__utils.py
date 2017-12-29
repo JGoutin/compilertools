@@ -38,6 +38,63 @@ def test_baseclass():
     with raises(KeyError):
         baseclass['do_not_exist']
 
+    # Test memoization
+    class TestClass(BaseClass):
+        """Base class with property"""
+        @BaseClass._memoized_property
+        def to_memoize(self):
+            """Property to memoize"""
+            return 1
+
+    testclass = TestClass()
+    assert 'to_memoize' not in testclass._items
+    assert testclass.to_memoize == 1
+    assert 'to_memoize' in testclass._items
+    assert testclass._items['to_memoize'] == 1
+    assert testclass.to_memoize == 1
+
+    testclass = TestClass()
+    assert 'to_memoize' not in testclass._items
+    assert testclass['to_memoize'] == 1
+    assert 'to_memoize' in testclass._items
+    assert testclass._items['to_memoize'] == 1
+
+    # Memoize with default values
+    class TestClass2(BaseClass):
+        """Base class with property and default"""
+        def __init__(self):
+            """Default value"""
+            BaseClass.__init__(self)
+            self._default['to_memoize'] = 2
+
+        @BaseClass._memoized_property
+        def to_memoize(self):
+            """Property to memoize"""
+            return
+
+        @BaseClass._memoized_property
+        def to_memoize_none(self):
+            """Property to memoize"""
+            return
+
+    testclass = TestClass2()
+    assert 'to_memoize' not in testclass._items
+    assert testclass.to_memoize == 2
+    assert 'to_memoize' in testclass._items
+    assert testclass._items['to_memoize'] == 2
+    assert testclass.to_memoize == 2
+
+    testclass = TestClass2()
+    assert 'to_memoize' not in testclass._items
+    assert testclass['to_memoize'] == 2
+    assert 'to_memoize' in testclass._items
+    assert testclass._items['to_memoize'] == 2
+
+    assert 'to_memoize_none' not in testclass._items
+    assert testclass.to_memoize_none is None
+    assert 'to_memoize_none' in testclass._items
+    assert testclass._items['to_memoize_none'] is None
+    assert testclass.to_memoize_none is None
 
 def tests_import_class():
     """"Test import_class"""
