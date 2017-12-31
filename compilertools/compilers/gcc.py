@@ -11,8 +11,9 @@ __all__ = ['Compiler']
 class Compiler(_CompilerBase):
     """GNU Compiler Collection"""
 
-    def __init__(self):
-        _CompilerBase.__init__(self)
+    def __init__(self, current_compiler=False):
+        _CompilerBase.__init__(self, current_compiler)
+        self._default['python_build_version'] = 0.0
 
         # Options
         self['option']['fast_fpmath'] = {
@@ -32,6 +33,30 @@ class Compiler(_CompilerBase):
 
     @_CompilerBase._memoized_property
     def version(self):
+        """Compiler version used.
+        """
+        if not self.current_compiler:
+            return
+
+        from subprocess import Popen, PIPE
+        try:
+            version_str = Popen(
+                ['gcc', '--version'],
+                stdout=PIPE, universal_newlines=True).stdout.read()
+        except OSError:
+            return
+        version_str = version_str.rstrip().split('\n', 1)[0]
+
+        if not version_str.lower().startswith('gcc'):
+            return
+
+        version_str = version_str.rsplit(maxsplit=1)[-1]
+
+        # Keep only major and minor
+        return float(version_str.rsplit('.', 1)[0])
+
+    @_CompilerBase._memoized_property
+    def python_build_version(self):
         """Compiler version that was used to build Python.
         """
         from platform import python_compiler

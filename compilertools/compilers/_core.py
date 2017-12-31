@@ -9,10 +9,11 @@ from compilertools.processors import get_processor, get_arch
 __all__ = ['CompilerBase', 'get_compiler']
 
 
-def get_compiler(compiler=None):
+def get_compiler(compiler=None, current_compiler=False):
     """Return compiler class
 
-    compiler: Compiler Name or instance"""
+    compiler: Compiler Name or instance
+    current_compiler: Compiler used to build"""
     # Return compiler instance
     if isinstance(compiler, CompilerBase):
         return compiler
@@ -26,7 +27,8 @@ def get_compiler(compiler=None):
     compiler = CONFIG.get('compilers', {}).get(compiler, compiler)
 
     # Return compiler
-    return import_class('compilers', compiler, 'Compiler', CompilerBase)()
+    return import_class('compilers', compiler, 'Compiler', CompilerBase)(
+        current_compiler=current_compiler)
 
 
 def _get_arch_and_cpu(arch=None, current_machine=False):
@@ -115,8 +117,10 @@ class CompilerBase(BaseClass):
            this argument and the current compiler (Ex compiler version).
            Default value is True.""")
 
-    def __init__(self):
+    def __init__(self, current_compiler=False):
         BaseClass.__init__(self)
+        self['current_compiler'] = current_compiler
+        self._default['current_compiler'] = False
         self['api'] = {}
         self['option'] = {}
         self._default['version'] = 0.0
@@ -147,19 +151,16 @@ class CompilerBase(BaseClass):
             return []
         return args[list(args)[0]]
 
-    def compile_args(self, arch=None, current_machine=False,
-                     current_compiler=False):
+    def compile_args(self, arch=None, current_machine=False):
         """Get compiler args list for a specific architecture.
 
         arch : target architecture name.
         current_machine : If True, return only arguments compatibles with
-            current machine (conditions from "import_if").
-        current_compiler : If True, return only arguments compatibles with
-            current compiler (conditions from "build_if")."""
+            current machine (conditions from "import_if")."""
         return _order_args_matrix(
             self._compile_args_matrix(
                 *_get_arch_and_cpu(arch, current_machine=current_machine)),
-            current_machine, current_compiler)
+            current_machine, self['current_compiler'])
 
     def compile_args_current_machine(self):
         """Return compiler arguments optimized by compiler for current

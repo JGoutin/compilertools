@@ -22,8 +22,8 @@ def tests_get_build_compile_args():
     class Compiler(CompilerBase):
         """Dummy Compiler"""
 
-        def __init__(self):
-            CompilerBase.__init__(self)
+        def __init__(self, current_compiler=False):
+            CompilerBase.__init__(self, current_compiler=current_compiler)
             self['api']['api_name'] = {
                 'compile': '--api-compile', 'link': '--api-link'}
             self['option']['option_name'] = {
@@ -42,7 +42,7 @@ def tests_get_build_compile_args():
             """return current machine args"""
             return '--native'
 
-    compiler = Compiler()
+    compiler = Compiler(current_compiler=True)
 
     # Test default values
     assert get_build_compile_args(compiler, 'arch1') == {

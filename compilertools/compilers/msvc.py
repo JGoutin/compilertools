@@ -16,8 +16,8 @@ __all__ = ['Compiler']
 class Compiler(_CompilerBase):
     """Microsoft Visual C++"""
 
-    def __init__(self):
-        _CompilerBase.__init__(self)
+    def __init__(self, current_compiler=False):
+        _CompilerBase.__init__(self, current_compiler)
 
         # Options
         self['option']['fast_fpmath'] = {'compile': '/fp:fast'}
@@ -27,12 +27,17 @@ class Compiler(_CompilerBase):
 
     @_CompilerBase._memoized_property
     def version(self):
-        """Compiler version that was used to build Python.
+        """For Microsoft Visual C++,
+        Compiler version used to build need to be
+        the same that the one used to build Python.
         """
+        if not self.current_compiler:
+            return
+
         from platform import python_compiler
         version_str = python_compiler()
 
-        if 'MSC v.' not in version_str:
+        if not version_str.startswith('MSC v.'):
             return
 
         version_str = version_str.split('MSC v.')[1].split(' ', 1)[0]

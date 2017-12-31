@@ -19,8 +19,8 @@ def get_compile_args(compiler=None, arch=None, current_machine=False,
     current_compiler : If True, return only arguments compatibles with
     current compiler."""
     # Generate options matrix for compiler and architecture
-    return get_compiler(compiler).compile_args(
-        arch, current_machine, current_compiler)
+    return get_compiler(compiler, current_compiler).compile_args(
+        arch, current_machine)
 
 
 def suffixe_from_args(args, extension='', return_empty_suffixes=False):

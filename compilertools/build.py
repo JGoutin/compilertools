@@ -42,7 +42,7 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
 
     # Compiler and base arguments
     build_args = {}
-    compiler = get_compiler(compiler)
+    compiler = get_compiler(compiler, current_compiler=True)
 
     # Optimized args for current machine
     if current_machine:
@@ -169,7 +169,8 @@ def _update_extension(self, ext):
     if CONFIG_BUILD['disabled']:
         return [ext]
 
-    compiler = get_compiler(self.compiler.compiler_type)
+    compiler = get_compiler(self.compiler.compiler_type,
+                            current_compiler=True)
 
     # Options list
     config_options = CONFIG_BUILD['option']

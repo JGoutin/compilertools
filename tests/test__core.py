@@ -58,7 +58,7 @@ def tests_get_compile_args():
         ('inst1-arch2', ['--generic', '--inst1', '--arch2']),
         ('arch1', ['--generic', '--arch1']),
         ('arch2', ['--generic', '--arch2'])])
-    assert get_compile_args(compiler, arch='arch1', current_compiler=True) == excepted
+    assert get_compile_args(Compiler(current_compiler=True), arch='arch1') == excepted
 
 
 def tests_suffixe_from_args():

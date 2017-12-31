@@ -142,8 +142,8 @@ def tests_compiler_base():
     assert compiler1.compile_args(arch='arch1') == excepted
     assert compiler1.compile_args(
         arch='arch1', current_machine=True) == excepted_currentmachine
-    assert compiler1.compile_args(
-        arch='arch1', current_compiler=True) == excepted_currentcompiler
+    assert Compiler(current_compiler=True).compile_args(
+        arch='arch1') == excepted_currentcompiler
 
     # Test compile_args_current_machine
     assert (compiler2.compile_args_current_machine() ==
