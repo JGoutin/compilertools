@@ -111,23 +111,153 @@ def tests_processor_nocpu():
     x86_32.Cpuid = x86_cpuid
 
 
-def tests_processor():
-    """Tests Processor methods that need a real x86 CPU"""
-    # Check architecture and skip if not compatible
-    from compilertools.processors import get_arch
+def tests_cpuid_nocpu():
+    """Tests cpuid without x86 CPU"""
+    from pytest import raises
 
-    if get_arch() != 'x86_32':
-        from pytest import skip
-        skip("Current processor is not x86_32")
+    # Initialize dummy testing environment
+    import platform
+    import ctypes
 
-    # Test instanciation
-    from compilertools.processors.x86_32 import Processor
-    processor = Processor(current_machine=True)
-    assert processor.features
+    platform_system = platform.system
+    ctypes_cdll = ctypes.cdll
+    try:
+        ctypes_windll = ctypes.windll
+    except AttributeError:
+        ctypes_windll = None
+    ctypes_cfunctype = ctypes.CFUNCTYPE
+    ctypes_memmove = ctypes.memmove
+    ctypes_c_void_p = ctypes.c_void_p
+
+    system = 'Unix'
+    address = 1
+    mprotect_success = 0
+    func_result = {}
+
+    def dummy_system():
+        """Dummy platform.system"""
+        return system
+
+    def dummy_generic(*args, **kwargs):
+        """Dummy generic method"""
+
+    def dummy_memmove(address, bytecode, size):
+        """Dummy ctypes.memmove
+        Store bytecode to execute"""
+        func_result['address'] = address
+        func_result['bytecode'] = bytecode
+        func_result['size'] = size
+
+    class DummyValloc:
+        """Dummy valloc"""
+        def __new__(self, *args, **kwargs):
+            """Dummy new"""
+            return address
+
+    class DummyMprotect:
+        """Dummy mprotect"""
+        def __call__(self, *args, **kwargs):
+            """Dummy call"""
+            return mprotect_success
+
+    class DummyCFuncType:
+        """Dummy ctypes.CFUNCTYPE"""
+        def __init__(self, *args, **kwargs):
+            """Dummy init"""
+        def __call__(self, *args, **kwargs):
+            """Dummy call"""
+            def func(*args, **kwargs):
+                """Return executed bytecode"""
+                return func_result
+            return func
+
+    class DummyCDll:
+        class LoadLibrary:
+            def __init__(self, *args, **kwargs):
+                """Dummy init"""
+            valloc = DummyValloc
+            mprotect = DummyMprotect()
+            free = dummy_generic
+
+    class DummyWinDll:
+        class kernel32:
+            VirtualAlloc = DummyValloc
+            VirtualFree = dummy_generic
+
+    platform.system = dummy_system
+    ctypes.memmove = dummy_memmove
+    ctypes.c_void_p = dummy_generic
+    ctypes.CFUNCTYPE = DummyCFuncType
+    ctypes.cdll = DummyCDll
+    ctypes.windll = DummyWinDll
+
+    from compilertools.processors.x86_32 import Cpuid
+
+    for system in ('Unix', 'Windows'):
+        # Check assembly bytecode
+        cpuid = Cpuid(0, 0)
+        assert cpuid.eax['bytecode'] == (
+            b'\x31\xc0'  # XOR eax, eax
+            b'\x31\xc9'  # XOR ecx, ecx
+            b'\x0f\xa2'  # CPUID
+            b'\xc3')     # RET
+        assert cpuid.ebx['bytecode'] == (
+            b'\x31\xc0'  # XOR eax, eax
+            b'\x31\xc9'  # XOR ecx, ecx
+            b'\x0f\xa2'  # CPUID
+            b'\x89\xd8'  # MOV eax, ebx
+            b'\xc3')     # RET
+        assert cpuid.ecx['bytecode'] == (
+            b'\x31\xc0'  # XOR eax, eax
+            b'\x31\xc9'  # XOR ecx, ecx
+            b'\x0f\xa2'  # CPUID
+            b'\x89\xc8'  # MOV eax, ecx
+            b'\xc3')     # RET
+        assert cpuid.edx['bytecode'] == (
+            b'\x31\xc0'  # XOR eax, eax
+            b'\x31\xc9'  # XOR ecx, ecx
+            b'\x0f\xa2'  # CPUID
+            b'\x89\xd0'  # MOV eax, edx
+            b'\xc3')     # RET
+
+        assert Cpuid(7, 5).eax['bytecode'] == (
+            b'\xb8\x07\x00\x00\x00'  # MOV eax, 0x00000007
+            b'\xb9\x05\x00\x00\x00'  # MOV ecx, 0x00000005
+            b'\x0f\xa2'              # CPUID
+            b'\xc3')                 # RET    
+
+        # Test failed to allocate memory
+        address = 0
+        with raises(RuntimeError):
+            Cpuid(0, 0).eax
+        address = 1
+
+    # Test failed to mprotect
+    system = 'Unix'
+    mprotect_success = 1
+    with raises(RuntimeError):
+        Cpuid(0, 0).eax
+
+    # Cleaning
+    platform.system = platform_system
+    ctypes.cdll = ctypes_cdll
+    if ctypes_windll is not None:
+        ctypes.windll = ctypes_windll
+    else:
+        del ctypes.windll
+    ctypes.CFUNCTYPE = ctypes_cfunctype
+    ctypes.memmove = ctypes_memmove
+    ctypes.c_void_p = ctypes_c_void_p
 
 
 def tests_cpuid():
-    """Test cpuid"""
+    """Test cpuid with a real x86 CPU"""
+    from compilertools.processors import get_arch
+
+    if get_arch().split('_')[0] != 'x86':
+        from pytest import skip
+        skip("Current processor is not x86")
+
     try:
         from x86cpu import cpuid as cpuid_ref
     except ImportError:
@@ -147,3 +277,18 @@ def tests_cpuid():
         assert cpuid.ecx == ref['ecx']
         assert cpuid.ebx == ref['ebx']
         assert cpuid.edx == ref['edx']
+
+
+def tests_processor():
+    """Tests Processor methods that need a real x86 CPU"""
+    # Check architecture and skip if not compatible
+    from compilertools.processors import get_arch
+
+    if get_arch() != 'x86_32':
+        from pytest import skip
+        skip("Current processor is not x86_32")
+
+    # Test instanciation
+    from compilertools.processors.x86_32 import Processor
+    processor = Processor(current_machine=True)
+    assert processor.features

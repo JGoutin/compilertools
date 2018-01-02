@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 """Test for core functionalities"""
 
-def tests_version():
-    """Test __version__ presence and format"""
-    from compilertools import __version__
-    from distutils.version import StrictVersion
-    assert StrictVersion(__version__)
-
 
 def tests_get_compile_args():
     """Test get_compile_args"""

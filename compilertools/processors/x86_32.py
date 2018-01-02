@@ -399,6 +399,7 @@ class Cpuid:
             else:
                 from ctypes import cdll
                 lib = cdll.LoadLibrary(None)
+                mprotect = lib.mprotect
                 valloc = lib.valloc
                 valloc.argtypes = [c_size_t]
                 args = (c_size_t(size), )
@@ -410,7 +411,6 @@ class Cpuid:
 
             if not is_windows:
                 # Set memory executable
-                mprotect = lib.mprotect
                 mprotect.restype = c_int
                 mprotect.argtypes = [c_void_p, c_size_t, c_int]
                 if mprotect(address, size, 1 | 2 | 4) != 0:

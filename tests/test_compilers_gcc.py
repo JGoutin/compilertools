@@ -98,10 +98,18 @@ def tests_compiler_gcc_command():
     from platform import system
     from subprocess import Popen, PIPE
     try:
-        Popen(['gcc', '--version'])
+        version_str = Popen(['gcc', '--version'])
     except OSError:
         from pytest import skip
-        skip('"gcc" not available')
+        skip('GCC not available')
+
+    version_str = Popen(
+        ['gcc' if system() == 'Windows' else 'cc', '--version'],
+        stdout=PIPE, universal_newlines=True).stdout.read()
+    if (version_str.rstrip().split(maxsplit=1)[0].lower()
+            not in ('gcc', 'cc')):
+        from pytest import skip
+        skip('"CC" is not GCC')
 
     from compilertools.compilers.gcc import Compiler
     assert Compiler(current_compiler=True).version != 0.0

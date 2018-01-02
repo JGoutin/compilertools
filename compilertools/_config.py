@@ -36,9 +36,16 @@ CONFIG = {
     'compilers': {
         # GCC
         'gcc': 'gcc',
-        'unix': 'gcc',
+        'g++': 'gcc',
         'mingw32': 'gcc',
         'cygwin': 'gcc',
+        'cc': 'gcc',
+        'c++': 'gcc',
+        'unix': 'gcc',
+
+        # Clang (Not implemented yet)
+        #'clang': 'clang',
+        #'clang++': 'clang',
 
         # MSVC
         'msvc': 'msvc',

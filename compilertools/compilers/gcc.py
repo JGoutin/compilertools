@@ -39,18 +39,20 @@ class Compiler(_CompilerBase):
             return
 
         from subprocess import Popen, PIPE
+        from platform import system
         try:
             version_str = Popen(
-                ['gcc', '--version'],
+                ['gcc' if system() == 'Windows' else 'cc', '--version'],
                 stdout=PIPE, universal_newlines=True).stdout.read()
         except OSError:
             return
-        version_str = version_str.rstrip().split('\n', 1)[0]
 
-        if not version_str.lower().startswith('gcc'):
+        if (not version_str or
+                version_str.rstrip().split(maxsplit=1)[0].lower()
+                not in ('gcc', 'cc')):
             return
 
-        version_str = version_str.rsplit(maxsplit=1)[-1]
+        version_str = version_str.split(')')[1].rstrip().split(maxsplit=1)[0]
 
         # Keep only major and minor
         return float(version_str.rsplit('.', 1)[0])

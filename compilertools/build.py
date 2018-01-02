@@ -140,9 +140,9 @@ def _find_if_current_machine():
     current_machine = CONFIG_BUILD['current_machine']
     if not isinstance(current_machine, bool):
         # Check if running from PIP
-        from sys import argv
-        from os.path import basename, dirname
-        return basename(dirname(argv[0])).startswith('pip-‌​')
+        from os import getcwd
+        from os.path import basename
+        return basename(getcwd()).startswith('pip-‌​')
     return current_machine
 
 

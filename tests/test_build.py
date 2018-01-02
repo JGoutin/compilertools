@@ -6,6 +6,7 @@ from distutils.command.build_ext import build_ext
 BUILD_EXTENSION = build_ext.build_extension
 GET_EXT_FILENAME = build_ext.get_ext_filename
 GET_EXT_FULLNAME = build_ext.get_ext_fullname
+BUILD_EXT_NEW = build_ext.__new__
 
 
 def tests_get_build_compile_args():
@@ -114,8 +115,17 @@ def tests_get_build_link_args():
 def tests_find_if_current_machine():
     """Test _find_if_current_machine"""
     from sys import argv
+    import os
     from compilertools.build import _find_if_current_machine
     from compilertools._config_build import CONFIG_BUILD
+
+    w_dir = os.getcwd()
+
+    def dummy_getcwd():
+        return w_dir
+
+    os_getcwd = os.getcwd
+    os.getcwd = dummy_getcwd
 
     # Set by configuration
     CONFIG_BUILD['current_machine'] = False
@@ -124,16 +134,16 @@ def tests_find_if_current_machine():
     assert _find_if_current_machine() is True
 
     # Pip detection
-    file = argv[0]
     CONFIG_BUILD['current_machine'] = 'autodetect'
-    argv[0] = 'dir/not_current_machine/file.py'
+    w_dir = 'dir/not_current_machine'
     assert _find_if_current_machine() is False
-    argv[0] = 'dir/pip-‌​current_machine/file.py'
+    w_dir = 'dir/pip-‌​current_machine'
     assert _find_if_current_machine() is True
 
     # Cleaning
-    argv[0] = file
+    os.getcwd = os_getcwd
     CONFIG_BUILD['current_machine'] = False
+
 
 def tests_add_args():
     """Test _add_args"""
@@ -327,6 +337,26 @@ def tests_update_extension():
     assert isinstance(dummy_build_ext.get_ext_fullname(_String('module')), _String)
 
 
+def tests_string():
+    """Test _String"""
+    from compilertools.build import _String
+
+    string = _String('a.b')
+
+    # Test parent_extension
+    parent_extension = 'parent_extension'
+    assert string.parent_extension is None
+    string.parent_extension = parent_extension
+    assert string.parent_extension == parent_extension
+
+    # Test split
+    splited = string.split('.')
+    assert isinstance(splited[0], _String)
+    assert isinstance(splited[1], _String)
+    assert splited[0].parent_extension == parent_extension
+    assert splited[1].parent_extension == parent_extension
+
+
 def tests_patch_build_extension():
     """Test _patch_build_extension"""
     from compilertools.build import _patch_build_extension
@@ -379,3 +409,18 @@ def tests_patch_get_ext_fullname():
     previous = build_ext.get_ext_fullname
     build_ext.get_ext_fullname = (_patch_get_ext_fullname(build_ext.get_ext_fullname))
     assert build_ext.get_ext_fullname is previous
+
+
+def tests_patch___new__():
+    """Test _patch___new__"""
+    from compilertools.build import _patch___new__
+
+    # Check if patched
+    assert BUILD_EXT_NEW is not build_ext.__new__
+
+    # Check build_ext instantiation
+    from distutils.dist import Distribution
+    build_ext(Distribution())
+    assert GET_EXT_FULLNAME is not build_ext.get_ext_fullname
+    assert GET_EXT_FILENAME is not build_ext.get_ext_filename
+    assert BUILD_EXTENSION is not build_ext.build_extension
