@@ -85,13 +85,23 @@ def _build_and_import(
         # Handle setup errors
         except SystemExit as exception:
             message = exception.args[0]
-            # Excepted exception if compiler not found
+            # Excepted exception if compiler not found by Distutils
             if ('Unable to find vcvarsall.bat' in message or
+                    # Or not found by Setuptools
                     ('Microsoft Visual C++ ' in message and
                      ' is required.' in message)):
                 from pytest import xfail
                 xfail(message)
+            # re-raise unexcepted exceptions
+            raise
 
+        except ValueError as exception:
+            message = exception.args[0]
+            # Excepted exception if compiler not found by Distutils
+            # on Python 3.4 or less
+            if "['path']" == message:
+                from pytest import xfail
+                xfail(message)
             # re-raise unexcepted exceptions
             raise
 

@@ -4,6 +4,8 @@ environment:
         - PYTHON: "C:\\Python36"
         - PYTHON: "C:\\Python35-x64"
         - PYTHON: "C:\\Python35"
+        - PYTHON: "C:\\Python34-x64"
+        - PYTHON: "C:\\Python34"
 platform: 
     - x64
     - x86
@@ -14,11 +16,14 @@ matrix:
           platform: x86
         - PYTHON: "C:\\Python35-x64"
           platform: x86
+        - PYTHON: "C:\\Python34-x64"
+          platform: x86
 
 build: off
 
 install:
     - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+    - "python -m pip install --upgrade setuptools pip"
     - "python -m pip install pytest coverage pytest-cov coveralls[yaml] x86cpu numpy cython"
 
 test_script:
