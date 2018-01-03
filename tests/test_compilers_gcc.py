@@ -106,7 +106,7 @@ def tests_compiler_gcc_command():
     version_str = Popen(
         ['gcc' if system() == 'Windows' else 'cc', '--version'],
         stdout=PIPE, universal_newlines=True).stdout.read()
-    if (version_str.rstrip().split(maxsplit=1)[0].lower()
+    if (version_str.split('(', 1)[0].strip().lower()
             not in ('gcc', 'cc')):
         from pytest import skip
         skip('"CC" is not GCC')

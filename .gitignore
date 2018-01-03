@@ -4,6 +4,9 @@ __pycache__/
 *.so
 *.pyd
 
+# Sphinx
+/doc/_build/
+
 # Windows folders files
 Desktop.ini
 Thumbs.db

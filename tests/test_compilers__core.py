@@ -67,6 +67,9 @@ def tests_compiler_base():
     from compilertools.compilers import CompilerBase
     from compilertools.compilers._core import _order_args_matrix
 
+    # Test name
+    assert CompilerBase().name == '_core'
+
     # Create compilers
     class Compiler(CompilerBase):
         """Dummy Compiler"""

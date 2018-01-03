@@ -56,3 +56,8 @@ class ProcessorBase(BaseClass):
         self._default['vendor'] = ''
         self._default['brand'] = ''
         self._default['features'] = []
+
+    @BaseClass._memoized_property
+    def arch(self):
+        """processor architecture"""
+        return self.__module__.rsplit('.', 1)[-1]

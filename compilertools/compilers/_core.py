@@ -167,3 +167,8 @@ class CompilerBase(BaseClass):
         machine"""
         return self._compile_args_current_machine(
             *_get_arch_and_cpu(current_machine=True))
+
+    @BaseClass._memoized_property
+    def name(self):
+        """Compiler type name"""
+        return self.__module__.rsplit('.', 1)[-1]

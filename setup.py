@@ -1,5 +1,6 @@
 """compilertools setup"""
 from setuptools import setup, find_packages
+from datetime import datetime
 
 # Set Package informations
 PACKAGE_INFOS = dict(
@@ -22,8 +23,7 @@ PACKAGE_INFOS = dict(
     author='J.Goutin',
     url='https://github.com/JGoutin/compilertools',
     license='BSD',
-    packages=find_packages(exclude=['tests']),
-    tests_require=['pytest'],
+    packages=find_packages(exclude=['tests', 'doc']),
     zip_safe=True,
     python_requires='>=3.4',
     extras_require={'tests': ['pytest']},
@@ -39,6 +39,15 @@ with open('compilertools/_version.py') as file:
 # Get long description from readme
 with open('readme.md') as file:
     PACKAGE_INFOS['long_description'] = file.read()
+
+# Sphinx configuration
+PACKAGE_INFOS['command_options']['build_sphinx'] = {
+    'project': ('setup.py', PACKAGE_INFOS['name'].capitalize()),
+    'version': ('setup.py', PACKAGE_INFOS['version']),
+    'release': ('setup.py', PACKAGE_INFOS['version']),
+    'copyright': ('setup.py', '2017-%s, %s' % (
+        datetime.now().year, PACKAGE_INFOS['author'])),
+    }
 
 # Run setup
 if __name__ == '__main__':

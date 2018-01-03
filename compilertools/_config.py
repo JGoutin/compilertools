@@ -8,13 +8,13 @@ CONFIG = {
     # Key is name or alias
     # Value is name to use
     'architectures': {
-        # ARM_32
+        # ARM 32bits
         'arm': 'arm_32',
 
-        # ARM_64
+        # ARM 64bits
         'arm64': 'arm_64',
 
-        # x86_32
+        # x86 32bits
         'x86_32': 'x86_32',
         'x86': 'x86_32',
         'i386': 'x86_32',
@@ -22,7 +22,7 @@ CONFIG = {
         'ia32': 'x86_32',
         'win32': 'x86_32',
 
-        # x86_64
+        # x86 64bits
         'x86_64': 'x86_64',
         'x86-64': 'x86_64',
         'amd64': 'x86_64',
@@ -34,20 +34,23 @@ CONFIG = {
     # Key is name or alias
     # Value is name to use
     'compilers': {
-        # GCC
+        # GNU Compiler Collection
         'gcc': 'gcc',
         'g++': 'gcc',
+        'gfortran': 'gcc',
+        'gnu fortran': 'gcc',
         'mingw32': 'gcc',
         'cygwin': 'gcc',
         'cc': 'gcc',
         'c++': 'gcc',
         'unix': 'gcc',
 
-        # Clang (Not implemented yet)
-        #'clang': 'clang',
-        #'clang++': 'clang',
+        # LLVM (Not implemented yet)
+        #'clang': 'llvm',
+        #'clang++': 'llvm',
+        #'flang': 'llvm',
 
-        # MSVC
+        # Microsoft Visual C
         'msvc': 'msvc',
         },
     }

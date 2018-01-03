@@ -6,6 +6,7 @@ from distutils.command.build_ext import build_ext
 BUILD_EXTENSION = build_ext.build_extension
 GET_EXT_FILENAME = build_ext.get_ext_filename
 GET_EXT_FULLNAME = build_ext.get_ext_fullname
+GET_OUTPUTS = build_ext.get_outputs
 BUILD_EXT_NEW = build_ext.__new__
 
 
@@ -114,7 +115,6 @@ def tests_get_build_link_args():
 
 def tests_find_if_current_machine():
     """Test _find_if_current_machine"""
-    from sys import argv
     import os
     from compilertools.build import _find_if_current_machine
     from compilertools._config_build import CONFIG_BUILD
@@ -122,6 +122,7 @@ def tests_find_if_current_machine():
     w_dir = os.getcwd()
 
     def dummy_getcwd():
+        """Dummy os.getcwd"""
         return w_dir
 
     os_getcwd = os.getcwd
@@ -178,13 +179,14 @@ def tests_update_extension():
     """Test _update_extension, _patch_build_extension.patched and
     _patch_get_ext_filename.patched"""
     from os.path import join
+    from os import makedirs
     from tempfile import TemporaryDirectory
     from distutils.sysconfig import get_config_var
     from compilertools.compilers import CompilerBase
     from compilertools._config_build import CONFIG_BUILD
     from compilertools.build import (
         _update_extension, _patch_build_extension, _patch_get_ext_filename,
-        _patch_get_ext_fullname, _String)
+        _patch_get_ext_fullname, _patch_get_outputs, _String)
 
     # File extension
     ext_suffix = get_config_var('EXT_SUFFIX')
@@ -232,11 +234,16 @@ def tests_update_extension():
             self.extensions = []
             self.compiler = DummyCompiler()
             self.plat_name = 'arch'
+            self.inplace = False
             self.debug = False  # Python 3.4 compatibility
 
         # Use build_ext.get_ext_filename directly
         get_ext_filename = GET_EXT_FILENAME
         get_ext_fullname = GET_EXT_FULLNAME
+ 
+        def get_outputs(self):
+            """Dummy get_outputs"""
+            return []
 
         def build_extension(self, _):
             """Dummy build_extension"""
@@ -250,6 +257,8 @@ def tests_update_extension():
         DummyBuildExt.build_extension)
     DummyBuildExt.get_ext_fullname = _patch_get_ext_fullname(
         DummyBuildExt.get_ext_fullname)
+    DummyBuildExt.get_outputs = _patch_get_outputs(
+        DummyBuildExt.get_outputs)
 
     # Test with patched build_extension
     dummy_build_ext = DummyBuildExt()
@@ -259,6 +268,7 @@ def tests_update_extension():
 
     # Check result count
     excepted_args = compiler.compile_args()
+    assert len(excepted_args) != 0
     assert len(results) == len(excepted_args)
 
     # Check results details
@@ -288,6 +298,22 @@ def tests_update_extension():
     dummy_build_ext.build_extension(dummy_ext)
     results = dummy_build_ext.extensions
     assert len(results) == len(excepted_args)
+
+    # Test "compilertools_extra_ouputs" presence
+    # Cause, not use default compiler for current platform
+    assert dummy_build_ext.compilertools_compiler_name
+    assert dummy_build_ext.compilertools_extra_ouputs == [
+        '%s%s' % (join('package', 'module'), '.compilertools')]
+
+    # Test get_output
+    with TemporaryDirectory() as tmp:
+        dummy_build_ext.build_lib = join(tmp, 'build')
+        makedirs(join(dummy_build_ext.build_lib, 'package'), exist_ok=True)
+        excepted_file = join(
+            dummy_build_ext.build_lib, 'package', 'module.compilertools')
+        assert dummy_build_ext.get_outputs() == [excepted_file]
+        with open(excepted_file, 'rt') as file:
+            assert file.read() == dummy_build_ext.compilertools_compiler_name
 
     # Test after disabling optimization with CONFIG_BUILD
     CONFIG_BUILD['disabled'] = True
@@ -412,10 +438,26 @@ def tests_patch_get_ext_fullname():
     assert build_ext.get_ext_fullname is previous
 
 
+def tests_patch_get_outputs():
+    """Test _patch_get_outputs"""
+    from compilertools.build import _patch_get_outputs
+
+    # Check if patched
+    assert GET_OUTPUTS is not build_ext.get_outputs
+
+    # Check wrap
+    assert (build_ext.get_outputs.__module__ ==
+            'compilertools.%s' % GET_OUTPUTS.__module__)
+    assert build_ext.get_outputs.__name__ == GET_OUTPUTS.__name__
+
+    # Test re-patch
+    previous = build_ext.get_outputs
+    build_ext.get_outputs = (_patch_get_outputs(build_ext.get_outputs))
+    assert build_ext.get_outputs is previous
+
+
 def tests_patch___new__():
     """Test _patch___new__"""
-    from compilertools.build import _patch___new__
-
     # Check if patched
     assert BUILD_EXT_NEW is not build_ext.__new__
 
@@ -425,3 +467,4 @@ def tests_patch___new__():
     assert GET_EXT_FULLNAME is not build_ext.get_ext_fullname
     assert GET_EXT_FILENAME is not build_ext.get_ext_filename
     assert BUILD_EXTENSION is not build_ext.build_extension
+    assert GET_OUTPUTS is not build_ext.get_outputs

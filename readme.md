@@ -4,7 +4,7 @@
 
 *This module is experimental*
 
-Actually, even if wheels provide pre-compiled extensions, binaries need to be hightly compatible with all possibles machines for the specified CPU architecture.
+Actually, even if wheels provide pre-compiled extensions, it need to be hightly compatible with all possibles machines.
 There is no easy solution to provide pre-compiled extensions using specific optimisation like SIMD (SSE, AVX, FMA, ...).
 
 This module help to easily build and distributes optimized Python extensions for multiples architectures.
@@ -70,8 +70,7 @@ Enable or disable generic extra compiler options like fast math.
 
 ### Supported processors
 
-* x86-32
-* x86-64
+* x86 (32 and 64 bits)
 
 ### Build tools compatiblity
 
@@ -81,7 +80,7 @@ Enable or disable generic extra compiler options like fast math.
 
 ### Python compatibility
 
-* Python 3.5 minimum.
+* Python 3.4 minimum.
 
 ## Work in progress
 
@@ -101,5 +100,5 @@ Enable or disable generic extra compiler options like fast math.
 * Ability to force the use of an API (openMP, ...)
 * Add it as an option in *setuptools* (or eventually merge it in *setuptools*).
 * Since this module get many informations on CPU, give possibility to users to access them easily as a dict.
-* Add support for more compilers (Intel, Clang, ...). The aim is to support all compilers availables with *distutils* and *numpy.distutils*.
-* Add support for more processors (ARM, ARM64, ...).
+* Add support for more compilers (Intel, LLVM, ...). The aim is to support all compilers available with *distutils* and *numpy.distutils*.
+* Add support for more processors (ARM, ...).

@@ -15,7 +15,7 @@ def tests_update_ext_suffixes():
     get_compile_args('gcc', current_machine=True)
     suffixes = suffixe_from_args(
         get_compile_args('gcc', current_machine=True),
-        EXTENSION_SUFFIXES, 'gcc')
+        EXTENSION_SUFFIXES)
 
     for suffixe in suffixes:
         assert suffixe in ARCH_SUFFIXES
@@ -38,7 +38,8 @@ def tests_extension_file_finder():
     from os.path import join
     from tempfile import TemporaryDirectory
     import importlib.machinery as machinery
-    from compilertools.imports import _ExtensionFileFinder, ARCH_SUFFIXES
+    from compilertools.imports import (
+        _ExtensionFileFinder, ARCH_SUFFIXES, _PROCESSED_COMPILERS)
 
     # Check presence in sys.meta_path
     assert isinstance(sys.meta_path[0], _ExtensionFileFinder)
@@ -61,28 +62,42 @@ def tests_extension_file_finder():
     machinery.ModuleSpec = dummy_spec
     machinery.ExtensionFileLoader = dummy_fileloader
 
-    with TemporaryDirectory() as tmp:
-        # Add temporary dir to sys.path
-        sys.path.insert(0, tmp)
+    for use_compiler_file in (False, True):
+        with TemporaryDirectory() as tmp:
+            # Add temporary dir to sys.path
+            sys.path.insert(0, tmp)
 
-        # Create a dummy file
-        name = "compilertools_dummy_file"
-        ext = ARCH_SUFFIXES[0]
-        path = join(tmp, ''.join([name, ext]))
-        with open(path, 'wt') as file:
-            file.write('')
+            # Create a dummy file
+            name = "compilertools_dummy_file"
+            ext = ARCH_SUFFIXES[0]
+            path = join(tmp, ''.join([name, ext]))
+            with open(path, 'wt') as file:
+                file.write('')
 
-        # Initialize file finder
-        file_finder = _ExtensionFileFinder()
+            # Create a dummy compiler file
+            if use_compiler_file:
+                compiler = _PROCESSED_COMPILERS.pop()
+                assert compiler not in _PROCESSED_COMPILERS
+                path_compiler = join(tmp, ''.join([name, '.compilertools']))
+                with open(path_compiler, 'wt') as file:
+                    file.write(compiler)
 
-        # Existing file
-        assert file_finder.find_spec(name, '') == path
+            # Initialize file finder
+            file_finder = _ExtensionFileFinder()
 
-        # non-existing file
-        assert file_finder.find_spec(
-            "compilertools_notexists_file", '') is None
+            # Existing file
+            assert file_finder.find_spec(name, '') == path
+
+            if use_compiler_file:
+                assert compiler in _PROCESSED_COMPILERS
+
+            # non-existing file
+            assert file_finder.find_spec(
+                "compilertools_notexists_file", '') is None
+
+            # Clean up
+            sys.path.remove(tmp)
 
     # Clean up
-    sys.path.remove(tmp)
     machinery.ModuleSpec = module_spec
     machinery.ExtensionFileLoader = extension_file_loader

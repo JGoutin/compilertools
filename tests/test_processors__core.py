@@ -70,3 +70,6 @@ def tests_processor_base():
     assert processor.features == []
     processor['features'] = ['feature1', 'feature2']
     assert processor.features == ['feature1', 'feature2']
+
+    # Test arch
+    assert processor.arch == '_core'

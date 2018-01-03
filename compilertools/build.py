@@ -2,16 +2,11 @@
 """Building functions"""
 
 from functools import wraps as _wraps
-from copy import deepcopy as _deepcopy
-
-from distutils.sysconfig import get_config_var as _get_config_var
 from distutils.command.build_ext import build_ext as _build_ext
-from distutils.util import get_platform as _get_platform
 
 from compilertools._config_build import CONFIG_BUILD
 from compilertools._core import (
     suffixe_from_args, get_compile_args, get_compiler)
-from compilertools._src_files import _use_api_pragma
 
 
 __all__ = ['get_build_compile_args', 'get_build_link_args', 'CONFIG_BUILD',
@@ -34,11 +29,13 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
     """
     # Default values
     if ext_suffix is None:
-        ext_suffix = _get_config_var('EXT_SUFFIX')
+        from distutils.sysconfig import get_config_var
+        ext_suffix = get_config_var('EXT_SUFFIX')
     if current_machine is None:
         current_machine = _find_if_current_machine()
     if arch is None:
-        arch = _get_platform()
+        from distutils.util import get_platform
+        arch = get_platform()
 
     # Compiler and base arguments
     build_args = {}
@@ -169,8 +166,26 @@ def _update_extension(self, ext):
     if CONFIG_BUILD['disabled']:
         return [ext]
 
+    # Get compiler
     compiler = get_compiler(self.compiler.compiler_type,
                             current_compiler=True)
+    self.compilertools_compiler_name = compiler.name
+
+    # Check if compiler is default for this platform
+    # for save compiler type in an extra output file
+    if not hasattr(self, 'compilertools_store_compiler'):
+        from distutils.ccompiler import get_default_compiler
+        default_compiler = get_default_compiler(self.plat_name)
+        if default_compiler == 'unix':
+            default_compiler = 'gcc'
+        self.compilertools_store_compiler = default_compiler != compiler.name
+        self.compilertools_extra_ouputs = []
+
+    if self.compilertools_store_compiler:
+        from os.path import join
+        self.compilertools_extra_ouputs.append(
+            join(*self.get_ext_fullname(ext.name).split('.')) +
+            '.compilertools')
 
     # Options list
     config_options = CONFIG_BUILD['option']
@@ -178,6 +193,7 @@ def _update_extension(self, ext):
                    if config_options[option]]
 
     # API detection
+    from compilertools._src_files import _use_api_pragma
     api_list = []
     config_api = CONFIG_BUILD['api']
     for api in config_api:
@@ -199,6 +215,7 @@ def _update_extension(self, ext):
 
     # Update Extensions and build
     exts = []
+    from copy import deepcopy
     for suffix in args:
         # Retrieve argument and suffix
         compile_args = args[suffix]
@@ -206,7 +223,7 @@ def _update_extension(self, ext):
         # Create an Extension copy
         ext.compilertools_updated = True
         if suffix:
-            ext_copy = _deepcopy(ext)
+            ext_copy = deepcopy(ext)
             ext_copy.compilertools_extended_suffix = suffix
             # Use a str subclass to add ability to store extension reference
             ext_copy.name = _String(ext.name)
@@ -302,6 +319,40 @@ def _patch_get_ext_fullname(get_ext_fullname):
     return patched
 
 
+def _patch_get_outputs(get_outputs):
+    """Decorate build_ext.get_outputs for compiler memorization"""
+    if get_outputs.__module__.startswith('compilertools.'):
+        return get_outputs
+
+    @_wraps(get_outputs)
+    def patched(self):
+        """Patched get_outputs"""
+        # Get outputs
+        outputs = get_outputs(self)
+
+        # Update with compilertools outputs
+        if (hasattr(self, 'compilertools_store_compiler') and
+                self.compilertools_store_compiler):
+            extra_outputs = self.compilertools_extra_ouputs
+            # Update path
+            if not self.inplace:
+                from os.path import join
+                extra_outputs = [
+                    join(self.build_lib, path) for path in extra_outputs]
+
+            # Save compiler used in extra files
+            for path in extra_outputs:
+                with open(path, 'wt') as file:
+                    file.write(self.compilertools_compiler_name)
+
+            # Add paths to current outputs
+            outputs.extend(extra_outputs)
+        return outputs
+
+    patched.__module__ = 'compilertools.%s' % patched.__module__
+    return patched
+
+
 def _patch___new__(__new__):
     """Patch "build_ext.__new__" for helping patching subclasses.
 
@@ -316,6 +367,7 @@ def _patch___new__(__new__):
         cls.build_extension = _patch_build_extension(cls.build_extension)
         cls.get_ext_filename = _patch_get_ext_filename(cls.get_ext_filename)
         cls.get_ext_fullname = _patch_get_ext_fullname(cls.get_ext_fullname)
+        cls.get_outputs = _patch_get_outputs(cls.get_outputs)
 
         # Instanciate
         return __new__(cls)
@@ -330,4 +382,6 @@ _build_ext.get_ext_filename = _patch_get_ext_filename(
     _build_ext.get_ext_filename)
 _build_ext.get_ext_fullname = _patch_get_ext_fullname(
     _build_ext.get_ext_fullname)
+_build_ext.get_outputs = _patch_get_outputs(
+    _build_ext.get_outputs)
 _build_ext.__new__ = _patch___new__(_build_ext.__new__)

@@ -48,11 +48,11 @@ class Compiler(_CompilerBase):
             return
 
         if (not version_str or
-                version_str.rstrip().split(maxsplit=1)[0].lower()
+                version_str.split('(', 1)[0].strip().lower()
                 not in ('gcc', 'cc')):
             return
 
-        version_str = version_str.split(')')[1].rstrip().split(maxsplit=1)[0]
+        version_str = version_str.split(')', 1)[1].rstrip().split(maxsplit=1)[0]
 
         # Keep only major and minor
         return float(version_str.rsplit('.', 1)[0])

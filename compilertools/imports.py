@@ -12,6 +12,7 @@ __all__ = ['ARCH_SUFFIXES', 'update_extensions_suffixes']
 
 # Current arch compatibles suffixes
 ARCH_SUFFIXES = []
+_PROCESSED_COMPILERS = set()
 
 
 def update_extensions_suffixes(compiler):
@@ -19,15 +20,29 @@ def update_extensions_suffixes(compiler):
     with ones from a specified compiler.
 
     compiler: compiler name."""
-    from compilertools._core import suffixe_from_args, get_compile_args
+    # Get suffixes
+    from compilertools._core import (
+        suffixe_from_args, get_compile_args, get_compiler)
+
+    compiler = get_compiler(compiler)
 
     suffixes = suffixe_from_args(
         get_compile_args(compiler, current_machine=True),
-        _machinery.EXTENSION_SUFFIXES, compiler)
+        _machinery.EXTENSION_SUFFIXES)
 
+    # Update list
+    suffixes_index = ARCH_SUFFIXES.index
+    suffixes_insert = ARCH_SUFFIXES.insert
+    index = 0
     for suffixe in suffixes:
-        if suffixe not in ARCH_SUFFIXES:
-            ARCH_SUFFIXES.append(suffixe)
+        try:
+            index = suffixes_index(suffixe, index) + 1
+        except ValueError:
+            suffixes_insert(index, suffixe)
+            index += 1
+
+    # Memorize compiler as processed
+    _PROCESSED_COMPILERS.add(compiler.name)
 
 update_extensions_suffixes(None)
 
@@ -38,10 +53,31 @@ class _ExtensionFileFinder(_MetaPathFinder):
 
     def find_spec(self, fullname, *args, path=None, **kwargs):
         """Find module spec using new arch specific suffixes"""
+        sys_paths = _sys.path
+
+        # Search for compiler information file
+        file_name = '%s.compilertools' % fullname
+        for sys_path in sys_paths:
+            file_path = _join(sys_path, file_name)
+            if _isfile(file_path):
+                # Get compiler name from file
+                with open(file_path, 'rt') as file:
+                    compiler = file.read()
+
+                # If compiler not already processed, update suffixes
+                if compiler not in _PROCESSED_COMPILERS:
+                    update_extensions_suffixes(compiler)
+
+                # Memorize path where file is for faster suffixed files
+                # search
+                sys_paths = [sys_path]
+                break
+
+        # Search for file
         for suffixe in ARCH_SUFFIXES:
-            # Search for each suffixe
+            # Search for each suffix
             file_name = '%s%s' % (fullname, suffixe)
-            for sys_path in _sys.path:
+            for sys_path in sys_paths:
                 # Search in all sys.path
                 file_path = _join(sys_path, file_name)
                 if _isfile(file_path):
