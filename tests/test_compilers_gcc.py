@@ -67,6 +67,10 @@ def tests_compiler():
     arch_x86, cpu_x86 = _get_arch_and_cpu('x86_32')
     arch_amd64, cpu_amd64 = _get_arch_and_cpu('x86_64')
 
+    # Test API/Options
+    assert len(compiler.api) > 0
+    assert len(compiler.option) > 0
+
     # Test _compile_args_matrix
     assert compiler._compile_args_matrix(arch_x86, cpu_x86)
     assert compiler._compile_args_matrix(arch_amd64, cpu_amd64)
@@ -80,7 +84,7 @@ def tests_compiler():
     assert compiler._compile_args_current_machine(arch_amd64, cpu_amd64)
 
     # Check -mfpmath with or without SSE
-    cpu_x86['features'] = ['sse']
+    cpu_x86['features'] = ['SSE']
     args = compiler._compile_args_current_machine(arch_x86, cpu_x86)
     assert '-mfpmath=sse' in args
 

@@ -11,30 +11,30 @@ __all__ = ['Compiler']
 class Compiler(_CompilerBase):
     """GNU Compiler Collection"""
 
-    def __init__(self, current_compiler=False):
-        _CompilerBase.__init__(self, current_compiler)
-        self._default['python_build_version'] = 0.0
+    @_CompilerBase._memoized_property
+    def option(self):
+        """Compatibles options"""
+        return {'fast_fpmath': {'compile': '-Ofast'}}
 
-        # Options
-        self['option']['fast_fpmath'] = {
-            'compile': '-Ofast'}
-
-        # API
-        self['api']['openmp'] = {
-            'compile': '-fopenmp',
-            'link': '-fopenmp'}
-
-        self['api']['openacc'] = {
-            'compile': '-fopenacc'}
-
-        self['api']['cilkplus'] = {
-            'compile': '-fcilkplus -lcilkrts',
-            'link': '-fcilkplus -lcilkrts'}
+    @_CompilerBase._memoized_property
+    def api(self):
+        """Compatibles API"""
+        api = {}
+        if self.version >= 4.2:
+            api['openmp'] = {
+                'compile': '-fopenmp',
+                'link': '-fopenmp'}
+        if self.version >= 4.9:
+            api['cilkplus'] = {
+                'compile': '-fcilkplus -lcilkrts',
+                'link': '-fcilkplus -lcilkrts'}
+        if self.version >= 6.1:
+            api['openacc'] = {'compile': '-fopenacc'}
+        return api
 
     @_CompilerBase._memoized_property
     def version(self):
-        """Compiler version used.
-        """
+        """Compiler version used."""
         if not self.current_compiler:
             return
 
@@ -59,13 +59,12 @@ class Compiler(_CompilerBase):
 
     @_CompilerBase._memoized_property
     def python_build_version(self):
-        """Compiler version that was used to build Python.
-        """
+        """Compiler version that was used to build Python."""
         from platform import python_compiler
         version_str = python_compiler()
 
         if 'GCC' not in version_str:
-            return
+            return 0.0
 
         version_str = version_str.split(' ', 2)[1]
 
@@ -89,22 +88,22 @@ class Compiler(_CompilerBase):
                 # CPU Instructions sets
                 [self.Arg(args=['-mavx512cd', '-mavx512f'],
                           suffix='avx512',
-                          import_if=('avx512f' in cpu.features and
-                                     'avx512cd' in cpu.features and
-                                     cpu.os_supports_avx),
+                          import_if=('AVX512F' in cpu.features and
+                                     'AVX512CD' in cpu.features and
+                                     cpu.os_supports_xsave),
                           build_if=self.version >= 4.9),
 
                  self.Arg(args='-mavx2',
                           suffix='avx2',
                           import_if=(self.version >= 4.7 and
-                                     'avx2' in cpu.features and
-                                     cpu.os_supports_avx)),
+                                     'AVX2' in cpu.features and
+                                     cpu.os_supports_xsave)),
 
                  self.Arg(args='-mavx',
                           suffix='avx',
                           import_if=(self.version >= 4.4 and
-                                     'avx' in cpu.features and
-                                     cpu.os_supports_avx)),
+                                     'AVX' in cpu.features and
+                                     cpu.os_supports_xsave)),
                  self.Arg(),
                 ],
 
@@ -127,53 +126,53 @@ class Compiler(_CompilerBase):
                 [self.Arg(args=['-mfpmath=sse', '-mavx2'],
                           suffix='avx2',
                           import_if=(self.version >= 4.7 and
-                                     'avx2' in cpu.features and
-                                     cpu.os_supports_avx)),
+                                     'AVX2' in cpu.features and
+                                     cpu.os_supports_xsave)),
 
                  self.Arg(args=['-mfpmath=sse', '-mavx'],
                           suffix='avx',
                           import_if=(self.version >= 4.4 and
-                                     'avx' in cpu.features and
-                                     cpu.os_supports_avx)),
+                                     'AVX' in cpu.features and
+                                     cpu.os_supports_xsave)),
 
                  self.Arg(args=['-mfpmath=sse', '-msse4'],
                           suffix='sse4',
-                          import_if=('sse4.1' in cpu.features and
-                                     'sse4.2' in cpu.features),
+                          import_if=('SSE4_1' in cpu.features and
+                                     'SSE4_2' in cpu.features),
                           build_if=self.version >= 4.3),
 
                  self.Arg(args=['-mfpmath=sse', '-msse4.2'],
                           suffix='sse4_2',
-                          import_if='sse4.2' in cpu.features,
+                          import_if='SSE4_2' in cpu.features,
                           build_if=self.version >= 4.3),
 
                  self.Arg(args=['-mfpmath=sse', '-msse4.1'],
                           suffix='sse4_1',
-                          import_if='sse4.1' in cpu.features,
+                          import_if='SSE4_1' in cpu.features,
                           build_if=self.version >= 4.3),
 
                  self.Arg(args=['-mfpmath=sse', '-msse4a'],
                           suffix='sse4a',
                           import_if=(self.version >= 4.9 and
-                                     'sse4a' in cpu.features and
+                                     'SSE4A' in cpu.features and
                                      cpu.vendor == 'AuthenticAMD')),
 
                  self.Arg(args=['-mfpmath=sse', '-mssse3'],
                           suffix='ssse3',
-                          import_if='ssse3' in cpu.features,
+                          import_if='SSSE3' in cpu.features,
                           build_if=self.version >= 4.3),
 
                  self.Arg(args=['-mfpmath=sse', '-msse2'],
                           suffix='sse2',
-                          import_if='sse2' in cpu.features,
+                          import_if='SSE2' in cpu.features,
                           build_if=self.version >= 3.3),
 
                  self.Arg(args=['-mfpmath=sse', '-msse'],
                           suffix='sse',
-                          import_if='sse' in cpu.features,
+                          import_if='SSE' in cpu.features,
                           build_if=self.version >= 3.1),
 
-                 self.Arg(args='-mfpmath=387'),
+                 self.Arg(),
                 ],
 
                 # CPU Generic vendor/brand optimisations
@@ -196,7 +195,7 @@ class Compiler(_CompilerBase):
         # Arch specific optimizations
         if arch == 'x86_32':
             args.append('-m32')
-            if 'sse' in cpu.features and self.version >= 3.1:
+            if 'SSE' in cpu.features and self.version >= 3.1:
                 args.append('-mfpmath=sse')
 
         elif arch == 'x86_64':

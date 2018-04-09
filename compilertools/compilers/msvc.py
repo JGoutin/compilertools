@@ -2,12 +2,6 @@
 """Microsoft Visual C++ Compiler"""
 # https://docs.microsoft.com/cpp/build/reference/c-cpp-building-reference
 
-# TODO: boost.simd "#BOOST_SIMD_ASSUME_{SIMD_EXT}" preprocessor symbols
-#       auto-add to C/C++ sources
-# https://developer.numscale.com/boost.simd/documentation/develop/quickstart.html#win-compilation
-
-# TODO: Use of '/arch:IA32' (MSVC11+) ?
-
 from compilertools.compilers import CompilerBase as _CompilerBase
 
 __all__ = ['Compiler']
@@ -16,14 +10,15 @@ __all__ = ['Compiler']
 class Compiler(_CompilerBase):
     """Microsoft Visual C++"""
 
-    def __init__(self, current_compiler=False):
-        _CompilerBase.__init__(self, current_compiler)
+    @_CompilerBase._memoized_property
+    def option(self):
+        """Compatibles options"""
+        return {'fast_fpmath': {'compile': '/fp:fast'}}
 
-        # Options
-        self['option']['fast_fpmath'] = {'compile': '/fp:fast'}
-
-        # API
-        self['api']['openmp'] = {'compile': '/openmp'}
+    @_CompilerBase._memoized_property
+    def api(self):
+        """Compatibles API"""
+        return {'openmp': {'compile': '/openmp'}}
 
     @_CompilerBase._memoized_property
     def version(self):
@@ -60,26 +55,26 @@ class Compiler(_CompilerBase):
             # CPU Instructions sets
             [self.Arg(args='/arch:AVX2',
                       suffix='avx2',
-                      import_if=('avx2' in cpu.features and
-                                 cpu.os_supports_avx and
+                      import_if=('AVX2' in cpu.features and
+                                 cpu.os_supports_xsave and
                                  self.version >= 12.0),
                       build_if=self.version >= 12.0),
 
              self.Arg(args='/arch:AVX',
                       suffix='avx',
-                      import_if=('avx' in cpu.features and
-                                 cpu.os_supports_avx and
+                      import_if=('AVX' in cpu.features and
+                                 cpu.os_supports_xsave and
                                  self.version >= 10.0),
                       build_if=self.version >= 10.0),
 
              self.Arg(args='/arch:SSE2',
                       suffix='sse2',
-                      import_if='sse2' in cpu.features and arch == 'x86_32',
+                      import_if='SSE2' in cpu.features and arch == 'x86_32',
                       build_if=arch == 'x86_32'),
 
              self.Arg(args='/arch:SSE',
                       suffix='sse',
-                      import_if='sse' in cpu.features and arch == 'x86_32',
+                      import_if='SSE' in cpu.features and arch == 'x86_32',
                       build_if=arch == 'x86_32'),
 
              self.Arg(),

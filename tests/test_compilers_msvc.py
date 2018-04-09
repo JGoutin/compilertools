@@ -41,6 +41,10 @@ def tests_compiler():
     # Clean up
     platform.python_compiler = platform_python_compiler
 
+    # Test API/Options
+    assert len(compiler.api) > 0
+    assert len(compiler.option) > 0
+
     # Test _compile_args_matrix
     arch, cpu = _get_arch_and_cpu('x86_32')
     assert compiler._compile_args_matrix(arch, cpu)

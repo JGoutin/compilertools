@@ -67,7 +67,7 @@ def tests_processor_nocpu():
     assert processor.vendor is ''
     assert processor.cpuid_highest_extended_function == 0
     assert processor.brand is ''
-    assert processor.os_supports_avx is False
+    assert processor.os_supports_xsave is False
     assert processor.features == []
 
     # Initialize processor as current one
@@ -92,20 +92,21 @@ def tests_processor_nocpu():
     # Test limited features (With dummy CPUID)
     processor['cpuid_highest_extended_function'] = 0x80000000
     assert processor.features == {
-        'prefetchwt1', 'pbe', 'fpu', 'hv', 'fsgsbase', 'avx512vl', 'sse3'}
+        'PREFETCHWT1', 'PBE', 'FPU', 'HYPERVISOR', 'FSGSBASE', 'AVX512VL',
+        'SSE3'}
 
     # Test full features (With dummy CPUID)
     processor['cpuid_highest_extended_function'] = 0x80000001
     del processor['features']
     assert processor.features == {
-        '3dnow!', 'ahf64', 'avx512vl', 'fpu', 'fsgsbase', 'hv', 'pbe',
-        'prefetchwt1', 'sse3'}
+        '3DNOW', 'LAHF_LM', 'AVX512VL', 'FPU', 'FSGSBASE', 'HYPERVISOR', 'PBE',
+        'PREFETCHWT1', 'SSE3'}
 
     # Test os_support_avx
-    assert processor.os_supports_avx is False
-    del processor['os_supports_avx']
-    processor['features'].update(('xsave', 'osxsave'))
-    assert processor.os_supports_avx is True
+    assert processor.os_supports_xsave is False
+    del processor['os_supports_xsave']
+    processor['features'].update(('XSAVE', 'OSXSAVE'))
+    assert processor.os_supports_xsave is True
 
     # Cleaning
     x86_32.Cpuid = x86_cpuid

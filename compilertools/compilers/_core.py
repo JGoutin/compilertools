@@ -121,8 +121,6 @@ class CompilerBase(BaseClass):
         BaseClass.__init__(self)
         self['current_compiler'] = current_compiler
         self._default['current_compiler'] = False
-        self['api'] = {}
-        self['option'] = {}
         self._default['version'] = 0.0
 
     def _compile_args_matrix(self, arch, cpu):
@@ -172,3 +170,13 @@ class CompilerBase(BaseClass):
     def name(self):
         """Compiler type name"""
         return self.__module__.rsplit('.', 1)[-1]
+
+    @BaseClass._memoized_property
+    def api(self):
+        """Compatibles API"""
+        return {}
+
+    @BaseClass._memoized_property
+    def option(self):
+        """Compatibles Options"""
+        return {}
