@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test for build configuration"""
 
+
 def tests_config_build():
     """Test CONFIG_BUILD"""
     from collections.abc import Mapping, Container

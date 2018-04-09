@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for compilers core"""
 
+
 def tests_get_compiler():
     """Test get_compiler"""
     from os import listdir
@@ -59,6 +60,7 @@ def tests_get_arch_and_cpu():
 
         # Check processor
         assert result_cpu == get_processor(arch)
+
 
 def tests_compiler_base():
     """Test CompilerBase & _order_args_matrix"""

@@ -6,11 +6,11 @@ from distutils.command.build_ext import build_ext as _build_ext
 
 from compilertools._config_build import CONFIG_BUILD
 from compilertools._core import (
-    suffixe_from_args, get_compile_args, get_compiler)
+    suffix_from_args, get_compile_args, get_compiler)
 
 
 __all__ = ['get_build_compile_args', 'get_build_link_args', 'CONFIG_BUILD',
-           'get_compile_args', 'get_compiler', 'suffixe_from_args']
+           'get_compile_args', 'get_compiler', 'suffix_from_args']
 
 
 def get_build_compile_args(compiler=None, arch=None, current_machine=None,
@@ -20,7 +20,7 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
 
     compiler: compiler name or instance. If None, use distutils default value
     arch: target architecture name.
-    current_machine: return only one suffixe/args pair optimized for current
+    current_machine: return only one suffix/args pair optimized for current
         machine only. If None, use CONFIG_BUILD value.
     ext_suffix: extensions to use after suffix.
     use_option: List of options to use (fast_fpmath, ...).
@@ -73,7 +73,7 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
 
         # Add to build arguments
         for arg, suffix in zip(args.values(),
-                               suffixe_from_args(args, ext_suffix, True)):
+                               suffix_from_args(args, ext_suffix, True)):
             build_args[suffix] = arg
 
     # Extend args with special options
@@ -284,7 +284,7 @@ def _patch_get_ext_filename(get_ext_filename):
 
         # Return extended name
         if extended:
-            # Replace "." by "#" for avoiding repacement by "/" in
+            # Replace "." by "#" for avoiding replacement by "/" in
             # "get_ext_filename"
             return get_ext_filename(
                 self, '%s%s' % (
@@ -369,7 +369,7 @@ def _patch___new__(__new__):
         cls.get_ext_fullname = _patch_get_ext_fullname(cls.get_ext_fullname)
         cls.get_outputs = _patch_get_outputs(cls.get_outputs)
 
-        # Instanciate
+        # Instantiate
         return __new__(cls)
 
     return patched

@@ -72,7 +72,7 @@ class Compiler(_CompilerBase):
         return float(version_str.rsplit('.', 1)[0])
 
     def _compile_args_matrix(self, arch, cpu):
-        """Return GCC compiler options availables for the
+        """Return available GCC compiler options for the
         specified CPU architecture.
 
         arch: CPU Architecture str."""

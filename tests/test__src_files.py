@@ -2,11 +2,11 @@
 """Tests for source file parsing utilities"""
 
 
-def tests_any_line_startwith():
-    """"Test _any_line_startwith"""
+def tests_any_line_startswith():
+    """"Test _any_line_startswith"""
     from tempfile import TemporaryDirectory
     from os.path import join
-    from compilertools._src_files import _any_line_startwith
+    from compilertools._src_files import _any_line_startswith
 
     with TemporaryDirectory() as tmp:
         # Create dummy files
@@ -17,23 +17,24 @@ def tests_any_line_startwith():
             file.write("\tWXCVBN\nUIOP\n   JKLM\n")
 
         # Test existing files content
-        assert _any_line_startwith(files, {'.ext1': 'uiop'})
+        assert _any_line_startswith(files, {'.ext1': 'uiop'})
 
         # Test ignore case
-        assert _any_line_startwith(files, {'.ext2': 'uiop'})
+        assert _any_line_startswith(files, {'.ext2': 'uiop'})
 
         # Test non existing file
-        assert not _any_line_startwith(files, {'.ext3': 'uiop'})
+        assert not _any_line_startswith(files, {'.ext3': 'uiop'})
 
         # Test non existing file content
-        assert not _any_line_startwith(
+        assert not _any_line_startswith(
             files, {'.ext1': 'wxcvbn', '.ext2': 'azerty'})
 
         # Test content list
-        assert _any_line_startwith(files, {'.ext1': ['uiop', 'qsd']})
+        assert _any_line_startswith(files, {'.ext1': ['uiop', 'qsd']})
 
         # Test str argument auto-conversion
-        assert _any_line_startwith(files[0], {'.ext1': 'uiop'})
+        assert _any_line_startswith(files[0], {'.ext1': 'uiop'})
+
 
 def tests_ignore_api():
     """Test _ignore_api"""
@@ -53,19 +54,20 @@ def tests_ignore_api():
     compiler['api']['test'] = {}
     assert _ignore_api(compiler, 'test') is False
 
+
 def tests_startwith_exts():
-    """Test _startwith_exts"""
-    from compilertools._src_files import _startwith_exts
+    """Test _startswith_exts"""
+    from compilertools._src_files import _startswith_exts
 
     # List arguments
-    result = _startwith_exts(c=['c1', 'c2'], fortran=['fortran'],
-                             not_exists=['not_exists'])
+    result = _startswith_exts(c=['c1', 'c2'], fortran=['fortran'],
+                              not_exists=['not_exists'])
     assert list(result['.c']) == ['c1', 'c2']
     assert list(result['.f']) == ['fortran']
     assert [key for key in result if 'not_exists' in result[key]] == []
 
     # str or None arguments
-    result = _startwith_exts(c='c', fortran=None)
+    result = _startswith_exts(c='c', fortran=None)
     assert result['.c'] == ('c',)
     assert '.f' not in result
 

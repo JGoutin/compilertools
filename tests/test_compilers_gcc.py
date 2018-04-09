@@ -80,7 +80,7 @@ def tests_compiler():
     assert args
     assert '-march=native' in args
 
-    # Check retun a result also with amd64 
+    # Check return a result also with amd64
     assert compiler._compile_args_current_machine(arch_amd64, cpu_amd64)
 
     # Check -mfpmath with or without SSE

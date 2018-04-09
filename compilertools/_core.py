@@ -5,7 +5,7 @@ from compilertools.compilers import get_compiler
 from compilertools._utils import always_str_list
 
 
-__all__ = ['get_compile_args', 'get_compiler', 'suffixe_from_args']
+__all__ = ['get_compile_args', 'get_compiler', 'suffix_from_args']
 
 
 def get_compile_args(compiler=None, arch=None, current_machine=False,
@@ -23,13 +23,13 @@ def get_compile_args(compiler=None, arch=None, current_machine=False,
         arch, current_machine)
 
 
-def suffixe_from_args(args, extension='', return_empty_suffixes=False):
+def suffix_from_args(args, extension='', return_empty_suffixes=False):
     """Return suffixes from args.
 
     args: args OrderedDict
     extension : File extensions, single str or list of str
     return_empty_suffixes : If True, return '' suffixes."""
-    # suffixe filtering
+    # suffix filtering
 
     suffixes = []
     for suffix in args:

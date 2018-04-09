@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for x86-64 CPU"""
 
+
 def tests_processor():
     """Tests Processor
 
@@ -12,7 +13,7 @@ def tests_processor():
         from pytest import skip
         skip("Current processor is not x86-64")
 
-    # Test instanciation
+    # Test instantiation
     from compilertools.processors.x86_64 import Processor
     processor = Processor(current_machine=True)
     assert processor.features

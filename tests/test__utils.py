@@ -7,7 +7,7 @@ def test_baseclass():
     from compilertools._utils import BaseClass
     from pytest import raises
 
-    # Instanciate
+    # Instantiate
     baseclass = BaseClass()
 
     # Test default values
@@ -95,6 +95,7 @@ def test_baseclass():
     assert 'to_memoize_none' in testclass._items
     assert testclass._items['to_memoize_none'] is None
     assert testclass.to_memoize_none is None
+
 
 def tests_import_class():
     """"Test import_class"""

@@ -32,6 +32,7 @@ def test():
     return 1
 '''
 
+
 TEST_SCRIPT = '''
 import sys
 sys.path.extend(%s)
@@ -92,7 +93,7 @@ def _build_and_import(
                      ' is required.' in message)):
                 from pytest import xfail
                 xfail(message)
-            # re-raise unexcepted exceptions
+            # re-raise other exceptions
             raise
 
         except ValueError as exception:
@@ -102,7 +103,7 @@ def _build_and_import(
             if "['path']" == message:
                 from pytest import xfail
                 xfail(message)
-            # re-raise unexcepted exceptions
+            # re-raise other exceptions
             raise
 
         # Check files presence
@@ -115,7 +116,7 @@ def _build_and_import(
         with open(script, 'wt') as file:
             file.write(TEST_SCRIPT % str([build, getcwd()]))
 
-        # Test sufixes imports
+        # Test suffixes imports
         assert ARCH_SUFFIXES
         for suffix in ARCH_SUFFIXES:
             # Ignore file not existing

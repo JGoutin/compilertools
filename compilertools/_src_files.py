@@ -8,12 +8,12 @@ from compilertools._config_build import CONFIG_BUILD
 __all__ = []
 
 
-def _any_line_startwith(sources, criterion):
+def _any_line_startswith(sources, criterion):
     """Detect if any line in source files start with a specific string.
 
     sources: str or list of str, sources files paths
     criterion: dict with keys equal to lower case file extension, and
-        value equal to a list of lower case startwith string criterion."""
+        value equal to a list of lower case startswith string criterion."""
     # Make sure arguments are iterables
     if isinstance(sources, str):
         sources = (sources,)
@@ -35,7 +35,7 @@ def _any_line_startwith(sources, criterion):
 
 
 def _ignore_api(compiler, api):
-    """Returne True if this API is not supported by
+    """Return True if this API is not supported by
     the specified compiler. If compiler is None,
     always return False.
 
@@ -46,9 +46,9 @@ def _ignore_api(compiler, api):
     return True
 
 
-def _startwith_exts(**startswiths_dict):
+def _startswith_exts(**startswiths_dict):
     """
-    Returne a dict with file extensions as key and startswith as values.
+    Return a dict with file extensions as key and startswith as values.
 
     startswiths_dict: dict with key as lower case language and value as list
         of startswith values.
@@ -82,8 +82,8 @@ def _use_api_pragma(sources, compiler, api, **startswith):
 
     sources: sources files to check.
     compiler/api: "_ignore_api" arguments.
-    startswith: "_startwith_exts" arguments.
+    startswith: "_startswith_exts" arguments.
     """
     if _ignore_api(compiler, api):
         return False
-    return _any_line_startwith(sources, _startwith_exts(**startswith))
+    return _any_line_startswith(sources, _startswith_exts(**startswith))

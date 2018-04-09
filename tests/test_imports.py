@@ -5,7 +5,7 @@
 def tests_update_ext_suffixes():
     """Test update_extensions_suffixes & ARCH_SUFFIXES"""
     from importlib.machinery import EXTENSION_SUFFIXES
-    from compilertools._core import suffixe_from_args, get_compile_args
+    from compilertools._core import suffix_from_args, get_compile_args
     from compilertools.imports import (
         ARCH_SUFFIXES, update_extensions_suffixes)
 
@@ -13,7 +13,7 @@ def tests_update_ext_suffixes():
     update_extensions_suffixes('gcc')
 
     get_compile_args('gcc', current_machine=True)
-    suffixes = suffixe_from_args(
+    suffixes = suffix_from_args(
         get_compile_args('gcc', current_machine=True),
         EXTENSION_SUFFIXES)
 

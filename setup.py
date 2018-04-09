@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 from datetime import datetime
 
-# Set Package informations
+# Set Package information
 PACKAGE_INFOS = dict(
     name='compilertools',
     description='A library for helping optimizing Python extensions compilation.',

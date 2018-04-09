@@ -7,7 +7,6 @@ from os.path import isfile as _isfile
 from importlib.abc import MetaPathFinder as _MetaPathFinder
 import importlib.machinery as _machinery
 
-
 __all__ = ['ARCH_SUFFIXES', 'update_extensions_suffixes']
 
 # Current arch compatibles suffixes
@@ -22,11 +21,11 @@ def update_extensions_suffixes(compiler):
     compiler: compiler name."""
     # Get suffixes
     from compilertools._core import (
-        suffixe_from_args, get_compile_args, get_compiler)
+        suffix_from_args, get_compile_args, get_compiler)
 
     compiler = get_compiler(compiler)
 
-    suffixes = suffixe_from_args(
+    suffixes = suffix_from_args(
         get_compile_args(compiler, current_machine=True),
         _machinery.EXTENSION_SUFFIXES)
 
@@ -34,17 +33,19 @@ def update_extensions_suffixes(compiler):
     suffixes_index = ARCH_SUFFIXES.index
     suffixes_insert = ARCH_SUFFIXES.insert
     index = 0
-    for suffixe in suffixes:
+    for suffix in suffixes:
         try:
-            index = suffixes_index(suffixe, index) + 1
+            index = suffixes_index(suffix, index) + 1
         except ValueError:
-            suffixes_insert(index, suffixe)
+            suffixes_insert(index, suffix)
             index += 1
 
     # Memorize compiler as processed
     _PROCESSED_COMPILERS.add(compiler.name)
 
+
 update_extensions_suffixes(None)
+
 
 # Update Python import hook
 
@@ -74,9 +75,9 @@ class _ExtensionFileFinder(_MetaPathFinder):
                 break
 
         # Search for file
-        for suffixe in ARCH_SUFFIXES:
+        for suffix in ARCH_SUFFIXES:
             # Search for each suffix
-            file_name = '%s%s' % (fullname, suffixe)
+            file_name = '%s%s' % (fullname, suffix)
             for sys_path in sys_paths:
                 # Search in all sys.path
                 file_path = _join(sys_path, file_name)
@@ -87,5 +88,6 @@ class _ExtensionFileFinder(_MetaPathFinder):
                     return _machinery.ModuleSpec(
                         fullname, loader, origin=file_path)
         return None
+
 
 _sys.meta_path.insert(0, _ExtensionFileFinder())  # Loaded before legacy loaders

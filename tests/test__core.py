@@ -55,27 +55,27 @@ def tests_get_compile_args():
     assert get_compile_args(Compiler(current_compiler=True), arch='arch1') == excepted
 
 
-def tests_suffixe_from_args():
-    """Test suffixe_from_args"""
+def tests_suffix_from_args():
+    """Test suffix_from_args"""
     from collections import OrderedDict
-    from compilertools._core import suffixe_from_args
+    from compilertools._core import suffix_from_args
 
-    args = OrderedDict([('suffixe1', ['-arg1', '-arg2']),
-                        ('suffixe2', ['-arg1', '-arg3']),
+    args = OrderedDict([('suffix1', ['-arg1', '-arg2']),
+                        ('suffix2', ['-arg1', '-arg3']),
                         ('', ['-arg1'])])
 
     # Default
-    assert suffixe_from_args(args) == [
-        '.suffixe1', '.suffixe2']
+    assert suffix_from_args(args) == [
+        '.suffix1', '.suffix2']
 
     # With extension
-    assert suffixe_from_args(args, '.pyd') == [
-        '.suffixe1.pyd', '.suffixe2.pyd']
+    assert suffix_from_args(args, '.pyd') == [
+        '.suffix1.pyd', '.suffix2.pyd']
 
     # With empty suffixes
-    assert suffixe_from_args(args, return_empty_suffixes=True) == [
-        '.suffixe1', '.suffixe2', '']
+    assert suffix_from_args(args, return_empty_suffixes=True) == [
+        '.suffix1', '.suffix2', '']
 
     # With extension and emtpy suffixes
-    assert suffixe_from_args(args, '.pyd', True) == [
-        '.suffixe1.pyd', '.suffixe2.pyd', '.pyd']
+    assert suffix_from_args(args, '.pyd', True) == [
+        '.suffix1.pyd', '.suffix2.pyd', '.pyd']

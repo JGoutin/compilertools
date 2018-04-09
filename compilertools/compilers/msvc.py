@@ -47,7 +47,7 @@ class Compiler(_CompilerBase):
         specified CPU architecture.
 
         arch: CPU Architecture str."""
-        # Compute carguments
+        # Compute arguments
         args = [
             # Generic optimisation
             [self.Arg(args=['/O2', '/GL'])],

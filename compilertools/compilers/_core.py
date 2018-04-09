@@ -124,7 +124,7 @@ class CompilerBase(BaseClass):
         self._default['version'] = 0.0
 
     def _compile_args_matrix(self, arch, cpu):
-        """Return compiler arguments availables for the specified CPU
+        """Return available compiler arguments for the specified CPU
         architecture as a matrix.
 
         Override for define matrix.

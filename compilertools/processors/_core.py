@@ -9,7 +9,7 @@ __all__ = ['ProcessorBase', 'get_processor', 'get_arch']
 
 
 def get_arch(arch=None):
-    """Check achitecture name and return fixed name.
+    """Check architecture name and return fixed name.
 
     arch : arch to be checked"""
     # Current machine architecture
@@ -41,7 +41,7 @@ def get_processor(arch, *args, **kwargs):
     """Return processor class
 
     arch: processor architecture
-    *args, **kwargs: args for class instanciation"""
+    *args, **kwargs: args for class instantiation"""
     return import_class('processors', get_arch(arch), 'Processor',
                         ProcessorBase)(*args, **kwargs)
 

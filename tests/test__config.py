@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test for general configuration"""
 
+
 def tests_config():
     """Test CONFIG"""
     from collections.abc import Mapping

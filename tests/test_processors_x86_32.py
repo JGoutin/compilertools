@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for x86-32 CPU"""
 
+
 def tests_processor_nocpu():
     """Tests Processor methods that don't need a real x86_32 CPU"""
     from compilertools.processors.x86_32 import Processor
@@ -61,7 +62,7 @@ def tests_processor_nocpu():
     assert x86_32.Cpuid.registers_to_str(
         encoded, encoded, encoded) == string * 3
 
-    #Test default values
+    # Test default values
     processor = Processor()
     assert processor.current_machine is False
     assert processor.vendor is ''
@@ -289,7 +290,7 @@ def tests_processor():
         from pytest import skip
         skip("Current processor is not x86_32")
 
-    # Test instanciation
+    # Test instantiation
     from compilertools.processors.x86_32 import Processor
     processor = Processor(current_machine=True)
     assert processor.features

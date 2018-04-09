@@ -85,6 +85,7 @@ def tests_get_build_compile_args():
         '.arch2%s' % ext_suffix: ['--arch2']}
     CONFIG_BUILD['suffixes_includes'].remove('arch2')
 
+
 def tests_get_build_link_args():
     """Test get_build_link_args"""
     from compilertools.compilers import CompilerBase
@@ -294,7 +295,7 @@ def tests_update_extension():
         assert (dummy_build_ext.get_ext_filename(result.name) ==
                 '%s%s%s' % (join('package', 'module'), suffix, ext_suffix))
 
-    # Check no duplicates if runned a second time
+    # Check no duplicates if run a second time
     dummy_build_ext.build_extension(dummy_ext)
     results = dummy_build_ext.extensions
     assert len(results) == len(excepted_args)
