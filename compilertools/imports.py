@@ -15,11 +15,14 @@ _PROCESSED_COMPILERS = set()
 
 
 def update_extensions_suffixes(compiler):
-    """Update file extensions suffixes compatibles with current machine
+    """Updates file extensions suffixes compatibles with current machine
     with ones from a specified compiler.
 
-    compiler: compiler name."""
-    # Get suffixes
+    Parameters
+    ----------
+        compiler : str
+            compiler name."""
+    # Gets suffixes
     from compilertools._core import (
         suffix_from_args, get_compile_args, get_compiler)
 
@@ -29,7 +32,7 @@ def update_extensions_suffixes(compiler):
         get_compile_args(compiler, current_machine=True),
         _machinery.EXTENSION_SUFFIXES)
 
-    # Update list
+    # Updates list
     suffixes_index = ARCH_SUFFIXES.index
     suffixes_insert = ARCH_SUFFIXES.insert
     index = 0
@@ -40,23 +43,25 @@ def update_extensions_suffixes(compiler):
             suffixes_insert(index, suffix)
             index += 1
 
-    # Memorize compiler as processed
+    # Memorizes compiler as processed
     _PROCESSED_COMPILERS.add(compiler.name)
 
 
 update_extensions_suffixes(None)
 
 
-# Update Python import hook
+# Updates Python import hook
 
 class _ExtensionFileFinder(_MetaPathFinder):
     """Path finder for extensions with architecture specific optimizations"""
 
     def find_spec(self, fullname, *args, path=None, **kwargs):
-        """Find module spec using new arch specific suffixes"""
+        """Finds module spec using new arch specific suffixes
+
+        See importlib.abc.MetaPathFinder.find_spec for more information."""
         sys_paths = _sys.path
 
-        # Search for compiler information file
+        # Searches for compiler information file
         file_name = '%s.compilertools' % fullname
         for sys_path in sys_paths:
             file_path = _join(sys_path, file_name)
@@ -65,24 +70,24 @@ class _ExtensionFileFinder(_MetaPathFinder):
                 with open(file_path, 'rt') as file:
                     compiler = file.read()
 
-                # If compiler not already processed, update suffixes
+                # If compiler not already processed, updates suffixes
                 if compiler not in _PROCESSED_COMPILERS:
                     update_extensions_suffixes(compiler)
 
-                # Memorize path where file is for faster suffixed files
+                # Memorizes path where file is for faster suffixed files
                 # search
                 sys_paths = [sys_path]
                 break
 
-        # Search for file
+        # Searches for file
         for suffix in ARCH_SUFFIXES:
-            # Search for each suffix
+            # Searches for each suffix
             file_name = '%s%s' % (fullname, suffix)
             for sys_path in sys_paths:
-                # Search in all sys.path
+                # Searches in all sys.path
                 file_path = _join(sys_path, file_name)
                 if _isfile(file_path):
-                    # Use standard extension loader and specified spec
+                    # Uses standard extension loader and specified spec
                     loader = _machinery.ExtensionFileLoader(
                         fullname, file_path)
                     return _machinery.ModuleSpec(

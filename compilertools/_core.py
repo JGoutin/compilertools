@@ -10,26 +10,48 @@ __all__ = ['get_compile_args', 'get_compiler', 'suffix_from_args']
 
 def get_compile_args(compiler=None, arch=None, current_machine=False,
                      current_compiler=False):
-    """Get compiler args OrderedDict for a specific compiler and architecture
+    """Gets compiler args OrderedDict for a specific compiler and architecture
     combination.
 
-    compiler: compiler name or instance.
-    arch: target architecture name.
-    current_machine: Only compatibles with current machine CPU
-    current_compiler : If True, return only arguments compatibles with
-    current compiler."""
-    # Generate options matrix for compiler and architecture
+    Parameters
+    ----------
+    compiler : str or compilertools.compilers.CompilerBase subclass
+        Compiler name or instance.
+    arch : str
+        Target architecture name.
+    current_machine : bool
+        Only compatibles with current machine CPU
+    current_compiler : bool
+        If True, return only arguments compatibles with
+        current compiler.
+
+    Returns
+    -------
+    collections.OrderedDict
+        Arguments
+    """
+    # Generates options matrix for compiler and architecture
     return get_compiler(compiler, current_compiler).compile_args(
         arch, current_machine)
 
 
 def suffix_from_args(args, extension='', return_empty_suffixes=False):
-    """Return suffixes from args.
+    """Returns suffixes from args.
 
-    args: args OrderedDict
-    extension : File extensions, single str or list of str
-    return_empty_suffixes : If True, return '' suffixes."""
-    # suffix filtering
+    Parameters
+    ----------
+    args : collections.OrderedDict
+        Arguments.
+    extension : str or list of str
+        File extensions.
+    return_empty_suffixes : bool
+        If True, return '' suffixes.
+
+    Returns
+    -------
+    list of str
+        Suffixes"""
+    # Suffixes filtering
 
     suffixes = []
     for suffix in args:
@@ -46,5 +68,5 @@ def suffix_from_args(args, extension='', return_empty_suffixes=False):
         elif return_empty_suffixes:
             suffixes.append('')
 
-    # Return with same form as input
+    # Returns with same form as input
     return suffixes

@@ -9,24 +9,33 @@ __all__ = []
 
 
 def _any_line_startswith(sources, criterion):
-    """Detect if any line in source files start with a specific string.
+    """Detects if any line in source files start with a specific string.
 
-    sources: str or list of str, sources files paths
-    criterion: dict with keys equal to lower case file extension, and
-        value equal to a list of lower case startswith string criterion."""
-    # Make sure arguments are iterables
+    Parameters
+    ----------
+    sources : str or list of str
+        Sources files paths
+    criterion : dict with str as keys and values
+        Dictionary with keys equal to lower case file extension, and
+        value equal to a list of lower case startswith string criterion.
+
+    Returns
+    -------
+    bool
+        Returns True if criterion detected."""
+    # Makes sure arguments are iterable
     if isinstance(sources, str):
         sources = (sources,)
 
-    # Check files for criterions
+    # Checks files for criterions
     for source in sources:
-        # Select criterions based on file extension
+        # Selects criterions based on file extension
         try:
             startswiths = criterion[splitext(source)[1].lower()]
         except KeyError:
             continue
 
-        # Check criterions
+        # Checks criterions
         with open(source, 'rt') as file:
             for line, startswith in product(file, startswiths):
                 if line.lstrip().lower().startswith(startswith):
@@ -35,12 +44,21 @@ def _any_line_startswith(sources, criterion):
 
 
 def _ignore_api(compiler, api):
-    """Return True if this API is not supported by
+    """Returns True if this API is not supported by
     the specified compiler. If compiler is None,
     always return False.
 
-    compiler: Compiler to check.
-    api: API to check the compiler support."""
+    Parameters
+    ----------
+    compiler: str or compilertools.compilers.CompilerBase
+        Compiler to check.
+    api: str
+        API to check the compiler support.
+
+    Returns
+    -------
+    bool
+        Returns True if API not supported."""
     if compiler is None or api in compiler['api']:
         return False
     return True
@@ -48,12 +66,20 @@ def _ignore_api(compiler, api):
 
 def _startswith_exts(**startswiths_dict):
     """
-    Return a dict with file extensions as key and startswith as values.
+    Returns a dict with file extensions as key and startswith as values.
 
-    startswiths_dict: dict with key as lower case language and value as list
+    Parameters
+    ----------
+    startswiths_dict : dict with str as keys and values
+        Dictionary with key as lower case language and value as list
         of startswith values.
+
+    Returns
+    -------
+    dict with str as keys and values
+        Keys are file extensions, values are startswith.
     """
-    startwith_exts = {}
+    startswith_exts = {}
 
     config_extensions = CONFIG_BUILD['extensions']
     for key in startswiths_dict:
@@ -66,23 +92,33 @@ def _startswith_exts(**startswiths_dict):
         except KeyError:
             continue
 
-        # Make sure arguments are iterables
+        # Makes sure arguments are iterable
         if isinstance(startswiths, str):
             startswiths = (startswiths,)
 
         # Insert Data
         for ext in exts:
-            startwith_exts[ext] = startswiths
+            startswith_exts[ext] = startswiths
 
-    return startwith_exts
+    return startswith_exts
 
 
 def _use_api_pragma(sources, compiler, api, **startswith):
     """Generic API preprocessors checker
 
-    sources: sources files to check.
-    compiler/api: "_ignore_api" arguments.
-    startswith: "_startswith_exts" arguments.
+    Parameters
+    ----------
+    sources : str or list of str
+        sources files to check.
+    compiler, api
+        See "_ignore_api" arguments.
+    startswith
+        See "_startswith_exts" arguments.
+
+    Returns
+    -------
+    bool
+        Returns True if API preprocessor usage detected.
     """
     if _ignore_api(compiler, api):
         return False

@@ -9,9 +9,17 @@ __all__ = ['ProcessorBase', 'get_processor', 'get_arch']
 
 
 def get_arch(arch=None):
-    """Check architecture name and return fixed name.
+    """Checks architecture name and returns fixed name.
 
-    arch : arch to be checked"""
+    Parameters
+    ----------
+    arch : str
+        Architecture name to check.
+
+    Returns
+    -------
+    str
+        Fixed architecture name."""
     # Current machine architecture
     if arch is None:
         arch = machine()
@@ -19,7 +27,7 @@ def get_arch(arch=None):
 
     arch_dict = CONFIG['architectures']
 
-    # If cross compilation, keep only target architecture
+    # If cross compilation, keeps only target architecture
     if '_' in arch:
         current, target = arch.split('_', 1)
         if current in arch_dict and target in arch_dict:
@@ -40,8 +48,17 @@ def get_arch(arch=None):
 def get_processor(arch, *args, **kwargs):
     """Return processor class
 
-    arch: processor architecture
-    *args, **kwargs: args for class instantiation"""
+    Parameters
+    ----------
+    arch : str
+        processor architecture
+    *args, **kwargs
+        args for class instantiation
+
+    Returns
+    -------
+    ProcessorBase subclass instance
+        Processor class instance."""
     return import_class('processors', get_arch(arch), 'Processor',
                         ProcessorBase)(*args, **kwargs)
 
@@ -59,5 +76,10 @@ class ProcessorBase(BaseClass):
 
     @BaseClass._memoized_property
     def arch(self):
-        """processor architecture"""
+        """processor architecture
+
+        Returns
+        -------
+        str
+            Architecture name."""
         return self.__module__.rsplit('.', 1)[-1]

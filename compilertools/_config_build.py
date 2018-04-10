@@ -6,7 +6,7 @@ CONFIG_BUILD = {
     # Disable compilertools's optimization while building
     'disabled': False,
 
-    # Compile optimized for current machine only
+    # Compiles optimized for current machine only
     # (If not compile for a cluster of possibles machines)
     # True or False for manually set value;
     # 'autodetect' for automatically set value to True if build from
@@ -14,22 +14,22 @@ CONFIG_BUILD = {
     'current_machine': 'autodetect',
 
     # Enabled suffixes in files matrix definition.
-    # If this set is not empty, include only suffixes specified
+    # If this set is not empty, includes only suffixes specified
     # inside it.
     # This does not affect current machine builds.
     'suffixes_includes': set(),
 
     # Disabled suffixes in files matrix definition.
-    # If 'suffixes_includes' is empty, complete this set to not
+    # If 'suffixes_includes' is empty, completes this set to not
     # build files for a specific architecture.
     # This does not affect current machine builds.
     'suffixes_excludes': {
         'sse', 'ssse3', 'sse4_1', 'sse4_2', 'intel_atom', 'intel', 'amd'
     },
 
-    # Enable compilers options
+    # Enables compilers options
     'option': {
-        # Enable Fast floating point math
+        # Enables Fast floating point math
         'fast_fpmath': False
     },
 

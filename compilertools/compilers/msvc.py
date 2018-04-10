@@ -12,12 +12,24 @@ class Compiler(_CompilerBase):
 
     @_CompilerBase._memoized_property
     def option(self):
-        """Compatibles options"""
+        """Compatibles Options
+
+        Returns
+        -------
+        dict
+            Keys are options names, values are dict of arguments
+            with keys in {'link', 'compile'}."""
         return {'fast_fpmath': {'compile': '/fp:fast'}}
 
     @_CompilerBase._memoized_property
     def api(self):
-        """Compatibles API"""
+        """Compatibles API
+
+        Returns
+        -------
+        dict
+            Keys are API names, values are dict of arguments
+            with keys in {'link', 'compile'}."""
         return {'openmp': {'compile': '/openmp'}}
 
     @_CompilerBase._memoized_property
@@ -25,6 +37,11 @@ class Compiler(_CompilerBase):
         """For Microsoft Visual C++,
         Compiler version used to build need to be
         the same that the one used to build Python.
+
+        Returns
+        -------
+        float
+            Version.
         """
         if not self.current_compiler:
             return
@@ -43,11 +60,21 @@ class Compiler(_CompilerBase):
         return version
 
     def _compile_args_matrix(self, arch, cpu):
-        """Return Microsoft Visual C++ compiler options availables for the
+        """Returns Microsoft Visual C++ compiler options available for the
         specified CPU architecture.
 
-        arch: CPU Architecture str."""
-        # Compute arguments
+        Parameters
+        ----------
+        arch : str
+            CPU Architecture.
+        cpu : compilertools.processors.ProcessorBase subclass
+            Processor instance
+
+        Returns
+        -------
+        list of CompilerBase.Arg
+            Arguments matrix."""
+        # Computes arguments
         args = [
             # Generic optimisation
             [self.Arg(args=['/O2', '/GL'])],
@@ -78,7 +105,7 @@ class Compiler(_CompilerBase):
                       build_if=arch == 'x86_32'),
 
              self.Arg(),
-            ],
+             ],
 
             # CPU Generic vendor/brand optimisations
             [self.Arg(args='/favor:ATOM',
@@ -101,7 +128,7 @@ class Compiler(_CompilerBase):
                       build_if=arch == 'x86_64'),
 
              self.Arg(),
-            ]
+             ]
         ]
 
         return args

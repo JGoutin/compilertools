@@ -10,15 +10,24 @@ __all__ = ['CompilerBase', 'get_compiler']
 
 
 def get_compiler(compiler=None, current_compiler=False):
-    """Return compiler class
+    """Returns compiler class
 
-    compiler: Compiler Name or instance
-    current_compiler: Compiler used to build"""
-    # Return compiler instance
+    Parameters
+    ----------
+    compiler : str of CompilerBase subclass
+        Compiler Name or instance
+    current_compiler : bool
+        Compiler used to build
+
+    Returns
+    -------
+    CompilerBase subclass instance
+        Compiler class instance."""
+    # Returns compiler instance
     if isinstance(compiler, CompilerBase):
         return compiler
 
-    # Use distutils default compiler as default
+    # Uses distutils default compiler as default
     if compiler is None:
         from distutils.ccompiler import get_default_compiler
         compiler = get_default_compiler()
@@ -26,55 +35,81 @@ def get_compiler(compiler=None, current_compiler=False):
     # Aliases for compilers names
     compiler = CONFIG.get('compilers', {}).get(compiler, compiler)
 
-    # Return compiler
+    # Returns compiler
     return import_class('compilers', compiler, 'Compiler', CompilerBase)(
         current_compiler=current_compiler)
 
 
 def _get_arch_and_cpu(arch=None, current_machine=False):
-    """Return arch and update CPU linked to compiler
+    """Returns arch and updates CPU linked to compiler.
 
-    arch: if None, use current computer arch, else use specified"""
-    # Get Architecture
+    Parameters
+    ----------
+    arch : str
+        CPU Architecture.
+        If None, use current computer arch, else use specified
+    current_compiler : bool
+        Compiler used to build
+
+    Returns
+    -------
+    str
+        Architecture
+    compilertools.processors.ProcessorBase subclass
+        Processor instance.
+    """
+    # Gets Architecture
     arch = get_arch(arch)
 
-    # Get CPU
+    # Gets CPU
     return arch, get_processor(arch, current_machine=current_machine)
 
 
 def _order_args_matrix(args_matrix, current_machine=False,
                        current_compiler=False):
-    """Convert args matrix to args ordered dict {suffix: arg}
+    """Converts args matrix to args ordered dict
 
-    args_matrix : result from self._compile_args_matrix or
+    Parameters
+    ----------
+    args_matrix : list of CompilerBase.Arg
+        result from self._compile_args_matrix or
         self._link_args_matrix
-    current_machine : If True, return only arguments compatibles with
+    current_machine : bool
+        If True, return only arguments compatibles with
         current machine (conditions from "import_if").
-    current_compiler : If True, return only arguments compatibles with
-        current compiler (conditions from "build_if")."""
+    current_compiler : bool
+        If True, return only arguments compatibles with
+        current compiler (conditions from "build_if").
 
-    # Create args combinations from args matrix
+    Returns
+    -------
+    collections.OrderedDict with keys and values as str
+        Arguments matrix. Keys are suffixes,
+        values are compiler arguments.
+    """
+
+    # Creates args combinations from args matrix
     args_combinations = OrderedDict()
     for args in product(*args_matrix):
         args_list = []
         suffix_list = []
         is_compatible = True
         for arg in args:
-            # Import conditions
+            # Imports conditions
             if current_machine:
                 is_compatible = not(
                     not arg.import_if or not is_compatible)
 
-            # Build condition
+            # Builds condition
             if current_compiler:
                 is_compatible = not(
                     not arg.build_if or not is_compatible)
 
-            # Don't add incompatible args
+            # Don't adds incompatible args
             if not is_compatible:
                 break
 
-            # Get argument
+            # Gets argument
             arg_arg = arg.args
             if arg_arg:
                 if isinstance(arg_arg, str):
@@ -82,14 +117,14 @@ def _order_args_matrix(args_matrix, current_machine=False,
                 else:
                     args_list.extend(arg_arg)
 
-            # Get suffix
+            # Gets suffix
             arg_suffix = arg.suffix
             if arg_suffix:
                 suffix_list.append(arg_suffix.
                                    replace('.', '_').
                                    replace('-', '_'))
 
-        # Add compatibles args
+        # Adds compatibles args
         if is_compatible:
             args_combinations['-'.join(suffix_list)] = args_list
 
@@ -105,15 +140,18 @@ class CompilerBase(BaseClass):
     Arg.__doc__ = ("""
        Compiler argument.
 
-       args: arguments sent to compiler (ex "-flto -w").
-
-       suffix: suffix related to this argument in compiled file name.
-
-       import_if: condition that must be True for importing file
+       Parameters
+       ----------
+       args : list of str
+           arguments sent to compiler (ex "-flto -w").
+       suffix : str
+           suffix related to this argument in compiled file name.
+       import_if : bool
+           condition that must be True for importing file
            compiled with this argument (ex architecture compatibility).
            Default value is True.
-
-       build_if: Condition that must be True for compile file with
+       build_if : bool
+           Condition that must be True for compile file with
            this argument and the current compiler (Ex compiler version).
            Default value is True.""")
 
@@ -124,24 +162,42 @@ class CompilerBase(BaseClass):
         self._default['version'] = 0.0
 
     def _compile_args_matrix(self, arch, cpu):
-        """Return available compiler arguments for the specified CPU
+        """Returns available compiler arguments for the specified CPU
         architecture as a matrix.
 
-        Override for define matrix.
+        Override to define matrix.
 
-        arch: CPU Architecture str.
-        cpu: Processor instance"""
+        Parameters
+        ----------
+        arch : str
+            CPU Architecture.
+        cpu : compilertools.processors.ProcessorBase subclass
+            Processor instance
+
+        Returns
+        -------
+        list of CompilerBase.Arg
+            Arguments matrix."""
         raise NotImplementedError
 
     def _compile_args_current_machine(self, arch, cpu):
-        """Define optimized arguments for current machine.
+        """Defines optimized arguments for current machine.
 
-        By default, get the best options from compile_args method.
+        By default, gets the best options from compile_args method.
 
-        Override for define another behavior.
+        Override to define another behavior.
 
-        arch: CPU Architecture str
-        cpu: Processor instance"""
+        Parameters
+        ----------
+        arch : str
+            CPU Architecture.
+        cpu : compilertools.processors.ProcessorBase subclass
+            Processor instance.
+
+        Returns
+        -------
+        str
+            Best compiler arguments for current machine."""
         args = _order_args_matrix(
             self._compile_args_matrix(arch, cpu), current_machine=True)
 
@@ -150,11 +206,21 @@ class CompilerBase(BaseClass):
         return args[list(args)[0]]
 
     def compile_args(self, arch=None, current_machine=False):
-        """Get compiler args list for a specific architecture.
+        """Gets compiler args list for a specific architecture.
 
-        arch : target architecture name.
-        current_machine : If True, return only arguments compatibles with
-            current machine (conditions from "import_if")."""
+        Parameters
+        ----------
+        arch : str
+            Target architecture name.
+        current_machine : bool
+            If True, returns only arguments compatibles with
+            current machine (conditions from "Arg.import_if").
+
+        Returns
+        -------
+        collections.OrderedDict with keys and values as str
+            Arguments matrix. Keys are suffixes,
+            values are compiler arguments."""
         return _order_args_matrix(
             self._compile_args_matrix(
                 *_get_arch_and_cpu(arch, current_machine=current_machine)),
@@ -162,21 +228,43 @@ class CompilerBase(BaseClass):
 
     def compile_args_current_machine(self):
         """Return compiler arguments optimized by compiler for current
-        machine"""
+        machine
+
+        Returns
+        -------
+        str
+            Best compiler arguments for current machine."""
         return self._compile_args_current_machine(
             *_get_arch_and_cpu(current_machine=True))
 
     @BaseClass._memoized_property
     def name(self):
-        """Compiler type name"""
+        """Compiler type name
+
+        Returns
+        -------
+        str
+            Name."""
         return self.__module__.rsplit('.', 1)[-1]
 
     @BaseClass._memoized_property
     def api(self):
-        """Compatibles API"""
+        """Compatibles API
+
+        Returns
+        -------
+        dict
+            Keys are API names, values are dict of arguments
+            with keys in {'link', 'compile'}."""
         return {}
 
     @BaseClass._memoized_property
     def option(self):
-        """Compatibles Options"""
+        """Compatibles Options
+
+        Returns
+        -------
+        dict
+            Keys are options names, values are dict of arguments
+            with keys in {'link', 'compile'}."""
         return {}

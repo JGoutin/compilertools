@@ -15,7 +15,12 @@ class Processor(_ProcessorBase):
 
     @_ProcessorBase._memoized_property
     def cpuid_highest_extended_function(self):
-        """CPUID highest extended function"""
+        """CPUID highest extended function.
+
+        Returns
+        -------
+        int
+            Related EAX value for CPUID."""
         if not self.current_machine:
             return
 
@@ -23,7 +28,12 @@ class Processor(_ProcessorBase):
 
     @_ProcessorBase._memoized_property
     def vendor(self):
-        """CPU's manufacturer ID from CPUID"""
+        """CPU's manufacturer ID from CPUID.
+
+        Returns
+        -------
+        str
+            Manufacturer ID."""
         if not self.current_machine:
             return
 
@@ -32,7 +42,12 @@ class Processor(_ProcessorBase):
 
     @_ProcessorBase._memoized_property
     def brand(self):
-        """CPU's brand from CPUID"""
+        """CPU's brand from CPUID
+
+        Returns
+        -------
+        str
+            Brand."""
         if not self.current_machine:
             return
 
@@ -49,18 +64,24 @@ class Processor(_ProcessorBase):
     def features(self):
         """CPU's features flags from CPUID
 
-        Reference: Linux kernel "arch/x86/include/asm/cpufeatures.h"
+        Returns
+        -------
+        list of str
+            Flags names.
 
-        Feature naming convention:
-        Use "cpufeatures.h" quoted names in comments in priority,
-        then use name from "cpufeatures.h" constants.
+        .. note::
+            Reference: Linux kernel "arch/x86/include/asm/cpufeatures.h"
 
-        Exceptions in names: PNI called SSE3 (like other SSE feature flags)"""
+            Feature naming convention:
+            Use "cpufeatures.h" quoted names in comments in priority,
+            then use name from "cpufeatures.h" constants.
+
+            Exceptions in names: PNI called SSE3 (like other SSE feature flags)"""
 
         if not self.current_machine:
             return
 
-        # feature bits description
+        # Feature bits description
         # feature_bits_desc: {(eax, ecx): registers_dict}
         # registers_dict: {register_name: feature_dict}
         # feature_dict: {bit: feature}
@@ -117,7 +138,7 @@ class Processor(_ProcessorBase):
                     23: 'PERFCTR_CORE', 24: 'PERFCTR_NB', 26: 'BPEXT',
                     27: 'PTSC', 28: 'PERFCTR_LLC', 29: 'MWAITX'}}
 
-        # Return features flags for current CPU
+        # Returns features flags for current CPU
         flags = set()
         add_flag = flags.add
         for eax, ecx in feature_bits_desc:
@@ -130,12 +151,17 @@ class Processor(_ProcessorBase):
                     if ((1 << bit) & bits) != 0:
                         add_flag(reg_exx[bit])
 
-        # Return flags
+        # Returns flags
         return flags
 
     @_ProcessorBase._memoized_property
     def os_supports_xsave(self):
-        """OS and CPU supports XSAVE instruction."""
+        """OS and CPU supports XSAVE instruction.
+
+        Returns
+        -------
+        bool
+            Supports if True."""
         if not self.current_machine:
             return
 
@@ -143,23 +169,27 @@ class Processor(_ProcessorBase):
 
 
 class Cpuid:
-    """Get Processor CPUID
+    """Gets Processor CPUID.
 
-    eax_value: EAX register value
-    ecx_value: ECX register value"""
+    Parameters
+    ----------
+    eax_value : int
+        EAX register value
+    ecx_value : int
+        ECX register value"""
     def __init__(self, eax_value=0, ecx_value=0):
-        # Define bytecode base
+        # Defines bytecode base
         bytecode = []
         for reg, value in ((0x0, eax_value), (0x1, ecx_value)):
             if value == 0:
-                # Set to 0 (XOR reg, reg)
+                # Sets to 0 (XOR reg, reg)
                 bytecode += (
                     # XOR
                     b'\x31',
                     # reg, reg
                     (0b11000000 | reg | (reg << 3)).to_bytes(1, 'little'))
             else:
-                # set other value (MOV reg, value)
+                # Sets other value (MOV reg, value)
                 bytecode += (
                     # MOV reg,
                     (0b10111000 | reg).to_bytes(1, 'little'),
@@ -172,14 +202,23 @@ class Cpuid:
             [b'\x0F\xA2'])
 
     def _get_cpuid(self, reg):
-        """Get specified register CPUID result.
-        reg: Register address"""
+        """Gets specified register CPUID result.
+
+        Parameters
+        ----------
+        reg : int
+            Register address.
+
+        Returns
+        -------
+        int
+            Raw CPUID Result as unsigned integer."""
         from platform import system
         from ctypes import (
             c_void_p, c_size_t, c_ulong, c_uint32, c_int,
             CFUNCTYPE, memmove)
 
-        # Complete bytecode with result address and RET
+        # Completes bytecode with result address and RET
         bytecode = [self._bytecode_base]
 
         if reg != 0x0:
@@ -195,7 +234,7 @@ class Cpuid:
             # RET
             [b'\xC3'])
 
-        # Execute bytecode
+        # Executes bytecode
         is_windows = system() == 'Windows'
 
         size = len(bytecode)
@@ -203,7 +242,7 @@ class Cpuid:
             size = 0x1000
 
         try:
-            # Allocate memory
+            # Allocates memory
             if is_windows:
                 from ctypes import windll
                 lib = windll.kernel32
@@ -224,20 +263,20 @@ class Cpuid:
                 raise RuntimeError('Failed to allocate memory')
 
             if not is_windows:
-                # Set memory executable
+                # Sets memory as executable
                 mprotect.restype = c_int
                 mprotect.argtypes = [c_void_p, c_size_t, c_int]
                 if mprotect(address, size, 1 | 2 | 4) != 0:
                     raise RuntimeError('Failed to memory protect')
 
-            # Copy bytecode to memory
+            # Copies bytecode to memory
             memmove(address, bytecode, size)
 
-            # Create and execute function
+            # Creates and executes function
             result = CFUNCTYPE(c_uint32)(address)()
 
         finally:
-            # Free memory
+            # Frees memory
             if is_windows:
                 lib.VirtualFree(c_ulong(address), 0, 0x8000)
             else:
@@ -247,30 +286,57 @@ class Cpuid:
 
     @property
     def eax(self):
-        """Get EAX register CPUID result"""
+        """Get EAX register CPUID result.
+
+        Returns
+        -------
+        int
+            Raw EAX register value."""
         return self._get_cpuid(0x0)
 
     @property
     def ebx(self):
-        """Get EBX register CPUID result"""
+        """Get EBX register CPUID result.
+
+        Returns
+        -------
+        int
+            Raw EAX register value."""
         return self._get_cpuid(0x3)
 
     @property
     def ecx(self):
-        """Get ECX register CPUID result"""
+        """Get ECX register CPUID result.
+
+        Returns
+        -------
+        int
+            Raw EAX register value."""
         return self._get_cpuid(0x1)
 
     @property
     def edx(self):
-        """Get EDX register CPUID result"""
+        """Get EDX register CPUID result.
+
+        Returns
+        -------
+        int
+            Raw EAX register value."""
         return self._get_cpuid(0x2)
 
     @staticmethod
     def registers_to_str(*uints):
-        """Convert unsigned integers from CPUID register to ASCII string
+        """Converts unsigned integers from CPUID register to ASCII string.
 
-        uints: list of unsigned integers to concatenate and convert to string.
-        """
+        Parameters
+        ----------
+        uints : int
+            List of unsigned integers to concatenate and convert to string.
+
+        Returns
+        -------
+        str
+            Result."""
         from struct import pack
         return pack('<%s' % ('I' * len(uints)),
                     *uints).decode('ASCII').strip('\x00 ')

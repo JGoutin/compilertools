@@ -13,12 +13,24 @@ class Compiler(_CompilerBase):
 
     @_CompilerBase._memoized_property
     def option(self):
-        """Compatibles options"""
+        """Compatibles Options
+
+        Returns
+        -------
+        dict
+            Keys are options names, values are dict of arguments
+            with keys in {'link', 'compile'}."""
         return {'fast_fpmath': {'compile': '-Ofast'}}
 
     @_CompilerBase._memoized_property
     def api(self):
-        """Compatibles API"""
+        """Compatibles API
+
+        Returns
+        -------
+        dict
+            Keys are API names, values are dict of arguments
+            with keys in {'link', 'compile'}."""
         api = {}
         if self.version >= 4.2:
             api['openmp'] = {
@@ -34,7 +46,12 @@ class Compiler(_CompilerBase):
 
     @_CompilerBase._memoized_property
     def version(self):
-        """Compiler version used."""
+        """Compiler version used.
+
+        Returns
+        -------
+        float
+            Version."""
         if not self.current_compiler:
             return
 
@@ -59,7 +76,12 @@ class Compiler(_CompilerBase):
 
     @_CompilerBase._memoized_property
     def python_build_version(self):
-        """Compiler version that was used to build Python."""
+        """Compiler version that was used to build Python.
+
+        Returns
+        -------
+        float
+            Version."""
         from platform import python_compiler
         version_str = python_compiler()
 
@@ -72,10 +94,20 @@ class Compiler(_CompilerBase):
         return float(version_str.rsplit('.', 1)[0])
 
     def _compile_args_matrix(self, arch, cpu):
-        """Return available GCC compiler options for the
+        """Returns available GCC compiler options for the
         specified CPU architecture.
 
-        arch: CPU Architecture str."""
+        Parameters
+        ----------
+        arch : str
+            CPU Architecture.
+        cpu : compilertools.processors.ProcessorBase subclass
+            Processor instance
+
+        Returns
+        -------
+        list of CompilerBase.Arg
+            Arguments matrix."""
         # Generic optimisation
         args = [[self.Arg(args=['-flto', '-O3'])]]
 
@@ -105,7 +137,7 @@ class Compiler(_CompilerBase):
                                      'AVX' in cpu.features and
                                      cpu.os_supports_xsave)),
                  self.Arg(),
-                ],
+                 ],
 
                 # CPU Generic vendor/brand optimisations
                 [self.Arg(args='-mtune=intel',
@@ -114,7 +146,7 @@ class Compiler(_CompilerBase):
                           build_if=self.version >= 4.9),
 
                  self.Arg(),
-                ]
+                 ]
             ]
 
         elif arch == 'x86_32':
@@ -173,7 +205,7 @@ class Compiler(_CompilerBase):
                           build_if=self.version >= 3.1),
 
                  self.Arg(),
-                ],
+                 ],
 
                 # CPU Generic vendor/brand optimisations
                 [self.Arg(args='-mtune=intel',
@@ -182,13 +214,25 @@ class Compiler(_CompilerBase):
                           build_if=self.version >= 4.9),
 
                  self.Arg(),
-                ]
+                 ]
             ]
 
         return args
 
     def _compile_args_current_machine(self, arch, cpu):
-        """Return auto-optimised compiler arguments for current machine"""
+        """Return auto-optimised GCC arguments for current machine.
+
+        Parameters
+        ----------
+        arch : str
+            CPU Architecture.
+        cpu : compilertools.processors.ProcessorBase subclass
+            Processor instance.
+
+        Returns
+        -------
+        str
+            Best compiler arguments for current machine."""
         # Base native optimisation
         args = ['-march=native -flto']
 
