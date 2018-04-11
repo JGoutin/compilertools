@@ -1,15 +1,21 @@
 [![Build Status](https://travis-ci.org/JGoutin/compilertools.svg?branch=master)](https://travis-ci.org/JGoutin/compilertools)
 [![Build status](https://ci.appveyor.com/api/projects/status/khsf4rjrjo78xcmm?svg=true)](https://ci.appveyor.com/project/JGoutin/compilertools)
 [![Coverage Status](https://coveralls.io/repos/github/JGoutin/compilertools/badge.svg?branch=master)](https://coveralls.io/github/JGoutin/compilertools?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/compilertools/badge/?version=latest)](http://compilertools.readthedocs.io/en/latest/?badge=latest)
 
 *This module is experimental*
 
-Actually, even if wheels provides pre-compiled extensions, it needs to be highly compatible with all possibles machines.
-There is no easy solution to provide pre-compiled extensions using specific optimisation like SIMD (SSE, AVX, FMA, ...).
+Python uses the Wheel format for simplified package distribution. However,
+it does not allow to distribute packages optimized for each machine but highly compatible ones.
+The user must compile the package himself to take advantage of optimization like SIMD (SSE, AVX, FMA, ...).
 
-This module helps to easily build and distribute optimized Python extensions for multiples architectures.
+Compilertools allows to work around this problem and distribute optimized packages for several machines while keeping the simplicity of Wheel.
+It works in the background and has been created with the aim of being easy to use.
+Package maintainer requires only to import it at runtime and buildtime. Everything is transparent for the end user.
 
-It is compatible with any existing modules and don't need to change any line of code (Other than an eventual import in module *setup.py* by maintainer).
+Its secondary objective is also to help the package maintainer to optimally compile its package with multiple compilers by configuring options for him.
+
+Documentation: http://compilertools.readthedocs.io/
 
 ## Features
 

@@ -26,7 +26,10 @@ PACKAGE_INFOS = dict(
     packages=find_packages(exclude=['tests', 'doc']),
     zip_safe=True,
     python_requires='>=3.4',
-    extras_require={'tests': ['pytest']},
+    extras_require={
+        'tests': ['pytest'],
+        'build_doc': ['sphinx']},
+    command_options={},
     )
 
 # Get package __version__ from package

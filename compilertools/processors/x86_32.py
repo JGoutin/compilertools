@@ -2,7 +2,7 @@
 """X86-32 Processors"""
 from compilertools.processors import ProcessorBase as _ProcessorBase
 
-__all__ = ['Processor']
+__all__ = ['Processor', 'Cpuid']
 
 
 class Processor(_ProcessorBase):
@@ -69,14 +69,15 @@ class Processor(_ProcessorBase):
         list of str
             Flags names.
 
-        .. note::
-            Reference: Linux kernel "arch/x86/include/asm/cpufeatures.h"
+        References
+        ----------
+        Reference: Linux kernel "arch/x86/include/asm/cpufeatures.h"
 
-            Feature naming convention:
-            Use "cpufeatures.h" quoted names in comments in priority,
-            then use name from "cpufeatures.h" constants.
+        Feature naming convention:
+        Use "cpufeatures.h" quoted names in comments in priority,
+        then use name from "cpufeatures.h" constants.
 
-            Exceptions in names: PNI called SSE3 (like other SSE feature flags)"""
+        Exceptions in names: PNI called SSE3 (like other SSE feature flags)"""
 
         if not self.current_machine:
             return

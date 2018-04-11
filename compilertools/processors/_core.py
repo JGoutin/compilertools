@@ -52,7 +52,7 @@ def get_processor(arch, *args, **kwargs):
     ----------
     arch : str
         processor architecture
-    *args, **kwargs
+    args, kwargs
         args for class instantiation
 
     Returns
