@@ -117,7 +117,10 @@ def _build_and_import(
             file.write(TEST_SCRIPT % str([build, getcwd()]))
 
         # Test suffixes imports
-        assert ARCH_SUFFIXES
+        if not ARCH_SUFFIXES:
+            from pytest import xfail
+            xfail('ARCH_SUFFIXES is empty on current environment')
+
         for suffix in ARCH_SUFFIXES:
             # Ignore file not existing
             path = join(build, 'ctsrcex%s' % suffix)
