@@ -9,6 +9,11 @@ def tests_update_ext_suffixes():
     from compilertools.imports import (
         ARCH_SUFFIXES, update_extensions_suffixes)
 
+    # Mark as xfail on environments without ARCH_SUFFIXES
+    if not ARCH_SUFFIXES:
+        from pytest import xfail
+        xfail('ARCH_SUFFIXES is empty on current environment')
+
     # Test update
     update_extensions_suffixes('gcc')
 
@@ -41,6 +46,11 @@ def tests_extension_file_finder():
     from compilertools.imports import (
         _ExtensionFileFinder, ARCH_SUFFIXES, _PROCESSED_COMPILERS)
 
+    # Mark as xfail on environments without ARCH_SUFFIXES
+    if not ARCH_SUFFIXES:
+        from pytest import xfail
+        xfail('ARCH_SUFFIXES is empty on current environment')
+
     # Check presence in sys.meta_path
     assert isinstance(sys.meta_path[0], _ExtensionFileFinder)
 
@@ -69,9 +79,6 @@ def tests_extension_file_finder():
 
             # Create a dummy file
             name = "compilertools_dummy_file"
-            if not ARCH_SUFFIXES:
-                from pytest import xfail
-                xfail('ARCH_SUFFIXES is empty on current environment')
             ext = ARCH_SUFFIXES[0]
             file_path = join(tmp, ''.join([name, ext]))
             with open(file_path, 'wt') as file:
