@@ -23,6 +23,7 @@ Features:
 * Support extra compiling options like fast math.
 * Provides build time settings for package maintainer to tweak compilation.
 * Provides API for getting information on current machine CPU.
+* Lightweight pure Python module with no dependency that use lazy import and evaluation as possible.
 
 How that works ?
 ================
@@ -79,7 +80,7 @@ openMP, OpenACC, Intel Cilk Plus API auto-detection:
    Compilertools searches in source files for API ``pragma`` preprocessor calls and enables compiler and linker options
    if needed.
 
-Extra generic compilers options
+Extra generic compilers options:
    Compilertools can enable or disable generic extra compiler options like fast math.
 
 Compatibility
@@ -123,6 +124,7 @@ Documentation
    :caption: User Documentation:
 
    getting_started
+   library_use
    api
    changes
 
