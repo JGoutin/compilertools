@@ -20,8 +20,9 @@ def update_extensions_suffixes(compiler):
 
     Parameters
     ----------
-        compiler : str
-            compiler name."""
+        compiler : str or None
+            compiler name.
+            If None, uses default compiler name on current platform"""
     # Gets suffixes
     from compilertools._core import (
         suffix_from_args, get_compile_args, get_compiler)

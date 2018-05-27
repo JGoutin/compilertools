@@ -3,7 +3,7 @@
 
 from os.path import splitext
 from itertools import product
-from compilertools._config_build import CONFIG_BUILD
+from compilertools._config_build import ConfigBuild
 
 __all__ = []
 
@@ -50,7 +50,7 @@ def _ignore_api(compiler, api):
 
     Parameters
     ----------
-    compiler: str or compilertools.compilers.CompilerBase
+    compiler: str or compilertools.compilers.CompilerBase or None
         Compiler to check.
     api: str
         API to check the compiler support.
@@ -81,7 +81,7 @@ def _startswith_exts(**startswiths_dict):
     """
     startswith_exts = {}
 
-    config_extensions = CONFIG_BUILD['extensions']
+    config_extensions = ConfigBuild.extensions
     for key in startswiths_dict:
         startswiths = startswiths_dict[key]
         if startswiths is None:

@@ -102,7 +102,7 @@ def tests_import_class():
     from compilertools._utils import import_class
 
     # Create dummy class for use ase default
-    class Dummy():
+    class Dummy:
         """Dummy class"""
 
     # Return excepted class

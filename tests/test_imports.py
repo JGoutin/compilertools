@@ -70,8 +70,8 @@ def tests_extension_file_finder():
             # Create a dummy file
             name = "compilertools_dummy_file"
             ext = ARCH_SUFFIXES[0]
-            path = join(tmp, ''.join([name, ext]))
-            with open(path, 'wt') as file:
+            file_path = join(tmp, ''.join([name, ext]))
+            with open(file_path, 'wt') as file:
                 file.write('')
 
             # Create a dummy compiler file
@@ -86,7 +86,7 @@ def tests_extension_file_finder():
             file_finder = _ExtensionFileFinder()
 
             # Existing file
-            assert file_finder.find_spec(name, '') == path
+            assert file_finder.find_spec(name, '') == file_path
 
             if use_compiler_file:
                 assert compiler in _PROCESSED_COMPILERS

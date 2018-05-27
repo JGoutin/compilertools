@@ -1,3 +1,4 @@
+# coding=utf-8
 """compilertools setup"""
 from datetime import datetime
 from os.path import abspath, dirname, join
@@ -8,7 +9,7 @@ PACKAGE_INFO = dict(
     description='A library for helping optimizing Python extensions compilation.',
     long_description_content_type='text/markdown; charset=UTF-8',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Topic :: Software Development :: Build Tools',

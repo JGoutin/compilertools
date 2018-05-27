@@ -48,8 +48,8 @@ def _get_arch_and_cpu(arch=None, current_machine=False):
     arch : str
         CPU Architecture.
         If None, use current computer arch, else use specified
-    current_compiler : bool
-        Compiler used to build
+    current_machine : bool
+        If True returns current machine CPU
 
     Returns
     -------

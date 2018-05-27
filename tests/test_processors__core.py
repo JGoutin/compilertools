@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for processors core"""
 
+
 def tests_get_arch():
     """Test get_arch"""
     from platform import machine

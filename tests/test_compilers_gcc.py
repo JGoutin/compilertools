@@ -20,7 +20,7 @@ def tests_compiler():
     class DummyPopen:
         """Always return version in stdout"""
 
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *_, **__):
             """Ignore arguments and raise exception on demand"""
             if raise_error:
                 raise OSError
@@ -102,7 +102,7 @@ def tests_compiler_gcc_command():
     from platform import system
     from subprocess import Popen, PIPE
     try:
-        version_str = Popen(['gcc', '--version'])
+        Popen(['gcc', '--version'])
     except OSError:
         from pytest import skip
         skip('GCC not available')

@@ -4,12 +4,11 @@
 from functools import wraps as _wraps
 from distutils.command.build_ext import build_ext as _build_ext
 
-from compilertools._config_build import CONFIG_BUILD
+from compilertools._config_build import ConfigBuild
 from compilertools._core import (
     suffix_from_args, get_compile_args, get_compiler)
 
-
-__all__ = ['get_build_compile_args', 'get_build_link_args', 'CONFIG_BUILD',
+__all__ = ['ConfigBuild', 'get_build_compile_args', 'get_build_link_args',
            'get_compile_args', 'get_compiler', 'suffix_from_args']
 
 
@@ -60,18 +59,18 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
 
     # Args for multiple machines
     else:
-        include = CONFIG_BUILD['suffixes_includes']
+        include = ConfigBuild.suffixes_includes
         if not include:
-            exclude = CONFIG_BUILD['suffixes_excludes']
+            exclude = ConfigBuild.suffixes_excludes
 
-            def filter_suffix(suffix):
+            def filter_suffix(suffix_to_test):
                 """Filter by exclusion"""
-                return suffix in exclude
+                return suffix_to_test in exclude
 
         else:
-            def filter_suffix(suffix):
+            def filter_suffix(suffix_to_test):
                 """Filter by inclusion"""
-                return suffix not in include
+                return suffix_to_test not in include
 
         args = get_compile_args(compiler, arch, current_compiler=True)
 
@@ -163,7 +162,7 @@ def _find_if_current_machine():
     -------
     str
         Current machine."""
-    current_machine = CONFIG_BUILD['current_machine']
+    current_machine = ConfigBuild.current_machine
     if not isinstance(current_machine, bool):
         # Check if running from PIP
         from os import getcwd
@@ -203,7 +202,7 @@ def _update_extension(self, ext):
     -------
     list of Extension
         Patched build_ext.extensions."""
-    if CONFIG_BUILD['disabled']:
+    if ConfigBuild.disabled:
         return [ext]
 
     # Gets compiler
@@ -228,14 +227,14 @@ def _update_extension(self, ext):
             '.compilertools')
 
     # Options list
-    config_options = CONFIG_BUILD['option']
+    config_options = ConfigBuild.option
     option_list = [option for option in config_options
                    if config_options[option]]
 
     # API detection
     from compilertools._src_files import _use_api_pragma
     api_list = []
-    config_api = CONFIG_BUILD['api']
+    config_api = ConfigBuild.api
     for api in config_api:
         if _use_api_pragma(ext.sources, compiler, api, **config_api[api]):
             api_list.append(api)

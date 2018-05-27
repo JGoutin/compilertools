@@ -1,3 +1,4 @@
+# coding=utf-8
 """Test build and import with real files and compilers"""
 
 
@@ -59,11 +60,11 @@ def _build_and_import(
     # This import also enable compilertools build patches
     from compilertools.build import get_build_compile_args
     from compilertools.imports import ARCH_SUFFIXES
-    from compilertools._config_build import CONFIG_BUILD
+    from compilertools._config_build import ConfigBuild
 
     # Compile all possibilities
-    CONFIG_BUILD['suffixes_includes'].clear()
-    CONFIG_BUILD['suffixes_excludes'].clear()
+    ConfigBuild.suffixes_includes.clear()
+    ConfigBuild.suffixes_excludes.clear()
 
     # Build
     with TemporaryDirectory() as tmp:

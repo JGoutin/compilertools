@@ -37,7 +37,7 @@ class Processor(_ProcessorBase):
         if not self.current_machine:
             return
 
-        reg = Cpuid(0)
+        reg = Cpuid()
         return Cpuid.registers_to_str(reg.ebx, reg.edx, reg.ecx)
 
     @_ProcessorBase._memoized_property
@@ -195,7 +195,7 @@ class Cpuid:
                     # MOV reg,
                     (0b10111000 | reg).to_bytes(1, 'little'),
                     # Value
-                    (value).to_bytes(4, 'little'))
+                    value.to_bytes(4, 'little'))
 
         self._bytecode_base = b''.join(
             bytecode +
@@ -332,7 +332,7 @@ class Cpuid:
         Parameters
         ----------
         uints : int
-            List of unsigned integers to concatenate and convert to string.
+            Unsigned integers to concatenate and convert to string.
 
         Returns
         -------

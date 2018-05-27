@@ -31,7 +31,7 @@ def tests_processor_nocpu():
     class Cpuid(x86_32.Cpuid):
         """Dummy CPUID function"""
 
-        def __init__(self, eax, ecx=None):
+        def __init__(self, eax=0, ecx=None):
             self._eax = eax
             self._ecx = ecx
 
@@ -132,7 +132,7 @@ def tests_cpuid_nocpu():
     ctypes_c_void_p = ctypes.c_void_p
 
     system = 'Unix'
-    address = 1
+    mem_address = 1
     mprotect_success = 0
     func_result = {}
 
@@ -140,7 +140,7 @@ def tests_cpuid_nocpu():
         """Dummy platform.system"""
         return system
 
-    def dummy_generic(*args, **kwargs):
+    def dummy_generic(*_, **__):
         """Dummy generic method"""
 
     def dummy_memmove(address, bytecode, size):
@@ -152,9 +152,10 @@ def tests_cpuid_nocpu():
 
     class DummyValloc:
         """Dummy valloc"""
-        def __new__(self, *args, **kwargs):
+
+        def __new__(cls, *args, **kwargs):
             """Dummy new"""
-            return address
+            return mem_address
 
     class DummyMprotect:
         """Dummy mprotect"""
@@ -168,13 +169,16 @@ def tests_cpuid_nocpu():
             """Dummy init"""
         def __call__(self, *args, **kwargs):
             """Dummy call"""
-            def func(*args, **kwargs):
+
+            def func(*_, **__):
                 """Return executed bytecode"""
                 return func_result
             return func
 
     class DummyCDll:
+        """Dummy ctypes.cdll"""
         class LoadLibrary:
+            """Dummy ctypes.cdll.LoadLibrary"""
             def __init__(self, *args, **kwargs):
                 """Dummy init"""
             valloc = DummyValloc
@@ -182,7 +186,9 @@ def tests_cpuid_nocpu():
             free = dummy_generic
 
     class DummyWinDll:
+        """Dummy ctypes.windll"""
         class kernel32:
+            """Dummy ctypes.windll.kernel32"""
             VirtualAlloc = DummyValloc
             VirtualFree = dummy_generic
 
@@ -197,7 +203,7 @@ def tests_cpuid_nocpu():
 
     for system in ('Unix', 'Windows'):
         # Check assembly bytecode
-        cpuid = Cpuid(0, 0)
+        cpuid = Cpuid()
         assert cpuid.eax['bytecode'] == (
             b'\x31\xc0'  # XOR eax, eax
             b'\x31\xc9'  # XOR ecx, ecx
@@ -229,16 +235,16 @@ def tests_cpuid_nocpu():
             b'\xc3')                 # RET    
 
         # Test failed to allocate memory
-        address = 0
+        mem_address = 0
         with raises(RuntimeError):
-            Cpuid(0, 0).eax
-        address = 1
+            Cpuid().eax
+        mem_address = 1
 
     # Test failed to mprotect
     system = 'Unix'
     mprotect_success = 1
     with raises(RuntimeError):
-        Cpuid(0, 0).eax
+        Cpuid().eax
 
     # Cleaning
     platform.system = platform_system

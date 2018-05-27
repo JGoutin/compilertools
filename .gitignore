@@ -4,25 +4,35 @@ __pycache__/
 *.so
 *.pyd
 
-# Sphinx
-/doc/_build/
-
 # Windows folders files
+._*
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
 Desktop.ini
+ehthumbs.db
 Thumbs.db
+*~
+*.bak
 
 # IDE
+.idea/
+.project
 .pydevproject
 .settings/
 .spyderproject
 .spyproject
 .vscode/
-.idea/
-
-# Scripts
-/*.bat
-/*.sh
 
 # Tests
 .cache/
 .coverage
+.pytest_cache/
+
+# Build
+build/
+dist/
+/doc/_build/
+.eggs/
+*.egg-info/

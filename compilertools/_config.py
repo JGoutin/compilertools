@@ -28,7 +28,7 @@ CONFIG = {
         'amd64': 'x86_64',
         'em64t': 'x86_64',
         'x64': 'x86_64',
-        },
+    },
 
     # Compilers
     # Key is name or alias
@@ -46,11 +46,11 @@ CONFIG = {
         'unix': 'gcc',
 
         # LLVM (Not implemented yet)
-        #'clang': 'llvm',
-        #'clang++': 'llvm',
-        #'flang': 'llvm',
+        # 'clang': 'llvm',
+        # 'clang++': 'llvm',
+        # 'flang': 'llvm',
 
         # Microsoft Visual C
         'msvc': 'msvc',
-        },
-    }
+    },
+}

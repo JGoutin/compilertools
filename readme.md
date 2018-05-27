@@ -3,108 +3,121 @@
 [![Coverage Status](https://coveralls.io/repos/github/JGoutin/compilertools/badge.svg?branch=master)](https://coveralls.io/github/JGoutin/compilertools?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/compilertools/badge/?version=latest)](http://compilertools.readthedocs.io/en/latest/?badge=latest)
 
-*This module is experimental*
-
 Python uses the Wheel format for simplified package distribution. However,
 it does not allow to distribute packages optimized for each machine but highly compatible ones.
 The user must compile the package himself to take advantage of optimization like SIMD (SSE, AVX, FMA, ...).
 
-Compilertools allows to work around this problem and distribute optimized packages for several machines while keeping the simplicity of Wheel.
-It works in the background and has been created with the aim of being easy to use.
+Compilertools allows to work around this problem and distribute optimized packages for several machines while keeping
+the simplicity of Wheel. It works in the background and has been created with the aim of being easy to use.
 Package maintainer requires only to import it at runtime and buildtime. Everything is transparent for the end user.
 
-Its secondary objective is also to help the package maintainer to optimally compile its package with multiple compilers by configuring options for him.
+Its secondary objective is also to help the package maintainer to optimally compile its package with multiple compilers
+by configuring options for him.
 
-Documentation: http://compilertools.readthedocs.io/
+Documentation:
+--------------
+[**Compilertools Documentation**](http://compilertools.readthedocs.io)
 
-## Features
 
-### Multi-architecture optimized compilation for distribution
+Features:
+---------
 
-#### At build time
+* Compiles and distributes optimized binaries for a variety of machines in a single Wheel package.
+* Helps to build optimized package from sources for current machine.
+* Handles automatically compiling and linking options for a variety of compilers.
+* Autodetects openMP, OpenACC or Intel Cilk Plus in source code and automatically sets related compiling and linking
+  options.
+* Support extra compiling options like fast math.
+* Provides build time settings for package maintainer to tweak compilation.
+* Provides API for getting information on current machine CPU.
 
-Make optimized ".so"/".pyd" for each architecture and name files with tagged suffixes : 
+How that works ?
+================
+
+Compulertools dynamically sets link options and compile options depending on the currently used compiler and targeted
+architecture.
+
+This avoid to have to specify compiler specific options in sources or setup files.
+
+Multi-architecture optimized compilation for distribution
+---------------------------------------------------------
+
+**At build time:**
+
+Compilertools helps to make optimized ".so"/".pyd" for each architecture and name files with tagged suffixes :
 
 Example:
-* module.avx2.cp36-win_amd64.pyd -> Optimized variant for AVX2 SIMD Extensions
-* module.avx.cp36-win_amd64.pyd -> Optimized variant for AVX SIMD Extensions
-* module.cp36-win_amd64.pyd -> Classic highly-compatible variant
 
-These optimized files must be packaged in the same wheel when distributing (Don't need to create a wheel by variant).
+* *module.avx2.cp36-win_amd64.pyd* -> Optimized variant for AVX2 SIMD Extensions
+* *module.avx.cp36-win_amd64.pyd* -> Optimized variant for AVX SIMD Extensions
+* *module.cp36-win_amd64.pyd* -> Classic highly-compatible variant
 
-Requirement:
-* Import *compilertools.build* before build module normally.
-
-#### At runtime
-
-Autodetect and choose the best optimized ".so"/".pyd" to run based on CPU information.
-
-If the best file not exist, search for the second best file, etc... If nothing found, use the highly-compatible one. 
+These optimized files are packaged in the same wheel when distributing (Don't need to create a wheel by variant).
 
 Requirement:
-* Import *compilertools* one time before import optimized modules (This add a new import hook to Python).
 
-### Current-architecture optimized compilation
+* Import ``compilertools.build`` before build module normally.
+* Options can easily be changed directly in ``compilertools.build.CONFIG_BUILD`` dictionary.
 
-Find the best compiler options for the current architecture and current compiler and build only one optimized ".so"/".pyd" with classic name.
+**At runtime:**
 
-Requirement:
-* Import *compilertools.build* before build module normally.
+Compilertools detects and chooses the best optimized ".so"/".pyd" to run based on CPU information.
 
-### Build-time all-compiler optimizations
-
-Dynamically set link options and compile options depending on the currently used compiler.
-
-Avoid to have to specify compiler specific options in sources or setup files.
+If the best file not exist, search for the second best file, etc... If nothing found, use the highly-compatible one.
 
 Requirement:
-* Import *compilertools.build* before build module normally.
-* For some options, eventually set a variable in "setup.py".
 
-#### *openMP*, *OpenACC*, *Intel Cilk Plus* API auto-detection
+* Import ``compilertools`` one time before import optimized modules (This add a new import hook to Python).
 
-Search in source files for API *pragma* preprocessor calls and enable compiler and linker options if needed.
+Current-architecture optimized compilation
+------------------------------------------
 
-#### Extra generic compilers options
+Compilertools finds the best compiler options for the current architecture and current compiler and build only one
+optimized ".so"/".pyd" with classic name.
 
-Enable or disable generic extra compiler options like fast math.
+Requirement:
 
-### Supported compilers
+* Import ``compilertools.build`` before build module normally.
+
+And also...
+-----------
+
+openMP, OpenACC, Intel Cilk Plus API auto-detection:
+   Compilertools searches in source files for API ``pragma`` preprocessor calls and enables compiler and linker options
+   if needed.
+
+Extra generic compilers options
+   Compilertools can enable or disable generic extra compiler options like fast math.
+
+Compatibility
+=============
+
+Supported Compilers
+-------------------
+
+Compilertools implements support for following compilers:
 
 * GCC
 * Microsoft Visual C++
 
-### Supported processors
+Supported Processors
+--------------------
+
+Compilertools implements support for following CPU:
 
 * x86 (32 and 64 bits)
 
-### Build tools compatibility
+Build tools compatibility
+-------------------------
 
-* distutils
-* setuptools
-* numpy.distutils
+Compilertools have been tested with following build tools:
 
-### Python compatibility
+* Distutils
+* Setuptools
+* Numpy.distutils
+* Cython
+
+Python compatibility
+--------------------
 
 * Python 3.4 minimum.
-
-## Work in progress
-
-* Module core : Done
-* Microsoft Visual C++ compiler support : Done
-* GNU Compiler Collection support : Done
-* API autodetection: Done (openMP, openACC, Intel Cilk Plus)
-* Unit test (pytest): Done
-* Continuous integration: Done
-* x86 CPUID : Done
-* Extended configuration: Done
-* PIP autodetection: Done
-* Documentation with sphinx and readthedoc: In progress...
-
-## Ideas & possibles futures features
-
-* Ability to force the use of an API (openMP, ...)
-* Add it as an option in *setuptools* (or eventually merge it in *setuptools*).
-* Since this module get many information on CPU, give possibility to users to access them easily as a dict.
-* Add support for more compilers (Intel, LLVM, ...). The aim is to support all compilers available with *distutils* and *numpy.distutils*.
-* Add support for more processors (ARM, ...).

@@ -5,11 +5,11 @@
 def tests_config_build():
     """Test CONFIG_BUILD"""
     from collections.abc import Mapping, Container
-    from compilertools._config_build import CONFIG_BUILD
+    from compilertools._config_build import ConfigBuild
 
     # Check sections presence and type
-    assert isinstance(CONFIG_BUILD.get('option'), Mapping)
-    assert isinstance(CONFIG_BUILD.get('api'), Mapping)
-    assert isinstance(CONFIG_BUILD.get('extensions'), Mapping)
-    assert isinstance(CONFIG_BUILD.get('suffixes_includes'), Container)
-    assert isinstance(CONFIG_BUILD.get('suffixes_excludes'), Container)
+    assert isinstance(ConfigBuild.option, Mapping)
+    assert isinstance(ConfigBuild.api, Mapping)
+    assert isinstance(ConfigBuild.extensions, Mapping)
+    assert isinstance(ConfigBuild.suffixes_includes, Container)
+    assert isinstance(ConfigBuild.suffixes_excludes, Container)
