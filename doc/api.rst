@@ -2,7 +2,7 @@ API documentation
 =================
 
 .. toctree::
-:maxdepth: 2
+   :maxdepth: 2
 
    api_build
    api_imports
