@@ -123,8 +123,8 @@ Documentation
    :caption: User Documentation:
 
    getting_started
-      api
-      changes
+   api
+   changes
 
 Indices and tables
 ==================
