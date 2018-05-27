@@ -69,6 +69,9 @@ def tests_extension_file_finder():
 
             # Create a dummy file
             name = "compilertools_dummy_file"
+            if not ARCH_SUFFIXES:
+                from pytest import xfail
+                xfail('ARCH_SUFFIXES is empty on current environment')
             ext = ARCH_SUFFIXES[0]
             file_path = join(tmp, ''.join([name, ext]))
             with open(file_path, 'wt') as file:
