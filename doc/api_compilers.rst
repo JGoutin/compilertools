@@ -3,7 +3,7 @@ compilertools.compilers
 
 .. automodule:: compilertools.compilers
    :members:
-         :inherited-members:
+   :inherited-members:
 
 .. toctree::
    :maxdepth: 2

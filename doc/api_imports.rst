@@ -3,4 +3,4 @@ compilertools.imports
 
 .. automodule:: compilertools.imports
    :members:
-         :inherited-members:
+   :inherited-members:
