@@ -1,6 +1,16 @@
 Getting Started
 ===============
 
+Installation
+------------
+
+Compilertools is available on PyPI and can be installed with pip:
+
+.. code-block:: bash
+
+    pip install compilertools
+
+
 Enabling compilertools in a Python package
 ------------------------------------------
 

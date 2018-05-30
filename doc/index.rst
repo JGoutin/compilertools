@@ -128,6 +128,13 @@ Documentation
    api
    changes
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Links
+
+   Project on Github <https://github.com/JGoutin/compilertools>
+   Download on PyPI <https://pypi.org/project/compilertools>
+
 Indices and tables
 ==================
 
