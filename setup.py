@@ -18,11 +18,16 @@ PACKAGE_INFO = dict(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: CPython'
         ],
     keywords='compiler distutils setuptools build_ext wheels setup build',
     author='J.Goutin',
     url='https://github.com/JGoutin/compilertools',
+    project_urls={
+        'Documentation': 'http://compilertools.readthedocs.io/',
+        'Download': 'https://pypi.org/project/compilertools',
+    },
     license='BSD',
     zip_safe=True,
     python_requires='>=3.4',
