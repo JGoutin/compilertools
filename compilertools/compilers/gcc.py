@@ -109,7 +109,7 @@ class Compiler(_CompilerBase):
         list of CompilerBase.Arg
             Arguments matrix."""
         # Generic optimisation
-        args = [[self.Arg(args=['-flto', '-O3'])]]
+        args = [[self.Arg(args=['-flto', '-O2'])]]
 
         # Architecture specific optimisations
         if arch == 'x86_64':
