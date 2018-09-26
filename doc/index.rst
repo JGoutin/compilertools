@@ -28,7 +28,7 @@ Features:
 How that works ?
 ================
 
-Compulertools dynamically sets link options and compile options depending on the currently used compiler and targeted
+Compilertools dynamically sets link options and compile options depending on the currently used compiler and targeted
 architecture.
 
 This avoid to have to specify compiler specific options in sources or setup files.
