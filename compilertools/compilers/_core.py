@@ -33,11 +33,48 @@ def get_compiler(compiler=None, current_compiler=False):
         compiler = get_default_compiler()
 
     # Aliases for compilers names
-    compiler = CONFIG.get('compilers', {}).get(compiler, compiler)
+    alias = CONFIG.get('compilers', {}).get(compiler, compiler)
+
+    # Unix compiler detection
+    if alias == 'unix':
+        alias = _which_unix_compiler(compiler)
 
     # Returns compiler
-    return import_class('compilers', compiler, 'Compiler', CompilerBase)(
+    return import_class('compilers', alias, 'Compiler', CompilerBase)(
         current_compiler=current_compiler)
+
+
+def _which_unix_compiler(compiler):
+    """
+    Find which Unix compiler is "cc", "c++".
+
+    Default to GCC if no other found.
+
+    Parameters
+    ----------
+    compiler : str
+        Compiler Name
+
+    Returns
+    -------
+    str:
+        Detected compiler Name
+    """
+    # Get version from command line
+    from subprocess import Popen, PIPE
+    try:
+        version_str = Popen(
+            [compiler if compiler != 'unix' else 'cc', '--version'],
+            stdout=PIPE, universal_newlines=True).stdout.read().lower()
+    except OSError:
+        return 'gcc'
+
+    # LLVM clang/clang++
+    if 'clang' in version_str:
+        return 'llvm'
+
+    # Default to GCC
+    return 'gcc'
 
 
 def _get_arch_and_cpu(arch=None, current_machine=False):

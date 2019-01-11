@@ -79,3 +79,40 @@ def tests_suffix_from_args():
     # With extension and emtpy suffixes
     assert suffix_from_args(args, '.pyd', True) == [
         '.suffix1.pyd', '.suffix2.pyd', '.pyd']
+
+
+def tests_log_exception(caplog):
+    """Test log_exception"""
+    from compilertools._core import log_exception
+    import compilertools._config as _config
+
+    config_logging = _config.CONFIG['logging']
+    message = 'Compilertools: Exception when trying to enable optimization'
+
+    # Tests
+    try:
+        # Logging enabled
+        _config.CONFIG['logging'] = True
+
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            log_exception()
+
+        assert message in ''.join((
+            rec.message for rec in caplog.records))
+
+        # Logging disabled
+        caplog.clear()
+        _config.CONFIG['logging'] = False
+
+        try:
+            raise RuntimeError
+        except RuntimeError:
+            log_exception()
+
+        assert not ''.join((rec.message for rec in caplog.records))
+
+    # Restore configuration
+    finally:
+        _config.CONFIG['logging'] = config_logging

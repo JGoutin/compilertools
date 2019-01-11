@@ -1,15 +1,41 @@
 language: python
+dist: xenial  # Needed for Python 3.7
 python:
-    - "3.4"
-    - "3.5"
+    - "3.7"
     - "3.6"
+    - "3.5"
+    - "3.4"
+
+matrix:
+  include:
+    # LLVM Clang on Linux
+    - compiler: clang
+
+    # Apple MacOS
+    - os: osx
+      language: sh  # Python not directly available as language
+      before_install:
+      - python3 -V  # Print system version
+
+    # Microsoft Windows
+    - os: windows
+      language: sh  # Python not directly available as language
+      before_install:
+      - choco install python3 -y
+      - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
+      - python3 -V  # print Chocolatey installed version
+
+  allow_failures:
+    - os: windows  # Early Windows support on Travis
+
+sudo: true
 
 install:
-    - "python -m pip install --upgrade setuptools pip"
-    - "python -m pip install pytest coverage pytest-cov coveralls[yaml] x86cpu numpy cython"
+    - "python3 -m pip install --upgrade --upgrade-strategy=eager setuptools pip wheel"
+    - "python3 -m pip install --upgrade --upgrade-strategy=eager pytest coverage pytest-cov codecov x86cpu numpy cython"
 
 script:
     - "py.test -v --cov=compilertools --cov-report=term-missing"
 
 after_success:
-    - "coveralls"
+    - "codecov"

@@ -5,7 +5,8 @@ from compilertools.compilers import get_compiler
 from compilertools._utils import always_str_list
 
 
-__all__ = ['get_compile_args', 'get_compiler', 'suffix_from_args']
+__all__ = ['get_compile_args', 'get_compiler', 'suffix_from_args',
+           'log_exception']
 
 
 def get_compile_args(compiler=None, arch=None, current_machine=False,
@@ -70,3 +71,24 @@ def suffix_from_args(args, extension='', return_empty_suffixes=False):
 
     # Returns with same form as input
     return suffixes
+
+
+def log_exception():
+    """
+    Log exception with system info.
+
+    Must be called in exception handler.
+    """
+    from compilertools._config import CONFIG
+
+    if CONFIG.get('logging', True):
+        from logging import getLogger
+        import platform
+        getLogger('compilertools').exception('\n'.join((
+            'Compilertools: Exception when trying to enable optimization, '
+            'Back to compatible mode.',
+            '  OS: %s' % platform.platform(),
+            '  CPU: %s' % platform.processor(),
+            '  Python: %s [%s]' % (
+                platform.python_version(), platform.python_compiler())
+        )))

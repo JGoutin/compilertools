@@ -12,7 +12,6 @@ platform:
     - x64
     - x86
 matrix:
-    fast_finish: true
     exclude:
         - PYTHON: "C:\\Python37-x64"
           platform: x86
@@ -27,11 +26,11 @@ build: off
 
 install:
     - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-    - "python -m pip install --upgrade setuptools pip wheel"
-    - "python -m pip install pytest coverage pytest-cov coveralls[yaml] x86cpu numpy cython"
+    - "python -m pip install --upgrade --upgrade-strategy=eager setuptools pip wheel"
+    - "python -m pip install --upgrade --upgrade-strategy=eager pytest coverage pytest-cov codecov x86cpu numpy cython"
 
 test_script:
     - "py.test -v --cov=compilertools --cov-report=term-missing"
     
 after_test:
-    - "coveralls"
+    - "codecov"

@@ -12,4 +12,34 @@ from compilertools._version import __version__
 
 # Loads only imports module at start, build module can be imported if needed
 from compilertools import imports
-__all__ = ['imports']
+
+# Public functions for system information
+from compilertools.processors import get_processor as _get_processor
+from compilertools.compilers import get_compiler as _get_compiler
+
+
+def get_compiler():
+    """
+    Get current compiler information.
+
+    Returns
+    -------
+    compilertools.processors.ProcessorBase subclass instance
+        Processor
+    """
+    return _get_compiler(current_compiler=True)
+
+
+def get_processor():
+    """
+    Get current processor information.
+
+    Returns
+    -------
+    compilertools.compilers.CompilerBase subclass instance
+        Compiler
+    """
+    return _get_processor(arch=None, current_machine=True)
+
+
+__all__ = ['imports', 'get_compiler', 'get_processor']

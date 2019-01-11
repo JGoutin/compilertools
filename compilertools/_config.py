@@ -34,6 +34,11 @@ CONFIG = {
     # Key is name or alias
     # Value is name to use
     'compilers': {
+        # Unix unspecified compiler
+        'unix': 'unix',
+        'cc': 'unix',
+        'c++': 'unix',
+
         # GNU Compiler Collection
         'gcc': 'gcc',
         'g++': 'gcc',
@@ -41,16 +46,16 @@ CONFIG = {
         'gnu fortran': 'gcc',
         'mingw32': 'gcc',
         'cygwin': 'gcc',
-        'cc': 'gcc',
-        'c++': 'gcc',
-        'unix': 'gcc',
 
-        # LLVM (Not implemented yet)
-        # 'clang': 'llvm',
-        # 'clang++': 'llvm',
-        # 'flang': 'llvm',
+        # LLVM
+        'clang': 'llvm',
+        'clang++': 'llvm',
+        'flang': 'llvm',
 
         # Microsoft Visual C
         'msvc': 'msvc',
     },
+
+    # Logging: If False, don't log exceptions on stdout
+    'logging': True,
 }

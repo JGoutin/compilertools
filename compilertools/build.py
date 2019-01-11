@@ -6,7 +6,8 @@ from distutils.command.build_ext import build_ext as _build_ext
 
 from compilertools._config_build import ConfigBuild
 from compilertools._core import (
-    suffix_from_args, get_compile_args, get_compiler)
+    suffix_from_args, get_compile_args, get_compiler,
+    log_exception as _log_exception)
 
 __all__ = ['ConfigBuild', 'get_build_compile_args', 'get_build_link_args',
            'get_compile_args', 'get_compiler', 'suffix_from_args']
@@ -55,7 +56,15 @@ def get_build_compile_args(compiler=None, arch=None, current_machine=None,
 
     # Optimized args for current machine
     if current_machine:
-        build_args[ext_suffix] = [compiler.compile_args_current_machine()]
+        try:
+            build_args[ext_suffix] = [compiler.compile_args_current_machine()]
+
+        except Exception:
+            # Compilertools should not break compilation in this case
+            # because it may be called from a Pip install.
+            # It should only back to compatible default in this case.
+            _log_exception()
+            build_args[ext_suffix] = []
 
     # Args for multiple machines
     else:

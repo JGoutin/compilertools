@@ -10,4 +10,5 @@ compilertools.compilers
    :caption: Specific compilers:
 
    api_compilers_gcc
+   api_compilers_llvm
    api_compilers_msvc

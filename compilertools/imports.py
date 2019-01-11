@@ -25,27 +25,35 @@ def update_extensions_suffixes(compiler):
             If None, uses default compiler name on current platform"""
     # Gets suffixes
     from compilertools._core import (
-        suffix_from_args, get_compile_args, get_compiler)
+        suffix_from_args, get_compile_args, get_compiler, log_exception)
 
-    compiler = get_compiler(compiler)
+    try:
 
-    suffixes = suffix_from_args(
-        get_compile_args(compiler, current_machine=True),
-        _machinery.EXTENSION_SUFFIXES)
+        compiler = get_compiler(compiler)
 
-    # Updates list
-    suffixes_index = ARCH_SUFFIXES.index
-    suffixes_insert = ARCH_SUFFIXES.insert
-    index = 0
-    for suffix in suffixes:
-        try:
-            index = suffixes_index(suffix, index) + 1
-        except ValueError:
-            suffixes_insert(index, suffix)
-            index += 1
+        suffixes = suffix_from_args(
+            get_compile_args(compiler, current_machine=True),
+            _machinery.EXTENSION_SUFFIXES)
 
-    # Memorizes compiler as processed
-    _PROCESSED_COMPILERS.add(compiler.name)
+        # Updates list
+        suffixes_index = ARCH_SUFFIXES.index
+        suffixes_insert = ARCH_SUFFIXES.insert
+        index = 0
+        for suffix in suffixes:
+            try:
+                index = suffixes_index(suffix, index) + 1
+            except ValueError:
+                suffixes_insert(index, suffix)
+                index += 1
+
+        # Memorizes compiler as processed
+        _PROCESSED_COMPILERS.add(compiler.name)
+
+    except Exception:
+        # Compilertools should not break user application, but only back to
+        # compatible mode.
+        # Exception is logged instead of risen.
+        log_exception()
 
 
 update_extensions_suffixes(None)

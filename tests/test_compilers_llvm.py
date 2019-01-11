@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for GNU Compiler Collection"""
+"""Tests for LLVM Clang"""
 
 
 def tests_compiler():
@@ -8,7 +8,7 @@ def tests_compiler():
     import subprocess
     from io import StringIO
     from compilertools.compilers._core import _get_arch_and_cpu
-    from compilertools.compilers.gcc import Compiler
+    from compilertools.compilers.llvm import Compiler
 
     # Test python_build_version and version
     # Monkey patch platform.python_compiler and subprocess.Popen for
@@ -47,12 +47,16 @@ def tests_compiler():
     assert compiler.version == 0.0
 
     # Check existing version
-    version = 'GCC 6.3.1 64bit'
-    version_cmd = 'gcc (GCC) 6.3.1\n...'
+    version = 'Clang 6.0 (clang-600.0.57)'
+    version_cmd = 'clang version 7.0.0 (Fedora 7.0.0-2.fc29)\n...'
     del compiler['python_build_version']
     del compiler['version']
-    assert compiler.python_build_version == 6.3
-    assert compiler.version == 6.3
+    assert compiler.python_build_version == 6.0
+    assert compiler.version == 7.0
+
+    version_cmd = 'Apple LLVM version 9.1.0 (clang-902.0.39.2)\n...'
+    del compiler['version']
+    assert compiler.version == 9.1
 
     # Not current compiler
     assert Compiler().version == 0.0
@@ -63,7 +67,7 @@ def tests_compiler():
     assert compiler.version == 0.0
 
     # Initialize system configurations
-    compiler['version'] = 6.3
+    compiler['version'] = 7.0
     arch_x86, cpu_x86 = _get_arch_and_cpu('x86_32')
     arch_amd64, cpu_amd64 = _get_arch_and_cpu('x86_64')
 
@@ -97,17 +101,17 @@ def tests_compiler():
     subprocess.Popen = subprocess_popen
 
 
-def tests_compiler_gcc_command():
-    """Test Compiler if CC/GCC command available"""
+def tests_compiler_clang_command():
+    """Test Compiler if CC/Clang command available"""
     from subprocess import Popen, PIPE
     try:
-        version_str = Popen(['gcc', '--version'], stdout=PIPE,
+        version_str = Popen(['clang', '--version'], stdout=PIPE,
                             universal_newlines=True).stdout.read().lower()
     except OSError:
         from pytest import skip
         version_str = ''
-        skip('GCC not available')
+        skip('Clang not available')
 
     from compilertools.compilers.llvm import Compiler
     assert Compiler(
-        current_compiler=True).version != 0.0 or 'gcc' not in version_str
+        current_compiler=True).version != 0.0 or 'clang' not in version_str

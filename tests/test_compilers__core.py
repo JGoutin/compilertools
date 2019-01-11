@@ -8,7 +8,8 @@ def tests_get_compiler():
     from os.path import splitext, dirname
     from compilertools._config import CONFIG
     from compilertools.compilers import CompilerBase, _core
-    from compilertools.compilers._core import get_compiler
+    from compilertools.compilers._core import (
+        get_compiler, _which_unix_compiler)
     from distutils.ccompiler import get_default_compiler
 
     # Initialise compiler
@@ -17,11 +18,15 @@ def tests_get_compiler():
     # Return compiler in parameter
     assert get_compiler(compiler) is compiler
 
+    # Get unix compiler
+    unix_compiler = _which_unix_compiler('cc')
+
     # Return default compiler
     name = get_default_compiler()
+    alias = CONFIG['compilers'].get(name, name)
     assert (get_compiler().__class__.__module__ ==
-            'compilertools.compilers.%s' %
-            CONFIG['compilers'].get(name, name))
+            'compilertools.compilers.%s' % (
+                alias if alias != 'unix' else unix_compiler))
 
     # Return compiler by name
     # with all file in "compilertools.compilers"
@@ -34,9 +39,14 @@ def tests_get_compiler():
 
     # Test aliases
     for name in CONFIG['compilers']:
-        assert (get_compiler(name).__class__.__module__ ==
-                'compilertools.compilers.%s' %
-                CONFIG['compilers'][name])
+        alias = CONFIG['compilers'][name]
+
+        if alias != 'unix':
+            assert (get_compiler(name).__class__.__module__ ==
+                    'compilertools.compilers.%s' % alias)
+        else:
+            assert (get_compiler(name).__class__.__module__ ==
+                    'compilertools.compilers.%s' % unix_compiler)
 
 
 def tests_get_arch_and_cpu():
@@ -159,3 +169,56 @@ def tests_compiler_base():
     assert compiler1.version == 0.0
     compiler1['version'] = 9.9
     assert compiler1.version == 9.9
+
+
+def test_which_unix_compiler():
+    """Test _which_unix_compiler"""
+    import subprocess
+    from io import StringIO
+    from compilertools.compilers._core import _which_unix_compiler
+
+    compiler = 'gcc'
+
+    # Mock Popen
+
+    raise_exception = False
+
+    class Process:
+        """Mocked process result"""
+        version_str = None
+
+        @property
+        def stdout(self):
+            """Mocked stdout"""
+            return StringIO(self.version_str)
+
+    def Popen(args, **_):
+        """Mocked Popen"""
+        assert args[0] == compiler or (args[0] == 'cc' and compiler == 'unix')
+        if raise_exception:
+            raise OSError
+        return Process()
+
+    subprocess_popen = subprocess.Popen
+    subprocess.Popen = Popen
+
+    # Test
+    try:
+        # GCC
+        Process.version_str = 'gcc (GCC) 6.3.1\n...'
+        assert _which_unix_compiler(compiler) == 'gcc'
+
+        # LLVM
+        Process.version_str = 'clang version 7.0.0 (Fedora 7.0.0-2.fc29)\n...'
+        assert _which_unix_compiler(compiler) == 'llvm'
+
+        Process.version_str = 'Apple LLVM version 9.1.0 (clang-902.0.39.2)\n...'
+        assert _which_unix_compiler(compiler) == 'llvm'
+
+        # Default to GCC if no compiler found
+        raise_exception = True
+        assert _which_unix_compiler(compiler) == 'gcc'
+
+    # Restore Popen
+    finally:
+        subprocess.Popen = subprocess_popen

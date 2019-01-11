@@ -50,7 +50,7 @@ def get_processor(arch, *args, **kwargs):
 
     Parameters
     ----------
-    arch : str
+    arch : str or None
         processor architecture
     args, kwargs
         args for class instantiation

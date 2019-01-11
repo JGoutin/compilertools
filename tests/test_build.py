@@ -22,6 +22,8 @@ def tests_get_build_compile_args():
     ext_suffix = get_config_var('EXT_SUFFIX')
 
     # Initialize compiler
+    raise_exception = False
+
     class Compiler(CompilerBase):
         """Dummy Compiler"""
 
@@ -43,6 +45,8 @@ def tests_get_build_compile_args():
 
         def _compile_args_current_machine(self, arch, cpu):
             """return current machine args"""
+            if raise_exception:
+                raise OSError
             return '--native'
 
     compiler = Compiler(current_compiler=True)
@@ -54,6 +58,12 @@ def tests_get_build_compile_args():
     # Test current_machine
     assert get_build_compile_args(compiler, current_machine=True) == {
         ext_suffix: ['--native']}
+
+    # Test current_machine, no exception in case of error
+    raise_exception = True
+    assert get_build_compile_args(compiler, current_machine=True) == {
+        ext_suffix: []}
+    raise_exception = False
 
     # Test current_machine from CONFIG_BUILD
     ConfigBuild.current_machine = True

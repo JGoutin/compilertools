@@ -29,6 +29,8 @@ PyInit_ctsrcex(void) {
 
 
 PYX_SOURCE = '''
+# cython: language_level=3
+
 def test():
     return 1
 '''
