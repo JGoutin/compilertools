@@ -3,8 +3,8 @@
 
 # Checks version compatibility
 from sys import version_info as _version_info
-if _version_info[0] < 3 or (_version_info[0] == 3 and _version_info[1] < 4):
-    raise ImportError('Compilertools needs Python 3.4 or above.')
+if _version_info[0] < 3 or (_version_info[0] == 3 and _version_info[1] < 5):
+    raise ImportError('Compilertools needs Python 3.5 or above.')
 del _version_info
 
 # Loads version

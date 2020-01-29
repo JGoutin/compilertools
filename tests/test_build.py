@@ -251,7 +251,6 @@ def tests_update_extension():
             self.compiler = DummyCompiler()
             self.plat_name = 'arch'
             self.inplace = False
-            self.debug = False  # Python 3.4 compatibility
 
         # Use build_ext.get_ext_filename directly
         get_ext_filename = GET_EXT_FILENAME

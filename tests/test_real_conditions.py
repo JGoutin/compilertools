@@ -99,16 +99,6 @@ def _build_and_import(
             # re-raise other exceptions
             raise
 
-        except ValueError as exception:
-            message = exception.args[0]
-            # Excepted exception if compiler not found by Distutils
-            # on Python 3.4 or less
-            if "['path']" == message:
-                from pytest import xfail
-                xfail(message)
-            # re-raise other exceptions
-            raise
-
         # Check files presence
         assert set(listdir(build)) == {
             'ctsrcex%s' % suffix for suffix in

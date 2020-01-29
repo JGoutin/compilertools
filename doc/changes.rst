@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.1.1 (2020/01/29)
+------------------
+
+Others:
+
+* Ensure Python 3.8 compatibility.
+* Drop Python 3.4 support.
+
 1.1.0 (2019/01/11)
 ------------------
 

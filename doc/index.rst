@@ -130,7 +130,7 @@ Compilertools have been tested with following build tools:
 Python compatibility
 --------------------
 
-* Python 3.4 minimum.
+* Python 3.5 minimum.
 
 Documentation
 =============

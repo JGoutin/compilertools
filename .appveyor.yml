@@ -1,25 +1,26 @@
 environment:
     matrix:
+        - PYTHON: "C:\\Python38-x64"
+        - PYTHON: "C:\\Python38"
         - PYTHON: "C:\\Python37-x64"
         - PYTHON: "C:\\Python37"
         - PYTHON: "C:\\Python36-x64"
         - PYTHON: "C:\\Python36"
         - PYTHON: "C:\\Python35-x64"
         - PYTHON: "C:\\Python35"
-        - PYTHON: "C:\\Python34-x64"
-        - PYTHON: "C:\\Python34"
+
 platform: 
     - x64
     - x86
 matrix:
     exclude:
+        - PYTHON: "C:\\Python38-x64"
+          platform: x86
         - PYTHON: "C:\\Python37-x64"
           platform: x86
         - PYTHON: "C:\\Python36-x64"
           platform: x86
         - PYTHON: "C:\\Python35-x64"
-          platform: x86
-        - PYTHON: "C:\\Python34-x64"
           platform: x86
 
 build: off

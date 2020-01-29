@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 # coding=utf-8
 """compilertools setup"""
 from datetime import datetime
@@ -15,10 +16,10 @@ PACKAGE_INFO = dict(
         'Topic :: Software Development :: Build Tools',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: Implementation :: CPython'
         ],
     keywords='compiler distutils setuptools build_ext wheels setup build',
@@ -30,7 +31,7 @@ PACKAGE_INFO = dict(
     },
     license='BSD',
     zip_safe=True,
-    python_requires='>=3.4',
+    python_requires='>=3.5',
     setup_requires=['setuptools'],
     tests_require=['pytest'],
     command_options={},
