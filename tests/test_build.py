@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Tests for building"""
 
-# Get methods references before compilertools.build path them
+# Get methods references before compilertools.build
 from distutils.command.build_ext import build_ext
 
 BUILD_EXTENSION = build_ext.build_extension
@@ -18,10 +17,7 @@ def tests_get_build_compile_args():
     from compilertools.build import get_build_compile_args
     from compilertools._config_build import ConfigBuild
 
-    # File extension
-    ext_suffix = get_config_var('EXT_SUFFIX')
-
-    # Initialize compiler
+    ext_suffix = get_config_var("EXT_SUFFIX")
     raise_exception = False
 
     class Compiler(CompilerBase):
@@ -29,72 +25,88 @@ def tests_get_build_compile_args():
 
         def __init__(self, current_compiler=False):
             CompilerBase.__init__(self, current_compiler=current_compiler)
-            self['api']['api_name'] = {
-                'compile': '--api-compile', 'link': '--api-link'}
-            self['option']['option_name'] = {
-                'compile': '--option-compile', 'link': '--option-link'}
+            self["api"]["api_name"] = {"compile": "--api-compile", "link": "--api-link"}
+            self["option"]["option_name"] = {
+                "compile": "--option-compile",
+                "link": "--option-link",
+            }
 
         def _compile_args_matrix(self, arch, cpu):
             """Return test args matrix"""
-            return [[self.Arg(args='--arch1', suffix='arch1',
-                              build_if=(arch == 'arch1')),
-                     self.Arg(args='--arch2', suffix='arch2',
-                              build_if=(arch == 'arch2')),
-                     self.Arg(args='--arch2_opt', suffix='arch2_opt',
-                              build_if=(arch == 'arch2'))]]
+            return [
+                [
+                    self.Arg(
+                        args="--arch1", suffix="arch1", build_if=(arch == "arch1")
+                    ),
+                    self.Arg(
+                        args="--arch2", suffix="arch2", build_if=(arch == "arch2")
+                    ),
+                    self.Arg(
+                        args="--arch2_opt",
+                        suffix="arch2_opt",
+                        build_if=(arch == "arch2"),
+                    ),
+                ]
+            ]
 
         def _compile_args_current_machine(self, arch, cpu):
             """return current machine args"""
             if raise_exception:
                 raise OSError
-            return '--native'
+            return "--native"
 
     compiler = Compiler(current_compiler=True)
 
     # Test default values
-    assert get_build_compile_args(compiler, 'arch1') == {
-        '.arch1%s' % ext_suffix: ['--arch1']}
+    assert get_build_compile_args(compiler, "arch1") == {
+        ".arch1%s" % ext_suffix: ["--arch1"]
+    }
 
     # Test current_machine
     assert get_build_compile_args(compiler, current_machine=True) == {
-        ext_suffix: ['--native']}
+        ext_suffix: ["--native"]
+    }
 
     # Test current_machine, no exception in case of error
     raise_exception = True
-    assert get_build_compile_args(compiler, current_machine=True) == {
-        ext_suffix: []}
+    assert get_build_compile_args(compiler, current_machine=True) == {ext_suffix: []}
     raise_exception = False
 
     # Test current_machine from CONFIG_BUILD
     ConfigBuild.current_machine = True
-    assert get_build_compile_args(compiler) == {ext_suffix: ['--native']}
+    assert get_build_compile_args(compiler) == {ext_suffix: ["--native"]}
     ConfigBuild.current_machine = False
 
     # Test ext_suffix
-    assert get_build_compile_args(compiler, 'arch1', ext_suffix='.ext') == {
-        '.arch1.ext': ['--arch1']}
+    assert get_build_compile_args(compiler, "arch1", ext_suffix=".ext") == {
+        ".arch1.ext": ["--arch1"]
+    }
 
     # Test use_api
-    assert get_build_compile_args(compiler, 'arch1', use_api=['api_name']) == {
-        '.arch1%s' % ext_suffix: ['--arch1', '--api-compile']}
+    assert get_build_compile_args(compiler, "arch1", use_api=["api_name"]) == {
+        ".arch1%s" % ext_suffix: ["--arch1", "--api-compile"]
+    }
 
     # Test use_option
-    assert get_build_compile_args(
-        compiler, 'arch1', use_option=['option_name']) == {
-               '.arch1%s' % ext_suffix: ['--arch1', '--option-compile']}
+    assert get_build_compile_args(compiler, "arch1", use_option=["option_name"]) == {
+        ".arch1%s" % ext_suffix: ["--arch1", "--option-compile"]
+    }
 
     # Test filtering suffixes
-    assert get_build_compile_args(compiler, 'arch2') == {
-        '.arch2%s' % ext_suffix: ['--arch2'],
-        '.arch2_opt%s' % ext_suffix: ['--arch2_opt']}
-    ConfigBuild.suffixes_excludes.add('arch2_opt')
-    assert get_build_compile_args(compiler, 'arch2') == {
-        '.arch2%s' % ext_suffix: ['--arch2']}
-    ConfigBuild.suffixes_excludes.remove('arch2_opt')
-    ConfigBuild.suffixes_includes.add('arch2')
-    assert get_build_compile_args(compiler, 'arch2') == {
-        '.arch2%s' % ext_suffix: ['--arch2']}
-    ConfigBuild.suffixes_includes.remove('arch2')
+    assert get_build_compile_args(compiler, "arch2") == {
+        ".arch2%s" % ext_suffix: ["--arch2"],
+        ".arch2_opt%s" % ext_suffix: ["--arch2_opt"],
+    }
+    ConfigBuild.suffixes_excludes.add("arch2_opt")
+    assert get_build_compile_args(compiler, "arch2") == {
+        ".arch2%s" % ext_suffix: ["--arch2"]
+    }
+    ConfigBuild.suffixes_excludes.remove("arch2_opt")
+    ConfigBuild.suffixes_includes.add("arch2")
+    assert get_build_compile_args(compiler, "arch2") == {
+        ".arch2%s" % ext_suffix: ["--arch2"]
+    }
+    ConfigBuild.suffixes_includes.remove("arch2")
 
 
 def tests_get_build_link_args():
@@ -107,10 +119,11 @@ def tests_get_build_link_args():
 
         def __init__(self):
             CompilerBase.__init__(self)
-            self['api']['api_name'] = {
-                'compile': '--api-compile', 'link': '--api-link'}
-            self['option']['option_name'] = {
-                'compile': '--option-compile', 'link': '--option-link'}
+            self["api"]["api_name"] = {"compile": "--api-compile", "link": "--api-link"}
+            self["option"]["option_name"] = {
+                "compile": "--option-compile",
+                "link": "--option-link",
+            }
 
     compiler = Compiler()
 
@@ -118,12 +131,12 @@ def tests_get_build_link_args():
     assert get_build_link_args(compiler) == []
 
     # Test use_api
-    assert get_build_link_args(
-        compiler, use_api=['api_name']) == ['--api-link']
+    assert get_build_link_args(compiler, use_api=["api_name"]) == ["--api-link"]
 
     # Test use_option
-    assert get_build_link_args(
-        compiler, use_option=['option_name']) == ['--option-link']
+    assert get_build_link_args(compiler, use_option=["option_name"]) == [
+        "--option-link"
+    ]
 
 
 def tests_find_if_current_machine():
@@ -140,23 +153,24 @@ def tests_find_if_current_machine():
 
     os_getcwd = os.getcwd
     os.getcwd = dummy_getcwd
+    try:
 
-    # Set by configuration
-    ConfigBuild.current_machine = False
-    assert _find_if_current_machine() is False
-    ConfigBuild.current_machine = True
-    assert _find_if_current_machine() is True
+        # Set by configuration
+        ConfigBuild.current_machine = False
+        assert _find_if_current_machine() is False
+        ConfigBuild.current_machine = True
+        assert _find_if_current_machine() is True
 
-    # Pip detection
-    ConfigBuild.current_machine = 'autodetect'
-    w_dir = 'dir/not_current_machine'
-    assert _find_if_current_machine() is False
-    w_dir = 'dir/pip-‌​current_machine'
-    assert _find_if_current_machine() is True
+        # Pip detection
+        ConfigBuild.current_machine = "autodetect"
+        w_dir = "dir/not_current_machine"
+        assert _find_if_current_machine() is False
+        w_dir = "dir/pip-‌​current_machine"
+        assert _find_if_current_machine() is True
 
-    # Cleaning
-    os.getcwd = os_getcwd
-    ConfigBuild.current_machine = False
+    finally:
+        os.getcwd = os_getcwd
+        ConfigBuild.current_machine = False
 
 
 def tests_add_args():
@@ -169,23 +183,23 @@ def tests_add_args():
 
         def __init__(self):
             CompilerBase.__init__(self)
-            self['api']['api_name'] = {'compile': '--api-compile'}
+            self["api"]["api_name"] = {"compile": "--api-compile"}
 
     compiler = Compiler()
 
     # API & category exists
     args = []
-    _add_args(compiler, args, 'api', 'compile', ['api_name'])
-    assert args == ['--api-compile']
+    _add_args(compiler, args, "api", "compile", ["api_name"])
+    assert args == ["--api-compile"]
 
     # API exists, category not exists
     args = []
-    _add_args(compiler, args, 'api', 'link', ['api_name'])
+    _add_args(compiler, args, "api", "link", ["api_name"])
     assert args == []
 
     # API not exists, category exists
     args = []
-    _add_args(compiler, args, 'api', 'compile', ['not_exist'])
+    _add_args(compiler, args, "api", "compile", ["not_exist"])
     assert args == []
 
 
@@ -199,28 +213,33 @@ def tests_update_extension():
     from compilertools.compilers import CompilerBase
     from compilertools._config_build import ConfigBuild
     from compilertools.build import (
-        _update_extension, _patch_build_extension, _patch_get_ext_filename,
-        _patch_get_ext_fullname, _patch_get_outputs, _String)
+        _update_extension,
+        _patch_build_extension,
+        _patch_get_ext_filename,
+        _patch_get_ext_fullname,
+        _patch_get_outputs,
+        _String,
+    )
 
-    # File extension
-    ext_suffix = get_config_var('EXT_SUFFIX')
+    ext_suffix = get_config_var("EXT_SUFFIX")
 
-    # Initialize compiler
     class Compiler(CompilerBase):
         """Dummy Compiler"""
 
         def __init__(self):
             CompilerBase.__init__(self)
-            self['api']['api_name'] = {
-                'compile': '--api-compile', 'link': '--api-link'}
-            self['option']['option_name'] = {
-                'compile': '--option-compile', 'link': '--option-link'}
+            self["api"]["api_name"] = {"compile": "--api-compile", "link": "--api-link"}
+            self["option"]["option_name"] = {
+                "compile": "--option-compile",
+                "link": "--option-link",
+            }
 
         def _compile_args_matrix(self, arch, cpu):
             """Return test args matrix"""
             return [
-                [self.Arg(args='--inst', suffix='inst'), self.Arg()],
-                [self.Arg(args='--arch', suffix='arch'), self.Arg()]]
+                [self.Arg(args="--inst", suffix="inst"), self.Arg()],
+                [self.Arg(args="--arch", suffix="arch"), self.Arg()],
+            ]
 
     compiler = Compiler()
 
@@ -238,9 +257,9 @@ def tests_update_extension():
 
         def __init__(self):
             self.sources = []
-            self.extra_compile_args = ['--extra_compile']
-            self.extra_link_args = ['--extra_link']
-            self.name = 'package.module'
+            self.extra_compile_args = ["--extra_compile"]
+            self.extra_link_args = ["--extra_link"]
+            self.name = "package.module"
 
     class DummyBuildExt:
         """Dummy distutils.command.build_ext.build_ext"""
@@ -249,7 +268,7 @@ def tests_update_extension():
             self.package = None
             self.extensions = []
             self.compiler = DummyCompiler()
-            self.plat_name = 'arch'
+            self.plat_name = "arch"
             self.inplace = False
 
         # Use build_ext.get_ext_filename directly
@@ -265,15 +284,18 @@ def tests_update_extension():
 
     # Patch dummy build_ext
     DummyBuildExt.build_extension = _patch_build_extension(
-        DummyBuildExt.build_extension)
+        DummyBuildExt.build_extension
+    )
     DummyBuildExt.get_ext_filename = _patch_get_ext_filename(
-        DummyBuildExt.get_ext_filename)
+        DummyBuildExt.get_ext_filename
+    )
     DummyBuildExt.build_extension = _patch_build_extension(
-        DummyBuildExt.build_extension)
+        DummyBuildExt.build_extension
+    )
     DummyBuildExt.get_ext_fullname = _patch_get_ext_fullname(
-        DummyBuildExt.get_ext_fullname)
-    DummyBuildExt.get_outputs = _patch_get_outputs(
-        DummyBuildExt.get_outputs)
+        DummyBuildExt.get_ext_fullname
+    )
+    DummyBuildExt.get_outputs = _patch_get_outputs(DummyBuildExt.get_outputs)
 
     # Test with patched build_extension
     dummy_build_ext = DummyBuildExt()
@@ -287,27 +309,34 @@ def tests_update_extension():
     assert len(results) == len(excepted_args)
 
     # Check results details
-    results.sort(key=lambda x: getattr(x, 'compilertools_extended_suffix')
-    if hasattr(x, 'compilertools_extended_suffix') else '')
+    results.sort(
+        key=lambda x: getattr(x, "compilertools_extended_suffix")
+        if hasattr(x, "compilertools_extended_suffix")
+        else ""
+    )
 
     for index, result in enumerate(results):
         # Get suffix (not for the legacy extension)
         if index == 0:
-            assert not hasattr(result, 'compilertools_extended_suffix')
-            suffix = ''
+            assert not hasattr(result, "compilertools_extended_suffix")
+            suffix = ""
         else:
             suffix = result.compilertools_extended_suffix
 
         # Check compile args
-        assert (result.extra_compile_args ==
-                excepted_args[suffix.strip('.')] + ['--extra_compile'])
+        assert result.extra_compile_args == excepted_args[suffix.strip(".")] + [
+            "--extra_compile"
+        ]
 
         # Check link args
-        assert result.extra_link_args == ['--extra_link']
+        assert result.extra_link_args == ["--extra_link"]
 
         # Check get_ext_filename
-        assert (dummy_build_ext.get_ext_filename(result.name) ==
-                '%s%s%s' % (join('package', 'module'), suffix, ext_suffix))
+        assert dummy_build_ext.get_ext_filename(result.name) == "%s%s%s" % (
+            join("package", "module"),
+            suffix,
+            ext_suffix,
+        )
 
     # Check no duplicates if run a second time
     dummy_build_ext.build_extension(dummy_ext)
@@ -318,16 +347,18 @@ def tests_update_extension():
     # Cause, not use default compiler for current platform
     assert dummy_build_ext.compilertools_compiler_name
     assert dummy_build_ext.compilertools_extra_ouputs == [
-        '%s%s' % (join('package', 'module'), '.compilertools')]
+        "%s%s" % (join("package", "module"), ".compilertools")
+    ]
 
     # Test get_output
     with TemporaryDirectory() as tmp:
-        dummy_build_ext.build_lib = join(tmp, 'build')
-        makedirs(join(dummy_build_ext.build_lib, 'package'), exist_ok=True)
+        dummy_build_ext.build_lib = join(tmp, "build")
+        makedirs(join(dummy_build_ext.build_lib, "package"), exist_ok=True)
         excepted_file = join(
-            dummy_build_ext.build_lib, 'package', 'module.compilertools')
+            dummy_build_ext.build_lib, "package", "module.compilertools"
+        )
         assert dummy_build_ext.get_outputs() == [excepted_file]
-        with open(excepted_file, 'rt') as file:
+        with open(excepted_file, "rt") as file:
             assert file.read() == dummy_build_ext.compilertools_compiler_name
 
     # Test after disabling optimization with CONFIG_BUILD
@@ -335,27 +366,25 @@ def tests_update_extension():
     dummy_ext = DummyExtension()
     assert _update_extension(DummyBuildExt(), dummy_ext) == [dummy_ext]
 
-    # Clean up
     ConfigBuild.disabled = False
 
     # Test options activation
-    ConfigBuild.option['option_name'] = True
+    ConfigBuild.option["option_name"] = True
     results = _update_extension(DummyBuildExt(), DummyExtension())
     for result in results:
         # Check option arguments presence
-        assert result.extra_compile_args[-2] == '--option-compile'
-        assert result.extra_link_args[-2] == '--option-link'
+        assert result.extra_compile_args[-2] == "--option-compile"
+        assert result.extra_link_args[-2] == "--option-link"
 
-    # Clean up
-    del ConfigBuild.option['option_name']
+    del ConfigBuild.option["option_name"]
 
     # Test API activation with file analysis
-    ConfigBuild.api['api_name'] = {'c': '#pragma api '}
+    ConfigBuild.api["api_name"] = {"c": "#pragma api "}
     with TemporaryDirectory() as tmp:
         # Create dummy source file
-        source = join(tmp, 'source.c')
-        with open(source, 'wt') as file:
-            file.write('#pragma api operation')
+        source = join(tmp, "source.c")
+        with open(source, "wt") as file:
+            file.write("#pragma api operation")
 
         # Reset extension and add file as source
         dummy_ext = DummyExtension()
@@ -366,33 +395,32 @@ def tests_update_extension():
 
     for result in results:
         # Check API arguments presence
-        assert result.extra_compile_args[-2] == '--api-compile'
-        assert result.extra_link_args[-2] == '--api-link'
+        assert result.extra_compile_args[-2] == "--api-compile"
+        assert result.extra_link_args[-2] == "--api-link"
 
-    # Clean up
-    del ConfigBuild.api['api_name']
+    del ConfigBuild.api["api_name"]
 
     # Check type conservation with "get_ext_fullname"
-    assert isinstance(DummyBuildExt().get_ext_fullname(_String('module')), _String)
+    assert isinstance(DummyBuildExt().get_ext_fullname(_String("module")), _String)
     dummy_build_ext = DummyBuildExt()
-    dummy_build_ext.package = 'package'
-    assert isinstance(dummy_build_ext.get_ext_fullname(_String('module')), _String)
+    dummy_build_ext.package = "package"
+    assert isinstance(dummy_build_ext.get_ext_fullname(_String("module")), _String)
 
 
 def tests_string():
     """Test _String"""
     from compilertools.build import _String
 
-    string = _String('a.b')
+    string = _String("a.b")
 
     # Test parent_extension
-    parent_extension = 'parent_extension'
+    parent_extension = "parent_extension"
     assert string.parent_extension is None
     string.parent_extension = parent_extension
     assert string.parent_extension == parent_extension
 
     # Test split
-    splited = string.split('.')
+    splited = string.split(".")
     assert isinstance(splited[0], _String)
     assert isinstance(splited[1], _String)
     assert splited[0].parent_extension == parent_extension
@@ -407,13 +435,15 @@ def tests_patch_build_extension():
     assert BUILD_EXTENSION is not build_ext.build_extension
 
     # Check wrap
-    assert (build_ext.build_extension.__module__ ==
-            'compilertools.%s' % BUILD_EXTENSION.__module__)
+    assert (
+        build_ext.build_extension.__module__
+        == "compilertools.%s" % BUILD_EXTENSION.__module__
+    )
     assert build_ext.build_extension.__name__ == BUILD_EXTENSION.__name__
 
     # Test re-patch
     previous = build_ext.build_extension
-    build_ext.build_extension = (_patch_build_extension(build_ext.build_extension))
+    build_ext.build_extension = _patch_build_extension(build_ext.build_extension)
     assert build_ext.build_extension is previous
 
 
@@ -425,13 +455,15 @@ def tests_patch_get_ext_filename():
     assert GET_EXT_FILENAME is not build_ext.get_ext_filename
 
     # Check wrap
-    assert (build_ext.get_ext_filename.__module__ ==
-            'compilertools.%s' % GET_EXT_FILENAME.__module__)
+    assert (
+        build_ext.get_ext_filename.__module__
+        == "compilertools.%s" % GET_EXT_FILENAME.__module__
+    )
     assert build_ext.get_ext_filename.__name__ == GET_EXT_FILENAME.__name__
 
     # Test re-patch
     previous = build_ext.get_ext_filename
-    build_ext.get_ext_filename = (_patch_get_ext_filename(build_ext.get_ext_filename))
+    build_ext.get_ext_filename = _patch_get_ext_filename(build_ext.get_ext_filename)
     assert build_ext.get_ext_filename is previous
 
 
@@ -443,13 +475,15 @@ def tests_patch_get_ext_fullname():
     assert GET_EXT_FULLNAME is not build_ext.get_ext_fullname
 
     # Check wrap
-    assert (build_ext.get_ext_fullname.__module__ ==
-            'compilertools.%s' % GET_EXT_FULLNAME.__module__)
+    assert (
+        build_ext.get_ext_fullname.__module__
+        == "compilertools.%s" % GET_EXT_FULLNAME.__module__
+    )
     assert build_ext.get_ext_fullname.__name__ == GET_EXT_FULLNAME.__name__
 
     # Test re-patch
     previous = build_ext.get_ext_fullname
-    build_ext.get_ext_fullname = (_patch_get_ext_fullname(build_ext.get_ext_fullname))
+    build_ext.get_ext_fullname = _patch_get_ext_fullname(build_ext.get_ext_fullname)
     assert build_ext.get_ext_fullname is previous
 
 
@@ -461,13 +495,14 @@ def tests_patch_get_outputs():
     assert GET_OUTPUTS is not build_ext.get_outputs
 
     # Check wrap
-    assert (build_ext.get_outputs.__module__ ==
-            'compilertools.%s' % GET_OUTPUTS.__module__)
+    assert (
+        build_ext.get_outputs.__module__ == "compilertools.%s" % GET_OUTPUTS.__module__
+    )
     assert build_ext.get_outputs.__name__ == GET_OUTPUTS.__name__
 
     # Test re-patch
     previous = build_ext.get_outputs
-    build_ext.get_outputs = (_patch_get_outputs(build_ext.get_outputs))
+    build_ext.get_outputs = _patch_get_outputs(build_ext.get_outputs)
     assert build_ext.get_outputs is previous
 
 
@@ -478,6 +513,7 @@ def tests_patch___new__():
 
     # Check build_ext instantiation
     from distutils.dist import Distribution
+
     build_ext(Distribution())
     assert GET_EXT_FULLNAME is not build_ext.get_ext_fullname
     assert GET_EXT_FILENAME is not build_ext.get_ext_filename

@@ -1,7 +1,6 @@
 [![Build Status](https://travis-ci.org/JGoutin/compilertools.svg?branch=master)](https://travis-ci.org/JGoutin/compilertools)
 [![Build status](https://ci.appveyor.com/api/projects/status/khsf4rjrjo78xcmm?svg=true)](https://ci.appveyor.com/project/JGoutin/compilertools)
 [![codecov](https://codecov.io/gh/JGoutin/compilertools/branch/master/graph/badge.svg)](https://codecov.io/gh/JGoutin/compilertools)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f56d272d071b4674abe1547c33d18aeb)](https://www.codacy.com/app/ginnungagap/compilertools?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=JGoutin/compilertools&amp;utm_campaign=Badge_Grade)
 [![Documentation Status](https://readthedocs.org/projects/compilertools/badge/?version=latest)](http://compilertools.readthedocs.io/en/latest/?badge=latest)
 [![PyPI](https://img.shields.io/pypi/v/compilertools.svg)](https://pypi.org/project/compilertools)
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test module import"""
 
 
@@ -10,15 +9,14 @@ def tests_init():
 
     sys_version_info = sys.version_info
     version_info = namedtuple(
-        'Version_Info',
-        ['major', 'minor', 'micro', 'releaselevel', 'serial'])
+        "Version_Info", ["major", "minor", "micro", "releaselevel", "serial"]
+    )
 
     try:
         with raises(ImportError):
-            sys.version_info = version_info(3, 3, 0, 'final', 0)
-            import compilertools
+            sys.version_info = version_info(3, 3, 0, "final", 0)
+            import compilertools  # noqa: F401
 
-    # Cleaning
     finally:
         sys.version_info = sys_version_info
 
@@ -31,7 +29,8 @@ def tests_get_processor():
     from compilertools.processors import get_processor as _get_processor
 
     assert compilertools.get_processor() == _get_processor(
-        arch=None, current_machine=True)
+        arch=None, current_machine=True
+    )
 
 
 def tests_get_compiler():
@@ -41,5 +40,4 @@ def tests_get_compiler():
     import compilertools
     from compilertools.compilers import get_compiler as _get_compiler
 
-    assert compilertools.get_compiler() == _get_compiler(
-        current_compiler=True)
+    assert compilertools.get_compiler() == _get_compiler(current_compiler=True)

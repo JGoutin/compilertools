@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
 """Core functionalities"""
 
 from compilertools.compilers import get_compiler
 from compilertools._utils import always_str_list
 
 
-__all__ = ['get_compile_args', 'get_compiler', 'suffix_from_args',
-           'log_exception']
+__all__ = ["get_compile_args", "get_compiler", "suffix_from_args", "log_exception"]
 
 
-def get_compile_args(compiler=None, arch=None, current_machine=False,
-                     current_compiler=False):
+def get_compile_args(
+    compiler=None, arch=None, current_machine=False, current_compiler=False
+):
     """Gets compiler args OrderedDict for a specific compiler and architecture
     combination.
 
@@ -23,20 +22,17 @@ def get_compile_args(compiler=None, arch=None, current_machine=False,
     current_machine : bool
         Only compatibles with current machine CPU
     current_compiler : bool
-        If True, return only arguments compatibles with
-        current compiler.
+        If True, return only arguments compatibles with current compiler.
 
     Returns
     -------
     collections.OrderedDict
         Arguments
     """
-    # Generates options matrix for compiler and architecture
-    return get_compiler(compiler, current_compiler).compile_args(
-        arch, current_machine)
+    return get_compiler(compiler, current_compiler).compile_args(arch, current_machine)
 
 
-def suffix_from_args(args, extension='', return_empty_suffixes=False):
+def suffix_from_args(args, extension="", return_empty_suffixes=False):
     """Returns suffixes from args.
 
     Parameters
@@ -52,24 +48,20 @@ def suffix_from_args(args, extension='', return_empty_suffixes=False):
     -------
     list of str
         Suffixes"""
-    # Suffixes filtering
-
     suffixes = []
     for suffix in args:
-        # Create string
         if extension:
             if suffix:
                 for ext in always_str_list(extension):
-                    suffixes.append('.%s%s' % (suffix, ext))
+                    suffixes.append(".%s%s" % (suffix, ext))
             elif return_empty_suffixes:
                 for ext in always_str_list(extension):
                     suffixes.append(ext)
         elif suffix:
-            suffixes.append('.%s' % suffix)
+            suffixes.append(".%s" % suffix)
         elif return_empty_suffixes:
-            suffixes.append('')
+            suffixes.append("")
 
-    # Returns with same form as input
     return suffixes
 
 
@@ -81,14 +73,19 @@ def log_exception():
     """
     from compilertools._config import CONFIG
 
-    if CONFIG.get('logging', True):
+    if CONFIG.get("logging", True):
         from logging import getLogger
         import platform
-        getLogger('compilertools').exception('\n'.join((
-            'Compilertools: Exception when trying to enable optimization, '
-            'Back to compatible mode.',
-            '  OS: %s' % platform.platform(),
-            '  CPU: %s' % platform.processor(),
-            '  Python: %s [%s]' % (
-                platform.python_version(), platform.python_compiler())
-        )))
+
+        getLogger("compilertools").exception(
+            "\n".join(
+                (
+                    "Compilertools: Exception when trying to enable optimization, "
+                    "Back to compatible mode.",
+                    "  OS: %s" % platform.platform(),
+                    "  CPU: %s" % platform.processor(),
+                    "  Python: %s [%s]"
+                    % (platform.python_version(), platform.python_compiler()),
+                )
+            )
+        )

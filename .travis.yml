@@ -27,7 +27,7 @@ install:
     - "python3 -m pip install --upgrade --upgrade-strategy=eager pytest coverage pytest-cov codecov x86cpu numpy cython"
 
 script:
-    - "pytest -v --cov=compilertools --cov-report=term-missing"
+    - "pytest"
 
 after_success:
     - "codecov"

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for x86-32 CPU"""
 
 
@@ -8,25 +7,20 @@ def tests_processor_nocpu():
     from compilertools.processors import x86_32
 
     # Initialise dummy CPUID
-    string = 'Test'
+    string = "Test"
     encoded = 0x74736554
     flags = 0b10000000000000000000000000000001
 
     registers = {
-        0: {'ebx': encoded, 'ecx': encoded, 'edx': encoded},
-        1: {'ecx': flags, 'edx': flags},
-        7: {'ebx': flags, 'ecx': flags, 'edx': flags},
-        0x80000000: {'eax': flags, 'ebx': flags,
-                     'ecx': flags, 'edx': flags},
-        0x80000001: {'eax': flags, 'ebx': flags,
-                     'ecx': flags, 'edx': flags},
-        0x80000002: {'eax': encoded, 'ebx': encoded,
-                     'ecx': encoded, 'edx': encoded},
-        0x80000003: {'eax': encoded, 'ebx': encoded,
-                     'ecx': encoded, 'edx': encoded},
-        0x80000004: {'eax': encoded, 'ebx': encoded,
-                     'ecx': encoded, 'edx': encoded},
-        }
+        0: {"ebx": encoded, "ecx": encoded, "edx": encoded},
+        1: {"ecx": flags, "edx": flags},
+        7: {"ebx": flags, "ecx": flags, "edx": flags},
+        0x80000000: {"eax": flags, "ebx": flags, "ecx": flags, "edx": flags},
+        0x80000001: {"eax": flags, "ebx": flags, "ecx": flags, "edx": flags},
+        0x80000002: {"eax": encoded, "ebx": encoded, "ecx": encoded, "edx": encoded},
+        0x80000003: {"eax": encoded, "ebx": encoded, "ecx": encoded, "edx": encoded},
+        0x80000004: {"eax": encoded, "ebx": encoded, "ecx": encoded, "edx": encoded},
+    }
 
     class Cpuid(x86_32.Cpuid):
         """Dummy CPUID function"""
@@ -38,79 +32,94 @@ def tests_processor_nocpu():
         @property
         def eax(self):
             """EAX"""
-            return registers[self._eax]['eax']
+            return registers[self._eax]["eax"]
 
         @property
         def ebx(self):
             """EAX"""
-            return registers[self._eax]['ebx']
+            return registers[self._eax]["ebx"]
 
         @property
         def ecx(self):
             """EAX"""
-            return registers[self._eax]['ecx']
+            return registers[self._eax]["ecx"]
 
         @property
         def edx(self):
             """EAX"""
-            return registers[self._eax]['edx']
+            return registers[self._eax]["edx"]
 
     x86_cpuid = x86_32.Cpuid
     x86_32.Cpuid = Cpuid
 
-    # Tests registers_to_str
-    assert x86_32.Cpuid.registers_to_str(
-        encoded, encoded, encoded) == string * 3
+    try:
 
-    # Test default values
-    processor = Processor()
-    assert processor.current_machine is False
-    assert processor.vendor is ''
-    assert processor.cpuid_highest_extended_function == 0
-    assert processor.brand is ''
-    assert processor.os_supports_xsave is False
-    assert processor.features == []
+        # Tests registers_to_str
+        assert x86_32.Cpuid.registers_to_str(encoded, encoded, encoded) == string * 3
 
-    # Initialize processor as current one
-    processor = Processor(current_machine=True)
-    assert processor.current_machine is True
+        # Test default values
+        processor = Processor()
+        assert processor.current_machine is False
+        assert processor.vendor == ""
+        assert processor.cpuid_highest_extended_function == 0
+        assert processor.brand == ""
+        assert processor.os_supports_xsave is False
+        assert processor.features == []
 
-    # Test cpuid_highest_extended_function
-    assert processor.cpuid_highest_extended_function == flags
+        # Initialize processor as current one
+        processor = Processor(current_machine=True)
+        assert processor.current_machine is True
 
-    # Test vendor (With dummy CPUID)
-    assert processor.vendor == string * 3
+        # Test cpuid_highest_extended_function
+        assert processor.cpuid_highest_extended_function == flags
 
-    # Test no brand (With dummy CPUID)
-    processor['cpuid_highest_extended_function'] = 0x80000000
-    assert processor.brand is ''
+        # Test vendor (With dummy CPUID)
+        assert processor.vendor == string * 3
 
-    # Test brand (With dummy CPUID)
-    processor['cpuid_highest_extended_function'] = 0x80000004
-    del processor['brand']
-    assert processor.brand == string * 12
+        # Test no brand (With dummy CPUID)
+        processor["cpuid_highest_extended_function"] = 0x80000000
+        assert processor.brand == ""
 
-    # Test limited features (With dummy CPUID)
-    processor['cpuid_highest_extended_function'] = 0x80000000
-    assert processor.features == {
-        'PREFETCHWT1', 'PBE', 'FPU', 'HYPERVISOR', 'FSGSBASE', 'AVX512VL',
-        'SSE3'}
+        # Test brand (With dummy CPUID)
+        processor["cpuid_highest_extended_function"] = 0x80000004
+        del processor["brand"]
+        assert processor.brand == string * 12
 
-    # Test full features (With dummy CPUID)
-    processor['cpuid_highest_extended_function'] = 0x80000001
-    del processor['features']
-    assert processor.features == {
-        '3DNOW', 'LAHF_LM', 'AVX512VL', 'FPU', 'FSGSBASE', 'HYPERVISOR', 'PBE',
-        'PREFETCHWT1', 'SSE3'}
+        # Test limited features (With dummy CPUID)
+        processor["cpuid_highest_extended_function"] = 0x80000000
+        assert processor.features == {
+            "PREFETCHWT1",
+            "PBE",
+            "FPU",
+            "HYPERVISOR",
+            "FSGSBASE",
+            "AVX512VL",
+            "SSE3",
+        }
 
-    # Test os_support_avx
-    assert processor.os_supports_xsave is False
-    del processor['os_supports_xsave']
-    processor['features'].update(('XSAVE', 'OSXSAVE'))
-    assert processor.os_supports_xsave is True
+        # Test full features (With dummy CPUID)
+        processor["cpuid_highest_extended_function"] = 0x80000001
+        del processor["features"]
+        assert processor.features == {
+            "3DNOW",
+            "LAHF_LM",
+            "AVX512VL",
+            "FPU",
+            "FSGSBASE",
+            "HYPERVISOR",
+            "PBE",
+            "PREFETCHWT1",
+            "SSE3",
+        }
 
-    # Cleaning
-    x86_32.Cpuid = x86_cpuid
+        # Test os_support_avx
+        assert processor.os_supports_xsave is False
+        del processor["os_supports_xsave"]
+        processor["features"].update(("XSAVE", "OSXSAVE"))
+        assert processor.os_supports_xsave is True
+
+    finally:
+        x86_32.Cpuid = x86_cpuid
 
 
 def tests_cpuid_nocpu():
@@ -131,160 +140,184 @@ def tests_cpuid_nocpu():
     ctypes_memmove = ctypes.memmove
     ctypes_c_void_p = ctypes.c_void_p
 
-    system = 'Unix'
-    mem_address = 1
-    mprotect_success = 0
-    func_result = {}
+    try:
+        system = "Unix"
+        mem_address = 1
+        mprotect_success = 0
+        func_result = {}
 
-    def dummy_system():
-        """Dummy platform.system"""
-        return system
+        def dummy_system():
+            """Dummy platform.system"""
+            return system
 
-    def dummy_generic(*_, **__):
-        """Dummy generic method"""
+        def dummy_generic(*_, **__):
+            """Dummy generic method"""
 
-    def dummy_memmove(address, bytecode, size):
-        """Dummy ctypes.memmove
-        Store bytecode to execute"""
-        func_result['address'] = address
-        func_result['bytecode'] = bytecode
-        func_result['size'] = size
+        def dummy_memmove(address, bytecode, size):
+            """Dummy ctypes.memmove. Store bytecode to execute"""
+            func_result["address"] = address
+            func_result["bytecode"] = bytecode
+            func_result["size"] = size
 
-    class DummyValloc:
-        """Dummy valloc"""
+        class DummyValloc:
+            """Dummy valloc"""
 
-        def __new__(cls, *args, **kwargs):
-            """Dummy new"""
-            return mem_address
+            def __new__(cls, *args, **kwargs):
+                """Dummy new"""
+                return mem_address
 
-    class DummyMprotect:
-        """Dummy mprotect"""
-        def __call__(self, *args, **kwargs):
-            """Dummy call"""
-            return mprotect_success
+        class DummyMprotect:
+            """Dummy mprotect"""
 
-    class DummyCFuncType:
-        """Dummy ctypes.CFUNCTYPE"""
-        def __init__(self, *args, **kwargs):
-            """Dummy init"""
-        def __call__(self, *args, **kwargs):
-            """Dummy call"""
+            def __call__(self, *args, **kwargs):
+                """Dummy call"""
+                return mprotect_success
 
-            def func(*_, **__):
-                """Return executed bytecode"""
-                return func_result
-            return func
+        class DummyCFuncType:
+            """Dummy ctypes.CFUNCTYPE"""
 
-    class DummyCDll:
-        """Dummy ctypes.cdll"""
-        class LoadLibrary:
-            """Dummy ctypes.cdll.LoadLibrary"""
             def __init__(self, *args, **kwargs):
                 """Dummy init"""
-            valloc = DummyValloc
-            mprotect = DummyMprotect()
-            free = dummy_generic
 
-    class DummyWinDll:
-        """Dummy ctypes.windll"""
-        class kernel32:
-            """Dummy ctypes.windll.kernel32"""
-            VirtualAlloc = DummyValloc
-            VirtualFree = dummy_generic
+            def __call__(self, *args, **kwargs):
+                """Dummy call"""
 
-    platform.system = dummy_system
-    ctypes.memmove = dummy_memmove
-    ctypes.c_void_p = dummy_generic
-    ctypes.CFUNCTYPE = DummyCFuncType
-    ctypes.cdll = DummyCDll
-    ctypes.windll = DummyWinDll
+                def func(*_, **__):
+                    """Return executed bytecode"""
+                    return func_result
 
-    from compilertools.processors.x86_32 import Cpuid
+                return func
 
-    for system in ('Unix', 'Windows'):
-        # Check assembly bytecode
-        cpuid = Cpuid()
-        assert cpuid.eax['bytecode'] == (
-            b'\x31\xc0'  # XOR eax, eax
-            b'\x31\xc9'  # XOR ecx, ecx
-            b'\x0f\xa2'  # CPUID
-            b'\xc3')     # RET
-        assert cpuid.ebx['bytecode'] == (
-            b'\x31\xc0'  # XOR eax, eax
-            b'\x31\xc9'  # XOR ecx, ecx
-            b'\x0f\xa2'  # CPUID
-            b'\x89\xd8'  # MOV eax, ebx
-            b'\xc3')     # RET
-        assert cpuid.ecx['bytecode'] == (
-            b'\x31\xc0'  # XOR eax, eax
-            b'\x31\xc9'  # XOR ecx, ecx
-            b'\x0f\xa2'  # CPUID
-            b'\x89\xc8'  # MOV eax, ecx
-            b'\xc3')     # RET
-        assert cpuid.edx['bytecode'] == (
-            b'\x31\xc0'  # XOR eax, eax
-            b'\x31\xc9'  # XOR ecx, ecx
-            b'\x0f\xa2'  # CPUID
-            b'\x89\xd0'  # MOV eax, edx
-            b'\xc3')     # RET
+        class DummyCDll:
+            """Dummy ctypes.cdll"""
 
-        assert Cpuid(7, 5).eax['bytecode'] == (
-            b'\xb8\x07\x00\x00\x00'  # MOV eax, 0x00000007
-            b'\xb9\x05\x00\x00\x00'  # MOV ecx, 0x00000005
-            b'\x0f\xa2'              # CPUID
-            b'\xc3')                 # RET    
+            class LoadLibrary:
+                """Dummy ctypes.cdll.LoadLibrary"""
 
-        # Test failed to allocate memory
-        mem_address = 0
+                def __init__(self, *args, **kwargs):
+                    """Dummy init"""
+
+                valloc = DummyValloc
+                mprotect = DummyMprotect()
+                free = dummy_generic
+
+        class DummyWinDll:
+            """Dummy ctypes.windll"""
+
+            class kernel32:
+                """Dummy ctypes.windll.kernel32"""
+
+                VirtualAlloc = DummyValloc
+                VirtualFree = dummy_generic
+
+        platform.system = dummy_system
+        ctypes.memmove = dummy_memmove
+        ctypes.c_void_p = dummy_generic
+        ctypes.CFUNCTYPE = DummyCFuncType
+        ctypes.cdll = DummyCDll
+        ctypes.windll = DummyWinDll
+
+        from compilertools.processors.x86_32 import Cpuid
+
+        for system in ("Unix", "Windows"):
+            # Check assembly bytecode
+            cpuid = Cpuid()
+            assert cpuid.eax["bytecode"] == (
+                b"\x31\xc0"  # XOR eax, eax
+                b"\x31\xc9"  # XOR ecx, ecx
+                b"\x0f\xa2"  # CPUID
+                b"\xc3"
+            )  # RET
+            assert cpuid.ebx["bytecode"] == (
+                b"\x31\xc0"  # XOR eax, eax
+                b"\x31\xc9"  # XOR ecx, ecx
+                b"\x0f\xa2"  # CPUID
+                b"\x89\xd8"  # MOV eax, ebx
+                b"\xc3"
+            )  # RET
+            assert cpuid.ecx["bytecode"] == (
+                b"\x31\xc0"  # XOR eax, eax
+                b"\x31\xc9"  # XOR ecx, ecx
+                b"\x0f\xa2"  # CPUID
+                b"\x89\xc8"  # MOV eax, ecx
+                b"\xc3"
+            )  # RET
+            assert cpuid.edx["bytecode"] == (
+                b"\x31\xc0"  # XOR eax, eax
+                b"\x31\xc9"  # XOR ecx, ecx
+                b"\x0f\xa2"  # CPUID
+                b"\x89\xd0"  # MOV eax, edx
+                b"\xc3"
+            )  # RET
+
+            assert Cpuid(7, 5).eax["bytecode"] == (
+                b"\xb8\x07\x00\x00\x00"  # MOV eax, 0x00000007
+                b"\xb9\x05\x00\x00\x00"  # MOV ecx, 0x00000005
+                b"\x0f\xa2"  # CPUID
+                b"\xc3"
+            )  # RET
+
+            # Test failed to allocate memory
+            mem_address = 0
+            with raises(RuntimeError):
+                Cpuid().eax
+            mem_address = 1
+
+        # Test failed to mprotect
+        system = "Unix"
+        mprotect_success = 1
         with raises(RuntimeError):
             Cpuid().eax
-        mem_address = 1
 
-    # Test failed to mprotect
-    system = 'Unix'
-    mprotect_success = 1
-    with raises(RuntimeError):
-        Cpuid().eax
-
-    # Cleaning
-    platform.system = platform_system
-    ctypes.cdll = ctypes_cdll
-    if ctypes_windll is not None:
-        ctypes.windll = ctypes_windll
-    else:
-        del ctypes.windll
-    ctypes.CFUNCTYPE = ctypes_cfunctype
-    ctypes.memmove = ctypes_memmove
-    ctypes.c_void_p = ctypes_c_void_p
+    finally:
+        platform.system = platform_system
+        ctypes.cdll = ctypes_cdll
+        if ctypes_windll is not None:
+            ctypes.windll = ctypes_windll
+        else:
+            del ctypes.windll
+        ctypes.CFUNCTYPE = ctypes_cfunctype
+        ctypes.memmove = ctypes_memmove
+        ctypes.c_void_p = ctypes_c_void_p
 
 
 def tests_cpuid():
     """Test cpuid with a real x86 CPU"""
     from compilertools.processors import get_arch
 
-    if get_arch().split('_')[0] != 'x86':
+    if get_arch().split("_")[0] != "x86":
         from pytest import skip
+
         skip("Current processor is not x86")
 
     try:
         from x86cpu import cpuid as cpuid_ref
     except ImportError:
         from pytest import skip
+
         skip("x86cpu package not installed")
     from compilertools.processors.x86_32 import Cpuid
 
     for eax, ecx in (
-            (0, 0), (1, 0), (2, 0), (3, 0),
-            (4, 0), (7, 0), (0x80000000, 0),
-            (0x80000001, 0), (0x80000002, 0),
-            (0x80000003, 0), (0x80000004, 0)):
+        (0, 0),
+        (1, 0),
+        (2, 0),
+        (3, 0),
+        (4, 0),
+        (7, 0),
+        (0x80000000, 0),
+        (0x80000001, 0),
+        (0x80000002, 0),
+        (0x80000003, 0),
+        (0x80000004, 0),
+    ):
 
         ref = cpuid_ref(eax, ecx)
         cpuid = Cpuid(eax, ecx)
-        assert cpuid.eax == ref['eax']
-        assert cpuid.ecx == ref['ecx']
-        assert cpuid.ebx == ref['ebx']
-        assert cpuid.edx == ref['edx']
+        assert cpuid.eax == ref["eax"]
+        assert cpuid.ecx == ref["ecx"]
+        assert cpuid.ebx == ref["ebx"]
+        assert cpuid.edx == ref["edx"]
 
 
 def tests_processor():
@@ -292,11 +325,13 @@ def tests_processor():
     # Check architecture and skip if not compatible
     from compilertools.processors import get_arch
 
-    if get_arch() != 'x86_32':
+    if get_arch() != "x86_32":
         from pytest import skip
+
         skip("Current processor is not x86_32")
 
     # Test instantiation
     from compilertools.processors.x86_32 import Processor
+
     processor = Processor(current_machine=True)
     assert processor.features

@@ -1,21 +1,17 @@
-# -*- coding: utf-8 -*-
 """A library for helping optimizing Python extensions compilation."""
 
-# Checks version compatibility
 from sys import version_info as _version_info
+
 if _version_info[0] < 3 or (_version_info[0] == 3 and _version_info[1] < 5):
-    raise ImportError('Compilertools needs Python 3.5 or above.')
+    raise ImportError("Compilertools needs Python 3.5 or above.")
 del _version_info
 
-# Loads version
-from compilertools._version import __version__
+from compilertools._version import __version__  # noqa: E402
 
-# Loads only imports module at start, build module can be imported if needed
-from compilertools import imports
+from compilertools import imports  # noqa: E402
 
-# Public functions for system information
-from compilertools.processors import get_processor as _get_processor
-from compilertools.compilers import get_compiler as _get_compiler
+from compilertools.processors import get_processor as _get_processor  # noqa: E402
+from compilertools.compilers import get_compiler as _get_compiler  # noqa: E402
 
 
 def get_compiler():
@@ -42,4 +38,4 @@ def get_processor():
     return _get_processor(arch=None, current_machine=True)
 
 
-__all__ = ['imports', 'get_compiler', 'get_processor']
+__all__ = ["imports", "get_compiler", "get_processor", "__version__"]

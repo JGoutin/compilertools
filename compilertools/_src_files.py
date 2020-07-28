@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Source files parsing functionalities"""
 
 from os.path import splitext
@@ -16,27 +15,23 @@ def _any_line_startswith(sources, criterion):
     sources : str or list of str
         Sources files paths
     criterion : dict with str as keys and values
-        Dictionary with keys equal to lower case file extension, and
-        value equal to a list of lower case startswith string criterion.
+        Dictionary with keys equal to lower case file extension, and value equal to a
+        list of lower case startswith string criterion.
 
     Returns
     -------
     bool
         Returns True if criterion detected."""
-    # Makes sure arguments are iterable
     if isinstance(sources, str):
         sources = (sources,)
 
-    # Checks files for criterions
     for source in sources:
-        # Selects criterions based on file extension
         try:
             startswiths = criterion[splitext(source)[1].lower()]
         except KeyError:
             continue
 
-        # Checks criterions
-        with open(source, 'rt') as file:
+        with open(source, "rt") as file:
             for line, startswith in product(file, startswiths):
                 if line.lstrip().lower().startswith(startswith):
                     return True
@@ -45,8 +40,7 @@ def _any_line_startswith(sources, criterion):
 
 def _ignore_api(compiler, api):
     """Returns True if this API is not supported by
-    the specified compiler. If compiler is None,
-    always return False.
+    the specified compiler. If compiler is None, always return False.
 
     Parameters
     ----------
@@ -59,7 +53,7 @@ def _ignore_api(compiler, api):
     -------
     bool
         Returns True if API not supported."""
-    if compiler is None or api in compiler['api']:
+    if compiler is None or api in compiler["api"]:
         return False
     return True
 
@@ -71,8 +65,8 @@ def _startswith_exts(**startswiths_dict):
     Parameters
     ----------
     startswiths_dict : dict with str as keys and values
-        Dictionary with key as lower case language and value as list
-        of startswith values.
+        Dictionary with key as lower case language and value as list of startswith
+        values.
 
     Returns
     -------
@@ -92,11 +86,9 @@ def _startswith_exts(**startswiths_dict):
         except KeyError:
             continue
 
-        # Makes sure arguments are iterable
         if isinstance(startswiths, str):
             startswiths = (startswiths,)
 
-        # Insert Data
         for ext in exts:
             startswith_exts[ext] = startswiths
 
