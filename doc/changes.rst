@@ -1,6 +1,21 @@
 Changelog
 =========
 
+
+1.1.2 (2020/10/03)
+------------------
+
+Fixes:
+
+ * Fix GCC/LLVM version detection in some cases.
+
+Others:
+
+* Use ``-O3`` instead of ``-O2`` on GCC/LLVM.
+* Ensure Python 3.9 compatibility.
+* Drop Python 3.5 support.
+
+
 1.1.1 (2020/01/29)
 ------------------
 

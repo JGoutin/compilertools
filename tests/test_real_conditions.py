@@ -67,7 +67,7 @@ def _build_and_import(
     # Build
     with TemporaryDirectory() as tmp:
         # Create source
-        source = join(tmp, "ctsrcex%s" % source_ext)
+        source = join(tmp, f"ctsrcex{source_ext}")
         build = join(tmp, "build_exts")
         with open(source, "wt") as file:
             file.write(source_content)
@@ -103,7 +103,7 @@ def _build_and_import(
 
         # Check files presence
         assert set(listdir(build)) == {
-            "ctsrcex%s" % suffix for suffix in get_build_compile_args()
+            f"ctsrcex{suffix}" for suffix in get_build_compile_args()
         }
 
         # Create import test script
@@ -119,7 +119,7 @@ def _build_and_import(
 
         for suffix in ARCH_SUFFIXES:
             # Ignore file not existing
-            path = join(build, "ctsrcex%s" % suffix)
+            path = join(build, f"ctsrcex{suffix}")
             if not isfile(path):
                 continue
 
@@ -128,10 +128,10 @@ def _build_and_import(
             stdout, stderr = process.communicate()
 
             # Check result printed by import test script
-            assert (stdout or stderr).decode() == "ctsrcex%s 1" % suffix
+            assert (stdout or stderr).decode() == f"ctsrcex{suffix} 1"
 
             # Remove imported file for forcing importing another in next loop
-            print('"%s" imported successfully' % suffix)
+            print(f'"{suffix}" imported successfully')
             remove(path)
 
 
@@ -161,7 +161,10 @@ def tests_build_numpy_distutils():
         from pytest import skip
 
         skip('"numpy.distutils" package not available')
+    except RuntimeError as exc:
+        from pytest import skip
 
+        skip(str(exc))
     _build_and_import(setup, Extension)
 
 

@@ -456,4 +456,4 @@ class Cpuid:
             Result."""
         from struct import pack
 
-        return pack("<%s" % ("I" * len(uints)), *uints).decode("ASCII").strip("\x00 ")
+        return pack(f"<{'I' * len(uints)}", *uints).decode("ASCII").strip("\x00 ")

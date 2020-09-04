@@ -53,12 +53,12 @@ def suffix_from_args(args, extension="", return_empty_suffixes=False):
         if extension:
             if suffix:
                 for ext in always_str_list(extension):
-                    suffixes.append(".%s%s" % (suffix, ext))
+                    suffixes.append(f".{suffix}{ext}")
             elif return_empty_suffixes:
                 for ext in always_str_list(extension):
                     suffixes.append(ext)
         elif suffix:
-            suffixes.append(".%s" % suffix)
+            suffixes.append(f".{suffix}")
         elif return_empty_suffixes:
             suffixes.append("")
 
@@ -82,10 +82,10 @@ def log_exception():
                 (
                     "Compilertools: Exception when trying to enable optimization, "
                     "Back to compatible mode.",
-                    "  OS: %s" % platform.platform(),
-                    "  CPU: %s" % platform.processor(),
-                    "  Python: %s [%s]"
-                    % (platform.python_version(), platform.python_compiler()),
+                    f"  OS: {platform.platform()}",
+                    f"  CPU: {platform.processor()}",
+                    f"  Python: {platform.python_version()} "
+                    f"[{platform.python_compiler()}]",
                 )
             )
         )

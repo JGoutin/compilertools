@@ -42,7 +42,7 @@ def tests_get_processor():
         name = splitext(file)[0]
 
         processor = get_processor(name, current_machine=current_machine)
-        assert processor.__class__.__module__ == "compilertools.processors.%s" % name
+        assert processor.__class__.__module__ == f"compilertools.processors.{name}"
         assert processor.current_machine is current_machine
 
 

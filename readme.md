@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/JGoutin/compilertools.svg?branch=master)](https://travis-ci.org/JGoutin/compilertools)
-[![Build status](https://ci.appveyor.com/api/projects/status/khsf4rjrjo78xcmm?svg=true)](https://ci.appveyor.com/project/JGoutin/compilertools)
+![tests](https://github.com/JGoutin/compilertools/workflows/tests/badge.svg)
 [![codecov](https://codecov.io/gh/JGoutin/compilertools/branch/master/graph/badge.svg)](https://codecov.io/gh/JGoutin/compilertools)
 [![Documentation Status](https://readthedocs.org/projects/compilertools/badge/?version=latest)](http://compilertools.readthedocs.io/en/latest/?badge=latest)
 [![PyPI](https://img.shields.io/pypi/v/compilertools.svg)](https://pypi.org/project/compilertools)
@@ -119,8 +118,3 @@ Compilertools have been tested with following build tools:
 * Setuptools
 * Numpy.distutils
 * Cython
-
-Python compatibility
---------------------
-
-* Python 3.5 minimum.

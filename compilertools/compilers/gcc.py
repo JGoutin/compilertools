@@ -2,6 +2,10 @@
 
 
 from compilertools.compilers import CompilerBase as _CompilerBase
+from compilertools._utils import (
+    dump_version as _dump_version,
+    python_version as _python_version,
+)
 
 __all__ = ["Compiler"]
 
@@ -51,23 +55,7 @@ class Compiler(_CompilerBase):
             Version."""
         if not self.current_compiler:
             return
-
-        from subprocess import Popen, PIPE
-
-        try:
-            version_str = Popen(
-                ["gcc", "--version"], stdout=PIPE, universal_newlines=True
-            ).stdout.read()
-        except OSError:
-            return
-
-        if "gcc" not in version_str.lower():
-            # "gcc" command is linked to non GCC compiler on some systems
-            return
-
-        version_str = version_str.split(")", 1)[1].rstrip().split(maxsplit=1)[0]
-
-        return float(version_str.rsplit(".", 1)[0])
+        return _dump_version("gcc")
 
     @_CompilerBase._memoized_property
     def python_build_version(self):
@@ -77,16 +65,7 @@ class Compiler(_CompilerBase):
         -------
         float
             Version."""
-        from platform import python_compiler
-
-        version_str = python_compiler()
-
-        if "GCC" not in version_str:
-            return 0.0
-
-        version_str = version_str.split(" ", 2)[1]
-
-        return float(version_str.rsplit(".", 1)[0])
+        return _python_version("gcc")
 
     def _compile_args_matrix(self, arch, cpu):
         """Returns available GCC compiler options for the specified CPU architecture.
@@ -103,7 +82,7 @@ class Compiler(_CompilerBase):
         list of CompilerBase.Arg
             Arguments matrix."""
         # Generic optimisation
-        args = [[self.Arg(args=["-flto", "-O2"])]]
+        args = [[self.Arg(args=["-flto", "-O3"])]]
 
         # Architecture specific optimisations
         if arch == "x86_64":
@@ -255,7 +234,7 @@ class Compiler(_CompilerBase):
         -------
         str
             Best compiler arguments for current machine."""
-        args = ["-march=native -flto"]
+        args = ["-O3 -march=native -flto"]
 
         if arch == "x86_32":
             args.append("-m32")

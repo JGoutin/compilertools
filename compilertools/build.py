@@ -294,7 +294,7 @@ def _patch_build_extension(build_extension):
         for updated_ext in _update_extension(self, ext):
             build_extension(self, updated_ext)
 
-    patched.__module__ = "compilertools.%s" % patched.__module__
+    patched.__module__ = f"compilertools.{patched.__module__}"
     return patched
 
 
@@ -313,12 +313,12 @@ def _patch_get_ext_filename(get_ext_filename):
 
         if extended:
             return get_ext_filename(
-                self, "%s%s" % (ext_name, extended.replace(".", "#"))
+                self, f"{ext_name}{extended.replace('.', '#')}"
             ).replace("#", ".")
 
         return get_ext_filename(self, ext_name)
 
-    patched.__module__ = "compilertools.%s" % patched.__module__
+    patched.__module__ = f"compilertools.{patched.__module__}"
     return patched
 
 
@@ -338,7 +338,7 @@ def _patch_get_ext_fullname(get_ext_fullname):
 
         return full_name
 
-    patched.__module__ = "compilertools.%s" % patched.__module__
+    patched.__module__ = f"compilertools.{patched.__module__}"
     return patched
 
 
@@ -369,7 +369,7 @@ def _patch_get_outputs(get_outputs):
             outputs.extend(extra_outputs)
         return outputs
 
-    patched.__module__ = "compilertools.%s" % patched.__module__
+    patched.__module__ = f"compilertools.{patched.__module__}"
     return patched
 
 

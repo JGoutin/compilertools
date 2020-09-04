@@ -67,7 +67,7 @@ class _ExtensionFileFinder(_MetaPathFinder):
         See importlib.abc.MetaPathFinder.find_spec for more information."""
         sys_paths = _sys.path
 
-        file_name = "%s.compilertools" % fullname
+        file_name = f"{fullname}.compilertools"
         for sys_path in sys_paths:
             file_path = _join(sys_path, file_name)
             if _isfile(file_path):
@@ -81,7 +81,7 @@ class _ExtensionFileFinder(_MetaPathFinder):
                 break
 
         for suffix in ARCH_SUFFIXES:
-            file_name = "%s%s" % (fullname, suffix)
+            file_name = f"{fullname}{suffix}"
             for sys_path in sys_paths:
                 file_path = _join(sys_path, file_name)
                 if _isfile(file_path):

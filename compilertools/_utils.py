@@ -42,7 +42,7 @@ def import_class(package_name, module_name, class_name, default_class):
     -------
     class
         Imported class."""
-    path = "compilertools.%s.%s" % (package_name, module_name)
+    path = f"compilertools.{package_name}.{module_name}"
     try:
         import_module(path)
     except ImportError:
@@ -121,3 +121,63 @@ class BaseClass(MutableMapping):
 
     def __iter__(self):
         return self._items.__iter__()
+
+
+def dump_version(command):
+    """
+    Dump version for GCC/Clang compilers
+
+    Parameters
+    ----------
+    command : str
+        Compiler command.
+
+    Returns
+    -------
+        float or None: version if found else None
+    """
+    from subprocess import run, PIPE, CalledProcessError
+
+    try:
+        if (
+            command
+            not in run(
+                [command, "--version"],
+                stdout=PIPE,
+                stderr=PIPE,
+                universal_newlines=True,
+                check=True,
+            ).stdout
+        ):
+            # Command is linked to another compiler
+            return
+    except (FileNotFoundError, CalledProcessError):
+        return
+
+    for method in ("-dumpversion", "-dumpfullversion"):
+        process = run(
+            [command, method], stdout=PIPE, stderr=PIPE, universal_newlines=True
+        )
+        if not process.returncode and "." in process.stdout:
+            return float(".".join(process.stdout.split(".", 2)[:2]))
+
+
+def python_version(name):
+    """
+    Get compiler version used in Python.
+
+    Parameters
+    ----------
+    name : str
+        Compiler name.
+
+    Returns
+    -------
+        float: version
+    """
+    from platform import python_compiler
+
+    version_str = python_compiler()
+    if name not in version_str.lower():
+        return 0.0
+    return float(version_str.split(" ", 2)[1].rsplit(".", 1)[0])

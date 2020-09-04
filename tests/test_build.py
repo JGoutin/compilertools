@@ -59,7 +59,7 @@ def tests_get_build_compile_args():
 
     # Test default values
     assert get_build_compile_args(compiler, "arch1") == {
-        ".arch1%s" % ext_suffix: ["--arch1"]
+        f".arch1{ext_suffix}": ["--arch1"]
     }
 
     # Test current_machine
@@ -84,27 +84,27 @@ def tests_get_build_compile_args():
 
     # Test use_api
     assert get_build_compile_args(compiler, "arch1", use_api=["api_name"]) == {
-        ".arch1%s" % ext_suffix: ["--arch1", "--api-compile"]
+        f".arch1{ext_suffix}": ["--arch1", "--api-compile"]
     }
 
     # Test use_option
     assert get_build_compile_args(compiler, "arch1", use_option=["option_name"]) == {
-        ".arch1%s" % ext_suffix: ["--arch1", "--option-compile"]
+        f".arch1{ext_suffix}": ["--arch1", "--option-compile"]
     }
 
     # Test filtering suffixes
     assert get_build_compile_args(compiler, "arch2") == {
-        ".arch2%s" % ext_suffix: ["--arch2"],
-        ".arch2_opt%s" % ext_suffix: ["--arch2_opt"],
+        f".arch2{ext_suffix}": ["--arch2"],
+        f".arch2_opt{ext_suffix}": ["--arch2_opt"],
     }
     ConfigBuild.suffixes_excludes.add("arch2_opt")
     assert get_build_compile_args(compiler, "arch2") == {
-        ".arch2%s" % ext_suffix: ["--arch2"]
+        f".arch2{ext_suffix}": ["--arch2"]
     }
     ConfigBuild.suffixes_excludes.remove("arch2_opt")
     ConfigBuild.suffixes_includes.add("arch2")
     assert get_build_compile_args(compiler, "arch2") == {
-        ".arch2%s" % ext_suffix: ["--arch2"]
+        f".arch2{ext_suffix}": ["--arch2"]
     }
     ConfigBuild.suffixes_includes.remove("arch2")
 
@@ -332,10 +332,12 @@ def tests_update_extension():
         assert result.extra_link_args == ["--extra_link"]
 
         # Check get_ext_filename
-        assert dummy_build_ext.get_ext_filename(result.name) == "%s%s%s" % (
-            join("package", "module"),
-            suffix,
-            ext_suffix,
+        assert dummy_build_ext.get_ext_filename(result.name) == "".join(
+            (
+                join("package", "module"),
+                suffix,
+                ext_suffix,
+            )
         )
 
     # Check no duplicates if run a second time
@@ -347,7 +349,7 @@ def tests_update_extension():
     # Cause, not use default compiler for current platform
     assert dummy_build_ext.compilertools_compiler_name
     assert dummy_build_ext.compilertools_extra_ouputs == [
-        "%s%s" % (join("package", "module"), ".compilertools")
+        "".join((join("package", "module"), ".compilertools"))
     ]
 
     # Test get_output
@@ -437,7 +439,7 @@ def tests_patch_build_extension():
     # Check wrap
     assert (
         build_ext.build_extension.__module__
-        == "compilertools.%s" % BUILD_EXTENSION.__module__
+        == f"compilertools.{BUILD_EXTENSION.__module__}"
     )
     assert build_ext.build_extension.__name__ == BUILD_EXTENSION.__name__
 
@@ -457,7 +459,7 @@ def tests_patch_get_ext_filename():
     # Check wrap
     assert (
         build_ext.get_ext_filename.__module__
-        == "compilertools.%s" % GET_EXT_FILENAME.__module__
+        == f"compilertools.{GET_EXT_FILENAME.__module__}"
     )
     assert build_ext.get_ext_filename.__name__ == GET_EXT_FILENAME.__name__
 
@@ -477,7 +479,7 @@ def tests_patch_get_ext_fullname():
     # Check wrap
     assert (
         build_ext.get_ext_fullname.__module__
-        == "compilertools.%s" % GET_EXT_FULLNAME.__module__
+        == f"compilertools.{GET_EXT_FULLNAME.__module__}"
     )
     assert build_ext.get_ext_fullname.__name__ == GET_EXT_FULLNAME.__name__
 
@@ -495,9 +497,7 @@ def tests_patch_get_outputs():
     assert GET_OUTPUTS is not build_ext.get_outputs
 
     # Check wrap
-    assert (
-        build_ext.get_outputs.__module__ == "compilertools.%s" % GET_OUTPUTS.__module__
-    )
+    assert build_ext.get_outputs.__module__ == f"compilertools.{GET_OUTPUTS.__module__}"
     assert build_ext.get_outputs.__name__ == GET_OUTPUTS.__name__
 
     # Test re-patch

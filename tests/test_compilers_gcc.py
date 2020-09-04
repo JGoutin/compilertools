@@ -5,35 +5,39 @@ def tests_compiler():
     """Test Compiler"""
     import platform
     import subprocess
-    from io import StringIO
     from compilertools.compilers._core import _get_arch_and_cpu
     from compilertools.compilers.gcc import Compiler
 
-    version = ""
-    version_cmd = ""
-    raise_error = False
-
-    class DummyPopen:
-        """Always return version in stdout"""
-
-        def __init__(self, *_, **__):
-            """Ignore arguments and raise exception on demand"""
-            if raise_error:
-                raise OSError
-
-        @property
-        def stdout(self):
-            """Dummy stdout"""
-            return StringIO(version_cmd)
+    cmd = {
+        "python": "",
+        "--version": "",
+        "-dumpversion": "",
+        "not_found": False,
+    }
 
     def dummy_compiler():
         """Force version"""
-        return version
+        return cmd["python"]
+
+    def run(*popenargs, check=False, **_):
+        """Mocked subprocess.run"""
+        args = popenargs[0]
+        if cmd["not_found"]:
+            raise FileNotFoundError
+        try:
+            stdout = cmd[args[1]]
+            return_code = 0
+        except KeyError:
+            stdout = ""
+            return_code = 1
+            if check:
+                raise subprocess.CalledProcessError(return_code, args)
+        return subprocess.CompletedProcess(args, return_code, stdout)
 
     platform_python_compiler = platform.python_compiler
     platform.python_compiler = dummy_compiler
-    subprocess_popen = subprocess.Popen
-    subprocess.Popen = DummyPopen
+    subprocess_run = subprocess.run
+    subprocess.run = run
 
     try:
         compiler = Compiler(current_compiler=True)
@@ -43,19 +47,26 @@ def tests_compiler():
         assert compiler.version == 0.0
 
         # Check existing version
-        version = "GCC 6.3.1 64bit"
-        version_cmd = "gcc (GCC) 6.3.1\n..."
+        cmd["python"] = "GCC 6.3.1 64bit"
+        cmd["--version"] = "gcc (GCC) 6.3.1\n..."
+        cmd["-dumpversion"] = "6.3.1"
         del compiler["python_build_version"]
         del compiler["version"]
         assert compiler.python_build_version == 6.3
         assert compiler.version == 6.3
+
+        cmd["--version"] = "gcc (GCC) 10.2.1 20200723 (Red Hat 10.2.1-1)\n..."
+        cmd["-dumpversion"] = "10"
+        cmd["-dumpfullversion"] = "10.2.1"
+        del compiler["version"]
+        assert compiler.version == 10.2
 
         # Not current compiler
         assert Compiler().version == 0.0
 
         # Test Error
         del compiler["version"]
-        raise_error = True
+        cmd["not_found"] = True
         assert compiler.version == 0.0
 
         # Initialize system configurations
@@ -90,7 +101,7 @@ def tests_compiler():
 
     finally:
         platform.python_compiler = platform_python_compiler
-        subprocess.Popen = subprocess_popen
+        subprocess.run = subprocess_run
 
 
 def tests_compiler_gcc_command():
@@ -109,6 +120,6 @@ def tests_compiler_gcc_command():
         version_str = ""
         skip("GCC not available")
 
-    from compilertools.compilers.llvm import Compiler
+    from compilertools.compilers.gcc import Compiler
 
     assert Compiler(current_compiler=True).version != 0.0 or "gcc" not in version_str

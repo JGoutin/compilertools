@@ -21,7 +21,7 @@ def tests_get_compiler():
     # Return default compiler
     name = get_default_compiler()
     alias = CONFIG["compilers"].get(name, name)
-    assert get_compiler().__class__.__module__ == "compilertools.compilers.%s" % (
+    assert get_compiler().__class__.__module__ == "compilertools.compilers." + (
         alias if alias != "unix" else unix_compiler
     )
 
@@ -31,8 +31,7 @@ def tests_get_compiler():
             continue
         name = splitext(file)[0]
         assert (
-            get_compiler(name).__class__.__module__
-            == "compilertools.compilers.%s" % name
+            get_compiler(name).__class__.__module__ == f"compilertools.compilers.{name}"
         )
 
     # Test aliases
@@ -42,12 +41,12 @@ def tests_get_compiler():
         if alias != "unix":
             assert (
                 get_compiler(name).__class__.__module__
-                == "compilertools.compilers.%s" % alias
+                == f"compilertools.compilers.{alias}"
             )
         else:
             assert (
                 get_compiler(name).__class__.__module__
-                == "compilertools.compilers.%s" % unix_compiler
+                == f"compilertools.compilers.{unix_compiler}"
             )
 
 

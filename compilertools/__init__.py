@@ -2,8 +2,8 @@
 
 from sys import version_info as _version_info
 
-if _version_info[0] < 3 or (_version_info[0] == 3 and _version_info[1] < 5):
-    raise ImportError("Compilertools needs Python 3.5 or above.")
+if _version_info[0] < 3 or (_version_info[0] == 3 and _version_info[1] < 6):
+    raise ImportError("Compilertools needs Python 3.6 or above.")
 del _version_info
 
 from compilertools._version import __version__  # noqa: E402

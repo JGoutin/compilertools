@@ -1,0 +1,78 @@
+---
+name: tests
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - "LICENSE"
+      - "docs/**"
+      - ".gitignore"
+      - ".pre-commit-config.yaml"
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04, windows-latest, macos-latest]
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
+          - "3.9.0-rc - 3.9.0"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U setuptools pip pytest-cov
+          pip install numpy cython
+
+      - name: Install x86cpu
+        run: pip install x86cpu
+        if: ${{ !startsWith(matrix.python-version, '3.9') }}
+
+      - name: Test
+        run: pytest
+
+      - name: Collect coverage report
+        uses: codecov/codecov-action@v1
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install -U flake8 flake8-polyfill bandit black radon yamllint
+
+      - name: Python code quality lint
+        run: flake8
+
+      - name: Python security lint
+        run: bandit -r -s B603,B404 compilertools
+
+      - name: Python code style lint
+        run: black --check --diff .
+
+      - name: Python code complexity
+        run: radon cc -n D compilertools
+
+      - name: Python code maintenability
+        run: radon mi -n B compilertools
+
+      - name: Yaml code style lint
+        run: yamllint .

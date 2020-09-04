@@ -127,11 +127,6 @@ Compilertools have been tested with following build tools:
 * Numpy.distutils
 * Cython
 
-Python compatibility
---------------------
-
-* Python 3.5 minimum.
-
 Documentation
 =============
 
