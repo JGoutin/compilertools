@@ -20,7 +20,7 @@ jobs:
           - 3.6
           - 3.7
           - 3.8
-          - "3.9.0-rc - 3.9.0"
+          - 3.9
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -30,10 +30,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Get pip cache dir
+        id: pip-cache
+        run: python -c "from pip._internal.locations import USER_CACHE_DIR; print(f'::set-output name=dir::{USER_CACHE_DIR}')"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: pip-${{ matrix.os }}-${{ matrix.python-version }}
+
       - name: Install dependencies
         run: |
-          python -m pip install -U setuptools pip pytest-cov
-          pip install numpy cython
+          python -m pip install -U setuptools pip wheel --disable-pip-version-check
+          pip install numpy cython pytest-cov --disable-pip-version-check
 
       - name: Install x86cpu
         run: pip install x86cpu
@@ -56,23 +66,36 @@ jobs:
         with:
           python-version: 3.x
 
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: pip-lint
+
       - name: Install dependencies
-        run: pip install -U flake8 flake8-polyfill bandit black radon yamllint
+        run: |
+          pip install wheel --disable-pip-version-check
+          pip install -U flake8 flake8-polyfill bandit black radon yamllint --disable-pip-version-check
 
       - name: Python code quality lint
         run: flake8
 
       - name: Python security lint
         run: bandit -r -s B603,B404 compilertools
+        if: ${{ always() }}
 
       - name: Python code style lint
         run: black --check --diff .
+        if: ${{ always() }}
 
       - name: Python code complexity
         run: radon cc -n D compilertools
+        if: ${{ always() }}
 
       - name: Python code maintenability
         run: radon mi -n B compilertools
+        if: ${{ always() }}
 
       - name: Yaml code style lint
         run: yamllint .
+        if: ${{ always() }}

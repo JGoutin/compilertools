@@ -1,4 +1,3 @@
 ---
 rules:
-  line-length:
-    max: 88
+  line-length: disable
