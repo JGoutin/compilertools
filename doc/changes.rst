@@ -1,6 +1,16 @@
 Changelog
 =========
 
+1.1.3 (2021/11/09)
+------------------
+
+Fixes:
+
+ * Remove ``-mtune`` generic optimization for LLVM.
+
+Others:
+
+* Ensure Python 3.10 compatibility.
 
 1.1.2 (2020/10/03)
 ------------------
@@ -14,7 +24,6 @@ Others:
 * Use ``-O3`` instead of ``-O2`` on GCC/LLVM.
 * Ensure Python 3.9 compatibility.
 * Drop Python 3.5 support.
-
 
 1.1.1 (2020/01/29)
 ------------------
