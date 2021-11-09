@@ -2,7 +2,7 @@
 
 
 def test_baseclass():
-    """"Test BaseClass"""
+    """Test BaseClass"""
     from compilertools._utils import BaseClass
     from pytest import raises
 
@@ -98,7 +98,7 @@ def test_baseclass():
 
 
 def tests_import_class():
-    """"Test import_class"""
+    """Test import_class"""
     from compilertools._utils import import_class
 
     class Dummy:
@@ -117,7 +117,7 @@ def tests_import_class():
 
 
 def tests_always_str_list():
-    """"Test always_str_list"""
+    """Test always_str_list"""
     from compilertools._utils import always_str_list
 
     # not a str

@@ -2,7 +2,7 @@
 
 
 def tests_any_line_startswith():
-    """"Test _any_line_startswith"""
+    """Test _any_line_startswith"""
     from tempfile import TemporaryDirectory
     from os.path import join
     from compilertools._src_files import _any_line_startswith

@@ -106,15 +106,6 @@ class Compiler(_CompilerBase):
                     ),
                     self.Arg(),
                 ],
-                # CPU Generic vendor/brand optimisations
-                [
-                    self.Arg(
-                        args="-mtune=intel",
-                        suffix="intel",
-                        import_if=cpu.vendor == "GenuineIntel",
-                    ),
-                    self.Arg(),
-                ],
             ]
 
         elif arch == "x86_32":
@@ -171,15 +162,6 @@ class Compiler(_CompilerBase):
                         args=["-mfpmath=sse", "-msse"],
                         suffix="sse",
                         import_if="SSE" in cpu.features,
-                    ),
-                    self.Arg(),
-                ],
-                # CPU Generic vendor/brand optimisations
-                [
-                    self.Arg(
-                        args="-mtune=intel",
-                        suffix="intel",
-                        import_if=cpu.vendor == "GenuineIntel",
                     ),
                     self.Arg(),
                 ],
