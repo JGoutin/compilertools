@@ -21,6 +21,7 @@ PACKAGE_INFO = dict(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: Implementation :: CPython",
     ],
     keywords="compiler distutils setuptools build_ext wheels setup build",
