@@ -508,6 +508,8 @@ def tests_patch_get_outputs():
 
 def tests_patch___new__():
     """Test _patch___new__"""
+    from compilertools.build import get_build_compile_args  # noqa
+
     # Check if patched
     assert BUILD_EXT_NEW is not build_ext.__new__
 
