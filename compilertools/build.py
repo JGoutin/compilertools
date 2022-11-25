@@ -1,4 +1,4 @@
-"""Building functions"""
+"""Building functions."""
 
 from functools import wraps as _wraps
 from distutils.command.build_ext import build_ext as _build_ext
@@ -29,8 +29,7 @@ def get_build_compile_args(
     use_option=None,
     use_api=None,
 ):
-    """Gets compiler args for build as a dict of file suffixes as key and args string as
-    values.
+    """Get compiler args for build.
 
     Parameters
     ----------
@@ -84,13 +83,13 @@ def get_build_compile_args(
             exclude = ConfigBuild.suffixes_excludes
 
             def filter_suffix(suffix_to_test):
-                """Filter by exclusion"""
+                """Filter by exclusion."""
                 return suffix_to_test in exclude
 
         else:
 
             def filter_suffix(suffix_to_test):
-                """Filter by inclusion"""
+                """Filter by inclusion."""
                 return suffix_to_test not in include
 
         args = get_compile_args(compiler, arch, current_compiler=True)
@@ -118,7 +117,8 @@ def get_build_compile_args(
 
 
 def get_build_link_args(compiler=None, use_api=None, use_option=None):
-    """Gets linker arg for build as a list of args string.
+    """
+    Get linker arg for build as a list of args string.
 
     Parameters
     ----------
@@ -137,7 +137,8 @@ def get_build_link_args(compiler=None, use_api=None, use_option=None):
 
 
 def _add_args(compiler, arg_list, arg_cat, arg_type, args_names):
-    """Updates arguments list with API specific arguments
+    """
+    Update arguments list with API specific arguments.
 
     Parameters
     ----------
@@ -148,7 +149,8 @@ def _add_args(compiler, arg_list, arg_cat, arg_type, args_names):
     arg_type : {'link', 'compile'}
         Type of argument.
     args_names : list of str
-        Arguments names to use."""
+        Arguments names to use.
+    """
     if args_names:
         for name in args_names:
             try:
@@ -158,12 +160,14 @@ def _add_args(compiler, arg_list, arg_cat, arg_type, args_names):
 
 
 def _find_if_current_machine():
-    """Checks configuration and if current machine is not specified, tries to set it.
+    """
+    Check configuration and if current machine is not specified, tries to set it.
 
     Returns
     -------
     str
-        Current machine."""
+        Current machine.
+    """
     current_machine = ConfigBuild.current_machine
     if not isinstance(current_machine, bool):
         from os import getcwd
@@ -180,9 +184,11 @@ class _String(str):
 
     @_wraps(str.split)
     def split(self, *args, **kwargs):
-        """Split String, but keep "parent_extension" attribute.
+        """
+        Split String, but keep "parent_extension" attribute.
 
-        See str.split for more information."""
+        See str.split for more information.
+        """
         splitted = str.split(self, *args, **kwargs)
         for i, string in enumerate(splitted):
             splitted[i] = _String(string)
@@ -191,8 +197,10 @@ class _String(str):
 
 
 def _update_extension(self, ext):
-    """Updates build_ext extensions for add new args and suffixes based on the current
-    extension.
+    """
+    Update build_ext extensions.
+
+    Add new args and suffixes based on the current extension.
 
     Parameters
     ----------
@@ -204,7 +212,8 @@ def _update_extension(self, ext):
     Returns
     -------
     list of Extension
-        Patched build_ext.extensions."""
+        Patched build_ext.extensions.
+    """
     if ConfigBuild.disabled:
         return [ext]
 
@@ -280,14 +289,13 @@ def _update_extension(self, ext):
 
 
 def _patch_build_extension(build_extension):
-    """Decorates build_ext.build_extension for run it as many time as needed for newly
-    updated extensions"""
+    """Decorate build_ext.build_extension."""
     if build_extension.__module__.startswith("compilertools."):
         return build_extension
 
     @_wraps(build_extension)
     def patched(self, ext):
-        """Patched build_extension"""
+        """Patched build_extension."""
         if hasattr(ext, "compilertools_updated"):
             return build_extension(self, ext)
 
@@ -299,13 +307,13 @@ def _patch_build_extension(build_extension):
 
 
 def _patch_get_ext_filename(get_ext_filename):
-    """Decorates build_ext.get_ext_fullname for return the filename with our suffixes"""
+    """Decorate build_ext.get_ext_fullname to return the filename with our suffixes."""
     if get_ext_filename.__module__.startswith("compilertools."):
         return get_ext_filename
 
     @_wraps(get_ext_filename)
     def patched(self, ext_name):
-        """Patched get_ext_filename"""
+        """Patched get_ext_filename."""
         try:
             extended = ext_name.parent_extension.compilertools_extended_suffix
         except AttributeError:
@@ -323,13 +331,13 @@ def _patch_get_ext_filename(get_ext_filename):
 
 
 def _patch_get_ext_fullname(get_ext_fullname):
-    """Decorates build_ext.get_ext_fullname for _String type conservation"""
+    """Decorate build_ext.get_ext_fullname for _String type conservation."""
     if get_ext_fullname.__module__.startswith("compilertools."):
         return get_ext_fullname
 
     @_wraps(get_ext_fullname)
     def patched(self, ext_name):
-        """Patched get_ext_fullname"""
+        """Patched get_ext_fullname."""
         full_name = get_ext_fullname(self, ext_name)
 
         if isinstance(ext_name, _String) and not isinstance(full_name, _String):
@@ -343,13 +351,13 @@ def _patch_get_ext_fullname(get_ext_fullname):
 
 
 def _patch_get_outputs(get_outputs):
-    """Decorates build_ext.get_outputs for compiler memorization"""
+    """Decorate build_ext.get_outputs for compiler memorization."""
     if get_outputs.__module__.startswith("compilertools."):
         return get_outputs
 
     @_wraps(get_outputs)
     def patched(self):
-        """Patched get_outputs"""
+        """Patched get_outputs."""
         outputs = get_outputs(self)
 
         if (
@@ -374,15 +382,17 @@ def _patch_get_outputs(get_outputs):
 
 
 def _patch___new__(__new__):
-    """Patches "build_ext.__new__" for helping patching subclasses.
+    """
+    Patch "build_ext.__new__" to help to patch subclasses.
 
-    This is needed when subclass totally override methods without calling parent's
+    This is needed when subclass totally overrides methods without calling parent's
     methods inside them.
 
-    (This is the case in "numpy.distutils")."""
+    (This is the case in "numpy.distutils").
+    """
 
     def patched(cls, _):
-        """Patched __new__"""
+        """Patched __new__."""
         cls.build_extension = _patch_build_extension(cls.build_extension)
         cls.get_ext_filename = _patch_get_ext_filename(cls.get_ext_filename)
         cls.get_ext_fullname = _patch_get_ext_fullname(cls.get_ext_fullname)

@@ -1,4 +1,4 @@
-"""Tests for building"""
+"""Tests for building."""
 
 # Get methods references before compilertools.build
 from distutils.command.build_ext import build_ext
@@ -11,7 +11,7 @@ BUILD_EXT_NEW = build_ext.__new__
 
 
 def tests_get_build_compile_args():
-    """Test get_build_compile_args"""
+    """Test get_build_compile_args."""
     from distutils.sysconfig import get_config_var
     from compilertools.compilers import CompilerBase
     from compilertools.build import get_build_compile_args
@@ -21,7 +21,7 @@ def tests_get_build_compile_args():
     raise_exception = False
 
     class Compiler(CompilerBase):
-        """Dummy Compiler"""
+        """Mock Compiler."""
 
         def __init__(self, current_compiler=False):
             CompilerBase.__init__(self, current_compiler=current_compiler)
@@ -32,7 +32,7 @@ def tests_get_build_compile_args():
             }
 
         def _compile_args_matrix(self, arch, cpu):
-            """Return test args matrix"""
+            """Return test args matrix."""
             return [
                 [
                     self.Arg(
@@ -50,7 +50,7 @@ def tests_get_build_compile_args():
             ]
 
         def _compile_args_current_machine(self, arch, cpu):
-            """return current machine args"""
+            """Return current machine args."""
             if raise_exception:
                 raise OSError
             return "--native"
@@ -110,12 +110,12 @@ def tests_get_build_compile_args():
 
 
 def tests_get_build_link_args():
-    """Test get_build_link_args"""
+    """Test get_build_link_args."""
     from compilertools.compilers import CompilerBase
     from compilertools.build import get_build_link_args
 
     class Compiler(CompilerBase):
-        """Dummy Compiler"""
+        """Mock Compiler."""
 
         def __init__(self):
             CompilerBase.__init__(self)
@@ -140,7 +140,7 @@ def tests_get_build_link_args():
 
 
 def tests_find_if_current_machine():
-    """Test _find_if_current_machine"""
+    """Test _find_if_current_machine."""
     import os
     from compilertools.build import _find_if_current_machine
     from compilertools._config_build import ConfigBuild
@@ -148,13 +148,12 @@ def tests_find_if_current_machine():
     w_dir = os.getcwd()
 
     def dummy_getcwd():
-        """Dummy os.getcwd"""
+        """Mock os.getcwd."""
         return w_dir
 
     os_getcwd = os.getcwd
     os.getcwd = dummy_getcwd
     try:
-
         # Set by configuration
         ConfigBuild.current_machine = False
         assert _find_if_current_machine() is False
@@ -174,12 +173,12 @@ def tests_find_if_current_machine():
 
 
 def tests_add_args():
-    """Test _add_args"""
+    """Test _add_args."""
     from compilertools.compilers import CompilerBase
     from compilertools.build import _add_args
 
     class Compiler(CompilerBase):
-        """Dummy Compiler"""
+        """Mock Compiler."""
 
         def __init__(self):
             CompilerBase.__init__(self)
@@ -204,8 +203,7 @@ def tests_add_args():
 
 
 def tests_update_extension():
-    """Test _update_extension, _patch_build_extension.patched and
-    _patch_get_ext_filename.patched"""
+    """Test _update_extension and other monkey patches."""
     from os.path import join
     from os import makedirs
     from tempfile import TemporaryDirectory
@@ -224,7 +222,7 @@ def tests_update_extension():
     ext_suffix = get_config_var("EXT_SUFFIX")
 
     class Compiler(CompilerBase):
-        """Dummy Compiler"""
+        """Mock Compiler."""
 
         def __init__(self):
             CompilerBase.__init__(self)
@@ -235,7 +233,7 @@ def tests_update_extension():
             }
 
         def _compile_args_matrix(self, arch, cpu):
-            """Return test args matrix"""
+            """Return test args matrix."""
             return [
                 [self.Arg(args="--inst", suffix="inst"), self.Arg()],
                 [self.Arg(args="--arch", suffix="arch"), self.Arg()],
@@ -245,7 +243,7 @@ def tests_update_extension():
 
     # Create dummy distutils classes
     class DummyCompiler:
-        """Dummy distutils.ccompiler.CCompiler"""
+        """Mock distutils.ccompiler.CCompiler."""
 
         def __init__(self):
             # Replace compiler type str by Compiler instance
@@ -253,7 +251,7 @@ def tests_update_extension():
             self.compiler_type = compiler
 
     class DummyExtension:
-        """Dummy distutils.extension.Extension"""
+        """Mock distutils.extension.Extension."""
 
         def __init__(self):
             self.sources = []
@@ -262,7 +260,7 @@ def tests_update_extension():
             self.name = "package.module"
 
     class DummyBuildExt:
-        """Dummy distutils.command.build_ext.build_ext"""
+        """Mock distutils.command.build_ext.build_ext."""
 
         def __init__(self):
             self.package = None
@@ -276,11 +274,11 @@ def tests_update_extension():
         get_ext_fullname = GET_EXT_FULLNAME
 
         def get_outputs(self):
-            """Dummy get_outputs"""
+            """Mock get_outputs."""
             return []
 
         def build_extension(self, _):
-            """Dummy build_extension"""
+            """Mock build_extension."""
 
     # Patch dummy build_ext
     DummyBuildExt.build_extension = _patch_build_extension(
@@ -310,9 +308,11 @@ def tests_update_extension():
 
     # Check results details
     results.sort(
-        key=lambda x: getattr(x, "compilertools_extended_suffix")
-        if hasattr(x, "compilertools_extended_suffix")
-        else ""
+        key=lambda x: (
+            getattr(x, "compilertools_extended_suffix")
+            if hasattr(x, "compilertools_extended_suffix")
+            else ""
+        )
     )
 
     for index, result in enumerate(results):
@@ -410,7 +410,7 @@ def tests_update_extension():
 
 
 def tests_string():
-    """Test _String"""
+    """Test _String."""
     from compilertools.build import _String
 
     string = _String("a.b")
@@ -430,7 +430,7 @@ def tests_string():
 
 
 def tests_patch_build_extension():
-    """Test _patch_build_extension"""
+    """Test _patch_build_extension."""
     from compilertools.build import _patch_build_extension
 
     # Check if patched
@@ -450,7 +450,7 @@ def tests_patch_build_extension():
 
 
 def tests_patch_get_ext_filename():
-    """Test _patch_get_ext_filename"""
+    """Test _patch_get_ext_filename."""
     from compilertools.build import _patch_get_ext_filename
 
     # Check if patched
@@ -470,7 +470,7 @@ def tests_patch_get_ext_filename():
 
 
 def tests_patch_get_ext_fullname():
-    """Test _patch_get_ext_filename"""
+    """Test _patch_get_ext_filename."""
     from compilertools.build import _patch_get_ext_fullname
 
     # Check if patched
@@ -490,7 +490,7 @@ def tests_patch_get_ext_fullname():
 
 
 def tests_patch_get_outputs():
-    """Test _patch_get_outputs"""
+    """Test _patch_get_outputs."""
     from compilertools.build import _patch_get_outputs
 
     # Check if patched
@@ -507,7 +507,7 @@ def tests_patch_get_outputs():
 
 
 def tests_patch___new__():
-    """Test _patch___new__"""
+    """Test _patch___new__."""
     from compilertools.build import get_build_compile_args  # noqa
 
     # Check if patched

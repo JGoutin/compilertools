@@ -1,18 +1,18 @@
-"""Test for core functionalities"""
+"""Test for core functionalities."""
 
 
 def tests_get_compile_args():
-    """Test get_compile_args"""
+    """Test get_compile_args."""
     from collections import OrderedDict
     from compilertools._core import get_compile_args
     from compilertools.compilers import CompilerBase
 
     # Create a compiler
     class Compiler(CompilerBase):
-        """Dummy Compiler"""
+        """Mock Compiler."""
 
         def _compile_args_matrix(self, arch, cpu):
-            """Return test args matrix"""
+            """Return test args matrix."""
             return [
                 [self.Arg(args=["--generic"])],
                 [
@@ -74,7 +74,7 @@ def tests_get_compile_args():
 
 
 def tests_suffix_from_args():
-    """Test suffix_from_args"""
+    """Test suffix_from_args."""
     from collections import OrderedDict
     from compilertools._core import suffix_from_args
 
@@ -108,7 +108,7 @@ def tests_suffix_from_args():
 
 
 def tests_log_exception(caplog):
-    """Test log_exception"""
+    """Test log_exception."""
     from compilertools._core import log_exception
     import compilertools._config as _config
 

@@ -1,8 +1,8 @@
-"""Tests for imports"""
+"""Tests for imports."""
 
 
 def tests_update_ext_suffixes():
-    """Test update_extensions_suffixes & ARCH_SUFFIXES"""
+    """Test update_extensions_suffixes & ARCH_SUFFIXES."""
     from collections import OrderedDict
     from importlib.machinery import EXTENSION_SUFFIXES
     import compilertools._core as core
@@ -14,7 +14,7 @@ def tests_update_ext_suffixes():
         ARCH_SUFFIXES += [".fake1", ".fake2"]
 
         def get_compile_args(*_, **__):
-            """Mocker function"""
+            """Mock function."""
             return OrderedDict(
                 [
                     ("inst1-arch1", ["--generic", "--inst1", "--arch1"]),
@@ -65,7 +65,7 @@ def tests_update_ext_suffixes():
 
 
 def tests_extension_file_finder():
-    """Test _ExtensionFileFinder"""
+    """Test _ExtensionFileFinder."""
     import sys
     from os.path import join
     from tempfile import TemporaryDirectory
@@ -83,7 +83,7 @@ def tests_extension_file_finder():
         _PROCESSED_COMPILERS.add("fake_compiler")
 
         def update_extensions_suffixes(compiler):
-            """Mocker function"""
+            """Mock function."""
             _PROCESSED_COMPILERS.add(compiler)
 
         imports_update_extensions_suffixes = imports.update_extensions_suffixes
@@ -101,12 +101,12 @@ def tests_extension_file_finder():
     extension_file_loader = machinery.ExtensionFileLoader
 
     def dummy_spec(_, loader, *, origin=None):
-        """Dummy ModuleSpec"""
+        """Mock ModuleSpec."""
         assert loader == origin
         return origin
 
     def dummy_fileloader(_, path):
-        """Dummy ExtensionFileLoader"""
+        """Mock ExtensionFileLoader."""
         return path
 
     machinery.ModuleSpec = dummy_spec

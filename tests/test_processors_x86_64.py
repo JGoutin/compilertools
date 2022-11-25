@@ -1,10 +1,12 @@
-"""Tests for x86-64 CPU"""
+"""Tests for x86-64 CPU."""
 
 
 def tests_processor():
-    """Tests Processor
+    """
+    Tests Processor.
 
-    Inherit from X86 CPU, tests for 64bits specifics functions only"""
+    Inherit from X86 CPU, tests for 64bits specifics functions only
+    """
     # Check architecture and skip if not compatible
     from compilertools.processors import get_arch
 

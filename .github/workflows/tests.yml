@@ -1,5 +1,5 @@
 ---
-name: tests
+name: Tests
 
 on:
   push:
@@ -10,99 +10,154 @@ on:
       - ".gitignore"
       - ".pre-commit-config.yaml"
 
+env:
+  CACHE_DIR: /tmp/.workflow_cache
+  POETRY_CACHE_DIR: /tmp/.workflow_cache/.pip_packages
+  POETRY_VIRTUALENVS_PATH: /tmp/.workflow_cache/.venvs
+  POETRY_HOME: /tmp/.workflow_cache/.poetry
+  PIP_CACHE_DIR: /tmp/.workflow_cache/.pip_packages
+  MYPY_CACHE_DIR: /tmp/.workflow_cache/.mypy
+
 jobs:
-  tests:
+  static-analysis:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os:
-          - "ubuntu-20.04"
-          - "ubuntu-18.04"
-          - "windows-2019"
-          - "windows-2022"
-          - "macos-11"
-          - "macos-10.15"
-        python-version:
-          - "3.6"
-          - "3.7"
-          - "3.8"
-          - "3.9"
-          - "3.10"
+        os: [ "ubuntu-latest" ]
+        python-version: [ "3.x" ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Get pip cache dir
-        id: pip-cache
-        run: python -c "from pip._internal.locations import USER_CACHE_DIR; print(f'::set-output name=dir::{USER_CACHE_DIR}')"
-
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
+        id: cache
         with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: pip-${{ matrix.os }}-${{ matrix.python-version }}
+          path: ${{ env.CACHE_DIR }}
+          key: tests-${{ matrix.os }}-${{ matrix.python-version }}--${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
         run: |
-          python -m pip install -U setuptools pip wheel --disable-pip-version-check
-          pip install numpy cython pytest-cov --disable-pip-version-check
+          curl -sSL https://install.python-poetry.org | python -
+          $POETRY_HOME/bin/poetry install -n
+        if: steps.cache.outputs.cache-hit != 'true'
 
-      - name: Install x86cpu
-        run: pip install x86cpu
-        if: ${{ !startsWith(matrix.python-version, '3.9') && !startsWith(matrix.python-version, '3.1') }}
-
-      - name: Test
-        run: pytest
-
-      - name: Collect coverage report
-        uses: codecov/codecov-action@v1
-
-  static-analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.x
-
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: pip-lint
-
-      - name: Install dependencies
-        run: |
-          pip install wheel --disable-pip-version-check
-          pip install -U flake8 flake8-polyfill bandit black radon yamllint --disable-pip-version-check
-
-      - name: Python code quality lint
-        run: flake8
-
-      - name: Python security lint
-        run: bandit -r -s B603,B404 compilertools
+      - name: Python code style
+        run: $POETRY_HOME/bin/poetry run black . --check --diff
         if: ${{ always() }}
 
-      - name: Python code style lint
-        run: black --check --diff .
+      - name: Python code quality
+        run: $POETRY_HOME/bin/poetry run flake8 --docstring-convention numpy
         if: ${{ always() }}
 
       - name: Python code complexity
-        run: radon cc -n D compilertools
+        run: $POETRY_HOME/bin/poetry run radon cc -n D compilertools 1>&2
         if: ${{ always() }}
 
-      - name: Python code maintenability
-        run: radon mi -n B compilertools
+      - name: Python code maintainability
+        run: $POETRY_HOME/bin/poetry run radon mi -n B compilertools 1>&2
         if: ${{ always() }}
 
-      - name: Yaml code style lint
-        run: yamllint .
+      - name: Python code security
+        run: $POETRY_HOME/bin/poetry run bandit compilertools -rs B404,B603
         if: ${{ always() }}
+
+      - name: YAML code style
+        run: $POETRY_HOME/bin/poetry run yamllint -s .
+        if: ${{ always() }}
+
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - "ubuntu-latest"
+          - "ubuntu-22.04"
+          - "ubuntu-20.04"
+          - "windows-2019"
+          - "windows-2022"
+          - "macos-12"
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.x"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ env.CACHE_DIR }}
+          key: tests-${{ matrix.os }}-${{ matrix.python-version }}--${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          curl -sSL https://install.python-poetry.org | python -
+          $POETRY_HOME/bin/poetry install -n
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Test
+        shell: bash
+        run: $POETRY_HOME/bin/poetry run pytest --junitxml=test-results.xml --cov-report xml
+        if: ${{ always() }}
+
+      - name: Collect coverage report
+        uses: codecov/codecov-action@v3
+
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest" ]
+        python-version: [ "3.x" ]
+    if: ${{ github.repository == 'JGoutin/compilertools' && github.ref_type == 'tag' }}
+    needs: [tests]
+    environment: PyPI
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ env.CACHE_DIR }}
+          key: tests-${{ matrix.os }}-${{ matrix.python-version }}--${{ hashFiles('**/poetry.lock') }}
+
+      - name: Set package version
+        run: $POETRY_HOME/bin/poetry version $(echo -e "${{ github.ref_name }}" | tr -d 'v')
+
+      - name: Publish packages on PyPI
+        run: $POETRY_HOME/bin/poetry publish --build
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+
+      - name: Publish release on GitHub
+        run: |
+          go install github.com/tcnksm/ghr@latest
+          ~/go/bin/ghr -generatenotes $PRERELEASE -c ${{ github.sha }} ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRERELEASE: ${{ contains(github.ref_name, '-') && '-prerelease' || '' }}

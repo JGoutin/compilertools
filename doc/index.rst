@@ -10,7 +10,7 @@ SIMD (SSE, AVX, FMA, ...).
 Compilertools allows to work around this problem and distribute optimized
 packages for several machines while keeping the simplicity of Wheel. It works in
 the background and has been created with the aim of being easy to use.
-Package maintainer requires only to import it at runtime and buildtime.
+Package maintainer requires only to import it at runtime and build-time.
 Everything is transparent for the end user.
 
 Its secondary objective is also to help the package maintainer to optimally
@@ -24,7 +24,7 @@ Features:
 * Helps to build optimized package from sources for current machine.
 * Handles automatically compiling and linking options for a variety of
   compilers.
-* Autodetects openMP, OpenACC or Intel Cilk Plus in source code and
+* Autodetect openMP, OpenACC or Intel Cilk Plus in source code and
   automatically sets related compiling and linking options.
 * Support extra compiling options like fast math.
 * Provides build time settings for package maintainer to tweak compilation.

@@ -1,8 +1,8 @@
-"""Tests for processors core"""
+"""Tests for processors core."""
 
 
 def tests_get_arch():
-    """Test get_arch"""
+    """Test get_arch."""
     from platform import machine
     from compilertools._config import CONFIG
     from compilertools.processors._core import get_arch
@@ -26,7 +26,7 @@ def tests_get_arch():
 
 
 def tests_get_processor():
-    """Test get_processor"""
+    """Test get_processor."""
     from os import listdir
     from os.path import splitext, dirname
     from compilertools.processors import _core
@@ -47,7 +47,7 @@ def tests_get_processor():
 
 
 def tests_processor_base():
-    """Test ProcessorBase"""
+    """Test ProcessorBase."""
     from compilertools.processors import ProcessorBase
 
     # Test current machine

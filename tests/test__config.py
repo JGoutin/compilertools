@@ -1,8 +1,8 @@
-"""Test for general configuration"""
+"""Test for general configuration."""
 
 
 def tests_config():
-    """Test CONFIG"""
+    """Test CONFIG."""
     from collections.abc import Mapping
     from compilertools._config import CONFIG
 

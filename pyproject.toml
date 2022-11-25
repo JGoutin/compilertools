@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "compilertools"
+version = "0.0.0"
+description = "A library for helping optimizing Python extensions compilation."
+readme = "readme.md"
+authors = ["J.Goutin"]
+license = "BSD-2-Clause"
+classifiers = [
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: BSD License",
+        "Topic :: Software Development :: Build Tools",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: Implementation :: CPython",
+]
+keywords = ["compiler", "distutils", "setuptools", "build_ext", "wheels", "setup", "build"]
+repository = "https://github.com/JGoutin/compilertools"
+documentation = "https://jgoutin.github.io/compilertools/"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+bandit = "*"
+black = "*"
+flake8 = "*"
+flake8-docstrings = "*"
+pre-commit = "*"
+pytest-cov = "*"
+radon = "*"
+yamllint = "*"
+setuptools = "*"
+types-setuptools = "*"
+numpy = "*"
+cython = "*"
+sphinx-rtd-theme = "*"
+x86cpu = { version = "*", python = "<3.9" }
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-markers",
+    "--cov=compilertools",
+]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:"
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

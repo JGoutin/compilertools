@@ -1,4 +1,4 @@
-"""Test build and import with real files and compilers"""
+"""Test build and import with real files and compilers."""
 
 
 C_SOURCE = """
@@ -136,14 +136,14 @@ def _build_and_import(
 
 
 def tests_build_distutils():
-    """Test compatibility with distutils only"""
+    """Test compatibility with distutils only."""
     from distutils.core import setup, Extension
 
     _build_and_import(setup, Extension)
 
 
 def tests_build_setuptools():
-    """Test compatibility with Setuptools"""
+    """Test compatibility with Setuptools."""
     try:
         from setuptools import setup, Extension
     except ImportError:
@@ -154,7 +154,7 @@ def tests_build_setuptools():
 
 
 def tests_build_numpy_distutils():
-    """Tests compatibility with numpy.distutils"""
+    """Test compatibility with numpy.distutils."""
     try:
         from numpy.distutils.core import setup, Extension
     except ImportError:
@@ -169,7 +169,7 @@ def tests_build_numpy_distutils():
 
 
 def tests_build_cython():
-    """Test compatibility with Cython"""
+    """Test compatibility with Cython."""
     from distutils.core import setup, Extension
 
     try:

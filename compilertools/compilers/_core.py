@@ -1,4 +1,4 @@
-"""Base class and functions for compilers"""
+"""Base class and functions for compilers."""
 from itertools import product
 from collections import namedtuple, OrderedDict
 from compilertools._utils import import_class, BaseClass
@@ -9,7 +9,8 @@ __all__ = ["CompilerBase", "get_compiler"]
 
 
 def get_compiler(compiler=None, current_compiler=False):
-    """Returns compiler class
+    """
+    Return compiler class.
 
     Parameters
     ----------
@@ -21,7 +22,8 @@ def get_compiler(compiler=None, current_compiler=False):
     Returns
     -------
     CompilerBase subclass instance
-        Compiler class instance."""
+        Compiler class instance.
+    """
     if isinstance(compiler, CompilerBase):
         return compiler
 
@@ -78,7 +80,8 @@ def _which_unix_compiler(compiler):
 
 
 def _get_arch_and_cpu(arch=None, current_machine=False):
-    """Returns arch and updates CPU linked to compiler.
+    """
+    Return arch and updates CPU linked to compiler.
 
     Parameters
     ----------
@@ -99,7 +102,8 @@ def _get_arch_and_cpu(arch=None, current_machine=False):
 
 
 def _order_args_matrix(args_matrix, current_machine=False, current_compiler=False):
-    """Converts args matrix to args ordered dict
+    """
+    Convert args matrix to args ordered dict.
 
     Parameters
     ----------
@@ -109,7 +113,7 @@ def _order_args_matrix(args_matrix, current_machine=False, current_compiler=Fals
         If True, return only arguments compatibles with current machine
         (conditions from "import_if").
     current_compiler : bool
-        If True, return only arguments compatibles with current compiler
+        If True, return only arguments compatible with current compiler
         (conditions from "build_if").
 
     Returns
@@ -150,7 +154,7 @@ def _order_args_matrix(args_matrix, current_machine=False, current_compiler=Fals
 
 
 class CompilerBase(BaseClass):
-    """Base class for compiler"""
+    """Base class for compiler."""
 
     Arg = namedtuple("Argument", "args suffix import_if build_if")
     Arg.__new__.__defaults__ = ("", "", True, True)
@@ -168,7 +172,8 @@ class CompilerBase(BaseClass):
            (ex architecture compatibility). Default value is True.
        build_if : bool
            Condition that must be True for compile file with this argument and the
-           current compiler (Ex compiler version). Default value is True."""
+           current compiler (Ex compiler version). Default value is True.
+        """
 
     def __init__(self, current_compiler=False):
         BaseClass.__init__(self)
@@ -177,8 +182,8 @@ class CompilerBase(BaseClass):
         self._default["version"] = 0.0
 
     def _compile_args_matrix(self, arch, cpu):
-        """Returns available compiler arguments for the specified CPU architecture as a
-        matrix.
+        """
+        Return available compiler arguments matrix for the specified CPU architecture.
 
         Override to define matrix.
 
@@ -192,13 +197,15 @@ class CompilerBase(BaseClass):
         Returns
         -------
         list of CompilerBase.Arg
-            Arguments matrix."""
+            Arguments matrix.
+        """
         raise NotImplementedError
 
     def _compile_args_current_machine(self, arch, cpu):
-        """Defines optimized arguments for current machine.
+        """
+        Define optimized arguments for the current machine.
 
-        By default, gets the best options from compile_args method.
+        By default, get the best options from compile_args method.
 
         Override to define another behavior.
 
@@ -212,7 +219,8 @@ class CompilerBase(BaseClass):
         Returns
         -------
         str
-            Best compiler arguments for current machine."""
+            Best compiler arguments for current machine.
+        """
         args = _order_args_matrix(
             self._compile_args_matrix(arch, cpu), current_machine=True
         )
@@ -222,20 +230,22 @@ class CompilerBase(BaseClass):
         return args[list(args)[0]]
 
     def compile_args(self, arch=None, current_machine=False):
-        """Gets compiler args list for a specific architecture.
+        """
+        Get the compiler args list for a specific architecture.
 
         Parameters
         ----------
         arch : str
             Target architecture name.
         current_machine : bool
-            If True, returns only arguments compatibles with current machine
+            If True, returns only arguments compatible with current machine
             (conditions from "Arg.import_if").
 
         Returns
         -------
         collections.OrderedDict with keys and values as str
-            Arguments matrix. Keys are suffixes, values are compiler arguments."""
+            Arguments matrix. Keys are suffixes, values are compiler arguments.
+        """
         return _order_args_matrix(
             self._compile_args_matrix(
                 *_get_arch_and_cpu(arch, current_machine=current_machine)
@@ -245,44 +255,52 @@ class CompilerBase(BaseClass):
         )
 
     def compile_args_current_machine(self):
-        """Return compiler arguments optimized by compiler for current machine
+        """
+        Return compiler arguments optimized by compiler for current machine.
 
         Returns
         -------
         str
-            Best compiler arguments for current machine."""
+            Best compiler arguments for current machine.
+        """
         return self._compile_args_current_machine(
             *_get_arch_and_cpu(current_machine=True)
         )
 
     @BaseClass._memoized_property
     def name(self):
-        """Compiler type name
+        """
+        Compiler type name.
 
         Returns
         -------
         str
-            Name."""
+            Name.
+        """
         return self.__module__.rsplit(".", 1)[-1]
 
     @BaseClass._memoized_property
     def api(self):
-        """Compatibles API
+        """
+        Compatibles API.
 
         Returns
         -------
         dict
             Keys are API names, values are dict of arguments with keys in
-            {'link', 'compile'}."""
+            {'link', 'compile'}.
+        """
         return {}
 
     @BaseClass._memoized_property
     def option(self):
-        """Compatibles Options
+        """
+        Compatibles Options.
 
         Returns
         -------
         dict
             Keys are options names, values are dict of arguments with keys in
-            {'link', 'compile'}."""
+            {'link', 'compile'}.
+        """
         return {}

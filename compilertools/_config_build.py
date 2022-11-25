@@ -1,8 +1,8 @@
-"""Extra configuration for build"""
+"""Extra configuration for build."""
 
 
 class ConfigBuild:
-    """Build configuration"""
+    """Build configuration."""
 
     #: Disable compilertools's optimization while building
     disabled = False

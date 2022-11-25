@@ -1,8 +1,8 @@
-"""Tests for compilers core"""
+"""Tests for compilers core."""
 
 
 def tests_get_compiler():
-    """Test get_compiler"""
+    """Test get_compiler."""
     from os import listdir
     from os.path import splitext, dirname
     from compilertools._config import CONFIG
@@ -51,7 +51,7 @@ def tests_get_compiler():
 
 
 def tests_get_arch_and_cpu():
-    """Test _get_arch_and_cpu"""
+    """Test _get_arch_and_cpu."""
     from os import listdir
     from os.path import splitext, dirname
     from compilertools.processors import _core
@@ -74,7 +74,7 @@ def tests_get_arch_and_cpu():
 
 
 def tests_compiler_base():
-    """Test CompilerBase & _order_args_matrix"""
+    """Test CompilerBase & _order_args_matrix."""
     from collections import OrderedDict
     from pytest import raises
     from compilertools.compilers import CompilerBase
@@ -85,10 +85,10 @@ def tests_compiler_base():
 
     # Create compilers
     class Compiler(CompilerBase):
-        """Dummy Compiler"""
+        """Mock Compiler."""
 
         def _compile_args_matrix(self, arch, cpu):
-            """Return test args matrix"""
+            """Return test args matrix."""
             return [
                 [self.Arg(args=["--generic"])],
                 [
@@ -115,10 +115,10 @@ def tests_compiler_base():
     compiler1 = Compiler()
 
     class Compiler2(CompilerBase):
-        """Dummy Compiler"""
+        """Mock Compiler."""
 
         def _compile_args_matrix(self, arch, cpu):
-            """Return test args matrix"""
+            """Return test args matrix."""
             return [
                 [self.Arg(args=["--generic"])],
                 [
@@ -200,7 +200,7 @@ def tests_compiler_base():
 
 
 def test_which_unix_compiler():
-    """Test _which_unix_compiler"""
+    """Test _which_unix_compiler."""
     import subprocess
     from io import StringIO
     from compilertools.compilers._core import _which_unix_compiler
@@ -212,17 +212,17 @@ def test_which_unix_compiler():
     raise_exception = False
 
     class Process:
-        """Mocked process result"""
+        """Mocked process result."""
 
         version_str = None
 
         @property
         def stdout(self):
-            """Mocked stdout"""
+            """Mock stdout."""
             return StringIO(self.version_str)
 
     def Popen(args, **_):
-        """Mocked Popen"""
+        """Mock Popen."""
         assert args[0] == compiler or (args[0] == "cc" and compiler == "unix")
         if raise_exception:
             raise OSError

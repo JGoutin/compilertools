@@ -1,1 +1,1 @@
-"""Compilertools tests"""
+"""Compilertools tests."""

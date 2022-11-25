@@ -1,4 +1,4 @@
-"""Base class and functions for CPU"""
+"""Base class and functions for CPU."""
 
 from platform import machine
 from compilertools._utils import import_class, BaseClass
@@ -8,7 +8,8 @@ __all__ = ["ProcessorBase", "get_processor", "get_arch"]
 
 
 def get_arch(arch=None):
-    """Checks architecture name and returns fixed name.
+    """
+    Check architecture name and returns fixed name.
 
     Parameters
     ----------
@@ -18,7 +19,8 @@ def get_arch(arch=None):
     Returns
     -------
     str
-        Fixed architecture name."""
+        Fixed architecture name.
+    """
     if arch is None:
         arch = machine()
     arch = arch.lower()
@@ -42,7 +44,8 @@ def get_arch(arch=None):
 
 
 def get_processor(arch, *args, **kwargs):
-    """Return processor class
+    """
+    Return processor class.
 
     Parameters
     ----------
@@ -54,14 +57,15 @@ def get_processor(arch, *args, **kwargs):
     Returns
     -------
     ProcessorBase subclass instance
-        Processor class instance."""
+        Processor class instance.
+    """
     return import_class("processors", get_arch(arch), "Processor", ProcessorBase)(
         *args, **kwargs
     )
 
 
 class ProcessorBase(BaseClass):
-    """Base class for CPU"""
+    """Base class for CPU."""
 
     def __init__(self, current_machine=False):
         BaseClass.__init__(self)
@@ -73,10 +77,12 @@ class ProcessorBase(BaseClass):
 
     @BaseClass._memoized_property
     def arch(self):
-        """processor architecture
+        """
+        Processor architecture.
 
         Returns
         -------
         str
-            Architecture name."""
+            Architecture name.
+        """
         return self.__module__.rsplit(".", 1)[-1]

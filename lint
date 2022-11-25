@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -e
+poetry run pre-commit run --all-files

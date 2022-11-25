@@ -1,8 +1,8 @@
-"""Tests for Microsoft Visual C++ Compiler"""
+"""Tests for Microsoft Visual C++ Compiler."""
 
 
 def tests_compiler():
-    """Test Compiler"""
+    """Test Compiler."""
     import platform
     from compilertools.compilers._core import _get_arch_and_cpu
     from compilertools.compilers.msvc import Compiler
@@ -10,7 +10,7 @@ def tests_compiler():
     version = ""
 
     def dummy_compiler():
-        """platform.python_compiler"""
+        """platform.python_compiler."""
         return version
 
     platform_python_compiler = platform.python_compiler

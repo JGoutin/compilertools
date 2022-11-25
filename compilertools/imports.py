@@ -1,4 +1,4 @@
-"""Import machinery"""
+"""Import machinery."""
 
 import sys as _sys
 from os.path import join as _join
@@ -14,13 +14,14 @@ _PROCESSED_COMPILERS = set()
 
 
 def update_extensions_suffixes(compiler):
-    """Updates file extensions suffixes compatibles with current machine with ones from
-    a specified compiler.
+    """
+    Update file extensions suffixes with current machine and specified compiler.
 
     Parameters
     ----------
         compiler : str or None
-            compiler name. If None, uses default compiler name on current platform"""
+            compiler name. If None, uses default compiler name on current platform
+    """
     from compilertools._core import (
         suffix_from_args,
         get_compile_args,
@@ -29,7 +30,6 @@ def update_extensions_suffixes(compiler):
     )
 
     try:
-
         compiler = get_compiler(compiler)
 
         suffixes = suffix_from_args(
@@ -59,12 +59,14 @@ update_extensions_suffixes(None)
 
 
 class _ExtensionFileFinder(_MetaPathFinder):
-    """Path finder for extensions with architecture specific optimizations"""
+    """Path finder for extensions with architecture specific optimizations."""
 
     def find_spec(self, fullname, *args, path=None, **kwargs):
-        """Finds module spec using new arch specific suffixes
+        """
+        Find module spec using new arch specific suffixes.
 
-        See importlib.abc.MetaPathFinder.find_spec for more information."""
+        See importlib.abc.MetaPathFinder.find_spec for more information.
+        """
         sys_paths = _sys.path
 
         file_name = f"{fullname}.compilertools"

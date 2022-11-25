@@ -1,4 +1,4 @@
-"""Microsoft Visual C++ Compiler"""
+"""Microsoft Visual C++ Compiler."""
 
 
 from compilertools.compilers import CompilerBase as _CompilerBase
@@ -7,35 +7,41 @@ __all__ = ["Compiler"]
 
 
 class Compiler(_CompilerBase):
-    """Microsoft Visual C++"""
+    """Microsoft Visual C++."""
 
     @_CompilerBase._memoized_property
     def option(self):
-        """Compatibles Options
+        """
+        Compatibles Options.
 
         Returns
         -------
         dict
             Keys are options names, values are dict of arguments with keys in
-            {'link', 'compile'}."""
+            {'link', 'compile'}.
+        """
         return {"fast_fpmath": {"compile": "/fp:fast"}}
 
     @_CompilerBase._memoized_property
     def api(self):
-        """Compatibles API
+        """
+        Compatibles API.
 
         Returns
         -------
         dict
             Keys are API names, values are dict of arguments with keys in
-            {'link', 'compile'}."""
+            {'link', 'compile'}.
+        """
         return {"openmp": {"compile": "/openmp"}}
 
     @_CompilerBase._memoized_property
     def version(self):
-        """For Microsoft Visual C++,
-        Compiler version used to build need to be the same that the one used to build
-        Python.
+        """
+        Version.
+
+        For Microsoft Visual C++, the Compiler version used to build needs to be the
+        same that the one used to build Python.
 
         Returns
         -------
@@ -43,14 +49,14 @@ class Compiler(_CompilerBase):
             Version.
         """
         if not self.current_compiler:
-            return
+            return None
 
         from platform import python_compiler
 
         version_str = python_compiler()
 
         if not version_str.startswith("MSC v."):
-            return
+            return None
 
         version_str = version_str.split("MSC v.")[1].split(" ", 1)[0]
         version = float(".".join((version_str[:-2], version_str[-2:]))) - 6.0
@@ -59,8 +65,8 @@ class Compiler(_CompilerBase):
         return version
 
     def _compile_args_matrix(self, arch, cpu):
-        """Returns Microsoft Visual C++ compiler options available for the specified
-        CPU architecture.
+        """
+        Return MSVC++ options available for the specified CPU architecture.
 
         Parameters
         ----------
@@ -72,7 +78,8 @@ class Compiler(_CompilerBase):
         Returns
         -------
         list of CompilerBase.Arg
-            Arguments matrix."""
+            Arguments matrix.
+        """
         args = [
             # Generic optimisation
             [self.Arg(args=["/O2", "/GL"])],

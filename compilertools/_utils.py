@@ -1,4 +1,4 @@
-"""Generic utilities"""
+"""Generic utilities."""
 import sys
 from importlib import import_module
 from collections.abc import MutableMapping
@@ -8,7 +8,8 @@ __all__ = ["always_str_list", "import_class", "BaseClass"]
 
 
 def always_str_list(list_or_str):
-    """Makes sure list_or_str is always a tuple or list
+    """
+    Make sure list_or_str is always a tuple or list.
 
     Parameters
     ----------
@@ -18,14 +19,16 @@ def always_str_list(list_or_str):
     Returns
     -------
     Iterable
-        Iterable equivalent to list_or_str."""
+        Iterable equivalent to list_or_str.
+    """
     if isinstance(list_or_str, str):
         return (list_or_str,)
     return list_or_str
 
 
 def import_class(package_name, module_name, class_name, default_class):
-    """Imports a sub module by name
+    """
+    Import a submodule by name.
 
     Parameters
     ----------
@@ -41,7 +44,8 @@ def import_class(package_name, module_name, class_name, default_class):
     Returns
     -------
     class
-        Imported class."""
+        Imported class.
+    """
     path = f"compilertools.{package_name}.{module_name}"
     try:
         import_module(path)
@@ -54,8 +58,11 @@ def import_class(package_name, module_name, class_name, default_class):
 
 
 class BaseClass(MutableMapping):
-    """Base class for data storage classes with default values, attribute/item access
-    and memoization"""
+    """
+    Base class for data storage classes.
+
+    Feature with default values, attribute/item access and memoization.
+    """
 
     def __init__(self):
         self._items = {}
@@ -63,7 +70,7 @@ class BaseClass(MutableMapping):
 
     @staticmethod
     def _memoized_property(class_property):
-        """Property decorator with memoization"""
+        """Property decorator with memoization."""
 
         @property
         @wraps(class_property)
@@ -89,6 +96,7 @@ class BaseClass(MutableMapping):
         return _property
 
     def __getitem__(self, key):
+        """Get."""
         try:
             return self._items.__getitem__(key)
         except KeyError:
@@ -100,6 +108,7 @@ class BaseClass(MutableMapping):
         return self._default.__getitem__(key)
 
     def __getattr__(self, name):
+        """Get."""
         try:
             return self._items.__getitem__(name)
         except KeyError:
@@ -111,21 +120,25 @@ class BaseClass(MutableMapping):
             raise AttributeError
 
     def __setitem__(self, key, value):
+        """Set."""
         return self._items.__setitem__(key, value)
 
     def __delitem__(self, key):
+        """Del."""
         return self._items.__delitem__(key)
 
     def __len__(self):
+        """Len."""
         return self._items.__len__()
 
     def __iter__(self):
+        """Iterate."""
         return self._items.__iter__()
 
 
 def dump_version(command):
     """
-    Dump version for GCC/Clang compilers
+    Dump version for GCC/Clang compilers.
 
     Parameters
     ----------

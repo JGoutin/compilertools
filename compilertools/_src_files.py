@@ -1,4 +1,4 @@
-"""Source files parsing functionalities"""
+"""Source files parsing functionalities."""
 
 from os.path import splitext
 from itertools import product
@@ -8,7 +8,8 @@ __all__ = []
 
 
 def _any_line_startswith(sources, criterion):
-    """Detects if any line in source files start with a specific string.
+    """
+    Detect if any line in source files start with a specific string.
 
     Parameters
     ----------
@@ -21,7 +22,8 @@ def _any_line_startswith(sources, criterion):
     Returns
     -------
     bool
-        Returns True if criterion detected."""
+        Returns True if criterion detected.
+    """
     if isinstance(sources, str):
         sources = (sources,)
 
@@ -39,8 +41,10 @@ def _any_line_startswith(sources, criterion):
 
 
 def _ignore_api(compiler, api):
-    """Returns True if this API is not supported by
-    the specified compiler. If compiler is None, always return False.
+    """
+    Return True if this API is not supported by the specified compiler.
+
+    If compiler is None, always return False.
 
     Parameters
     ----------
@@ -52,7 +56,8 @@ def _ignore_api(compiler, api):
     Returns
     -------
     bool
-        Returns True if API not supported."""
+        Returns True if API not supported.
+    """
     if compiler is None or api in compiler["api"]:
         return False
     return True
@@ -60,7 +65,7 @@ def _ignore_api(compiler, api):
 
 def _startswith_exts(**startswiths_dict):
     """
-    Returns a dict with file extensions as key and startswith as values.
+    Return a dict with file extensions as key and startswith as values.
 
     Parameters
     ----------
@@ -96,7 +101,8 @@ def _startswith_exts(**startswiths_dict):
 
 
 def _use_api_pragma(sources, compiler, api, **startswith):
-    """Generic API preprocessors checker
+    """
+    Check generic API preprocessors.
 
     Parameters
     ----------

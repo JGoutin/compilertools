@@ -1,22 +1,21 @@
 ![tests](https://github.com/JGoutin/compilertools/workflows/tests/badge.svg)
 [![codecov](https://codecov.io/gh/JGoutin/compilertools/branch/master/graph/badge.svg)](https://codecov.io/gh/JGoutin/compilertools)
-[![Documentation Status](https://readthedocs.org/projects/compilertools/badge/?version=latest)](http://compilertools.readthedocs.io/en/latest/?badge=latest)
 [![PyPI](https://img.shields.io/pypi/v/compilertools.svg)](https://pypi.org/project/compilertools)
 
 Python uses the Wheel format for simplified package distribution. However,
-it does not allow to distribute packages optimized for each machine but highly compatible ones.
+it does not allow distributing packages optimized for each machine but highly compatible ones.
 The user must compile the package himself to take advantage of optimization like SIMD (SSE, AVX, FMA, ...).
 
-Compilertools allows to work around this problem and distribute optimized packages for several machines while keeping
+Compilertools allows working around this problem and distributing optimized packages for several machines while keeping
 the simplicity of Wheel. It works in the background and has been created with the aim of being easy to use.
-Package maintainer requires only to import it at runtime and buildtime. Everything is transparent for the end user.
+Package maintainer requires only importing it at runtime and buildtime. Everything is transparent for the end user.
 
 Its secondary objective is also to help the package maintainer to optimally compile its package with multiple compilers
 by configuring options for him.
 
 Documentation:
 --------------
-[**Compilertools Documentation**](http://compilertools.readthedocs.io)
+[**Compilertools Documentation**](https://jgoutin.github.io/compilertools/)
 
 
 Features:
@@ -30,15 +29,15 @@ Features:
 * Support extra compiling options like fast math.
 * Provides build time settings for package maintainer to tweak compilation.
 * Provides API for getting information on current machine CPU.
-* Lightweight pure Python module with no dependency that use lazy import and evaluation as possible.
+* Lightweight pure Python module with no dependency that uses lazy import and evaluation as possible.
 
 How that works ?
 ================
 
-Compilertools dynamically sets link options and compile options depending on the currently used compiler and targeted
+Compilertools dynamically sets link options and compiles options depending on the currently used compiler and targeted
 architecture.
 
-This avoid to have to specify compiler specific options in sources or setup files.
+This avoids having to specify compiler-specific options in sources or setup files.
 
 Multi-architecture optimized compilation for distribution
 ---------------------------------------------------------
@@ -64,11 +63,11 @@ Requirement:
 
 Compilertools detects and chooses the best optimized ".so"/".pyd" to run based on CPU information.
 
-If the best file not exist, search for the second best file, etc... If nothing found, use the highly-compatible one.
+If the best file not exists, search for the second best file, etc... If nothing found, use the highly-compatible one.
 
 Requirement:
 
-* Import ``compilertools`` one time before import optimized modules (This add a new import hook to Python).
+* Import ``compilertools`` one time before import-optimized modules (This adds a new import hook to Python).
 
 Current-architecture optimized compilation
 ------------------------------------------
@@ -96,7 +95,7 @@ Compatibility
 Supported Compilers
 -------------------
 
-Compilertools implements support for following compilers:
+Compilertools implements support for the following compilers:
 
 * GCC
 * LLVM Clang
@@ -105,14 +104,14 @@ Compilertools implements support for following compilers:
 Supported Processors
 --------------------
 
-Compilertools implements support for following CPU:
+Compilertools implements support for the following CPU:
 
 * x86 (32 and 64 bits)
 
 Build tools compatibility
 -------------------------
 
-Compilertools have been tested with following build tools:
+Compilertools has been tested with the following build tools:
 
 * Distutils
 * Setuptools

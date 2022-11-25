@@ -1,11 +1,11 @@
-"""X86-32 Processors"""
+"""X86-32 Processors."""
 from compilertools.processors import ProcessorBase as _ProcessorBase
 
 __all__ = ["Processor", "Cpuid"]
 
 
 class Processor(_ProcessorBase):
-    """x86-32 CPU"""
+    """x86-32 CPU."""
 
     def __init__(self, current_machine=False):
         _ProcessorBase.__init__(self, current_machine)
@@ -14,44 +14,50 @@ class Processor(_ProcessorBase):
 
     @_ProcessorBase._memoized_property
     def cpuid_highest_extended_function(self):
-        """CPUID highest extended function.
+        """
+        CPUID highest extended function.
 
         Returns
         -------
         int
-            Related EAX value for CPUID."""
+            Related EAX value for CPUID.
+        """
         if not self.current_machine:
-            return
+            return None
 
         return Cpuid(0x80000000).eax
 
     @_ProcessorBase._memoized_property
     def vendor(self):
-        """CPU's manufacturer ID from CPUID.
+        """
+        Manufacturer ID from CPUID.
 
         Returns
         -------
         str
-            Manufacturer ID."""
+            Manufacturer ID.
+        """
         if not self.current_machine:
-            return
+            return None
 
         reg = Cpuid()
         return Cpuid.registers_to_str(reg.ebx, reg.edx, reg.ecx)
 
     @_ProcessorBase._memoized_property
     def brand(self):
-        """CPU's brand from CPUID
+        """
+        Brand from CPUID.
 
         Returns
         -------
         str
-            Brand."""
+            Brand.
+        """
         if not self.current_machine:
-            return
+            return None
 
         if self.cpuid_highest_extended_function < 0x80000004:
-            return
+            return None
 
         brand_list = []
         for eax in (0x80000002, 0x80000003, 0x80000004):
@@ -61,7 +67,8 @@ class Processor(_ProcessorBase):
 
     @_ProcessorBase._memoized_property
     def features(self):
-        """CPU's features flags from CPUID
+        """
+        Features flags from CPUID.
 
         Returns
         -------
@@ -76,10 +83,10 @@ class Processor(_ProcessorBase):
         Use "cpufeatures.h" quoted names in comments in priority, then use name from
         "cpufeatures.h" constants.
 
-        Exceptions in names: PNI called SSE3 (like other SSE feature flags)"""
-
+        Exceptions in names: PNI called SSE3 (like other SSE feature flags)
+        """
         if not self.current_machine:
-            return
+            return None
 
         # Feature bits description
         # feature_bits_desc: {(eax, ecx): registers_dict}
@@ -265,27 +272,31 @@ class Processor(_ProcessorBase):
 
     @_ProcessorBase._memoized_property
     def os_supports_xsave(self):
-        """OS and CPU supports XSAVE instruction.
+        """
+        OS and CPU support XSAVE instruction.
 
         Returns
         -------
         bool
-            Supports if True."""
+            Supports if True.
+        """
         if not self.current_machine:
-            return
+            return None
 
         return "XSAVE" in self["features"] and "OSXSAVE" in self["features"]
 
 
 class Cpuid:
-    """Gets Processor CPUID.
+    """
+    Gets Processor CPUID.
 
     Parameters
     ----------
     eax_value : int
         EAX register value
     ecx_value : int
-        ECX register value"""
+        ECX register value
+    """
 
     def __init__(self, eax_value=0, ecx_value=0):
         bytecode = []
@@ -311,11 +322,12 @@ class Cpuid:
             bytecode
             +
             # CPUID
-            [b"\x0F\xA2"]
+            [b"\x0f\xa2"]
         )
 
     def _get_cpuid(self, reg):
-        """Gets specified register CPUID result.
+        """
+        Get the specified register CPUID result.
 
         Parameters
         ----------
@@ -325,7 +337,8 @@ class Cpuid:
         Returns
         -------
         int
-            Raw CPUID Result as unsigned integer."""
+            Raw CPUID Result as unsigned integer.
+        """
         from platform import system
         from ctypes import (
             c_void_p,
@@ -352,7 +365,7 @@ class Cpuid:
             bytecode
             +
             # RET
-            [b"\xC3"]
+            [b"\xc3"]
         )
 
         is_windows = system() == "Windows"
@@ -403,47 +416,56 @@ class Cpuid:
 
     @property
     def eax(self):
-        """Get EAX register CPUID result.
+        """
+        Get EAX register CPUID result.
 
         Returns
         -------
         int
-            Raw EAX register value."""
+            Raw EAX register value.
+        """
         return self._get_cpuid(0x0)
 
     @property
     def ebx(self):
-        """Get EBX register CPUID result.
+        """
+        Get EBX register CPUID result.
 
         Returns
         -------
         int
-            Raw EAX register value."""
+            Raw EAX register value.
+        """
         return self._get_cpuid(0x3)
 
     @property
     def ecx(self):
-        """Get ECX register CPUID result.
+        """
+        Get ECX register CPUID result.
 
         Returns
         -------
         int
-            Raw EAX register value."""
+            Raw EAX register value.
+        """
         return self._get_cpuid(0x1)
 
     @property
     def edx(self):
-        """Get EDX register CPUID result.
+        """
+        Get EDX register CPUID result.
 
         Returns
         -------
         int
-            Raw EAX register value."""
+            Raw EAX register value.
+        """
         return self._get_cpuid(0x2)
 
     @staticmethod
     def registers_to_str(*uints):
-        """Converts unsigned integers from CPUID register to ASCII string.
+        """
+        Convert unsigned integers from CPUID register to ASCII string.
 
         Parameters
         ----------
@@ -453,7 +475,8 @@ class Cpuid:
         Returns
         -------
         str
-            Result."""
+            Result.
+        """
         from struct import pack
 
         return pack(f"<{'I' * len(uints)}", *uints).decode("ASCII").strip("\x00 ")

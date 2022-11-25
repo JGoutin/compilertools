@@ -1,15 +1,6 @@
-"""A library for helping optimizing Python extensions compilation."""
-
-from sys import version_info as _version_info
-
-if _version_info[0] < 3 or (_version_info[0] == 3 and _version_info[1] < 6):
-    raise ImportError("Compilertools needs Python 3.6 or above.")
-del _version_info
-
-from compilertools._version import __version__  # noqa: E402
+"""A library for helping to optimize Python extensions compilation."""
 
 from compilertools import imports  # noqa: E402
-
 from compilertools.processors import get_processor as _get_processor  # noqa: E402
 from compilertools.compilers import get_compiler as _get_compiler  # noqa: E402
 
@@ -38,4 +29,4 @@ def get_processor():
     return _get_processor(arch=None, current_machine=True)
 
 
-__all__ = ["imports", "get_compiler", "get_processor", "__version__"]
+__all__ = ["imports", "get_compiler", "get_processor"]

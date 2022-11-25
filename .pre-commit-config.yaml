@@ -1,6 +1,31 @@
 ---
 repos:
-  - repo: https://github.com/psf/black
-    rev: stable
+  - repo: local
     hooks:
       - id: black
+        name: Black (Formatting)
+        entry: poetry run black . --preview
+        language: system
+        pass_filenames: false
+      - id: flake8
+        name: Flake8 (Quality)
+        entry: poetry run flake8 --docstring-convention numpy
+        language: system
+        pass_filenames: false
+      - id: radon_cc
+        name: Radon (Cyclomatic complexity)
+        entry: poetry run radon cc -n D compilertools
+        language: system
+        pass_filenames: false
+        verbose: true
+      - id: radon_mi
+        name: Radon (Maintainability index)
+        entry: poetry run radon mi -n B compilertools
+        language: system
+        pass_filenames: false
+        verbose: true
+      - id: bandit
+        name: Bandit (Security)
+        entry: poetry run bandit compilertools -qrs B404,B603
+        language: system
+        pass_filenames: false

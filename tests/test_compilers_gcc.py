@@ -1,8 +1,8 @@
-"""Tests for GNU Compiler Collection"""
+"""Tests for GNU Compiler Collection."""
 
 
 def tests_compiler():
-    """Test Compiler"""
+    """Test Compiler."""
     import platform
     import subprocess
     from compilertools.compilers._core import _get_arch_and_cpu
@@ -16,11 +16,11 @@ def tests_compiler():
     }
 
     def dummy_compiler():
-        """Force version"""
+        """Force version."""
         return cmd["python"]
 
     def run(*popenargs, check=False, **_):
-        """Mocked subprocess.run"""
+        """Mock subprocess.run."""
         args = popenargs[0]
         if cmd["not_found"]:
             raise FileNotFoundError
@@ -105,7 +105,7 @@ def tests_compiler():
 
 
 def tests_compiler_gcc_command():
-    """Test Compiler if CC/GCC command available"""
+    """Test Compiler if CC/GCC command available."""
     from subprocess import Popen, PIPE
 
     try:

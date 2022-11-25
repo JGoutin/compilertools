@@ -1,8 +1,8 @@
-"""Tests for x86-32 CPU"""
+"""Tests for x86-32 CPU."""
 
 
 def tests_processor_nocpu():
-    """Tests Processor methods that don't need a real x86_32 CPU"""
+    """Tests Processor methods that don't need a real x86_32 CPU."""
     from compilertools.processors.x86_32 import Processor
     from compilertools.processors import x86_32
 
@@ -23,7 +23,7 @@ def tests_processor_nocpu():
     }
 
     class Cpuid(x86_32.Cpuid):
-        """Dummy CPUID function"""
+        """Mock CPUID function."""
 
         def __init__(self, eax=0, ecx=None):
             self._eax = eax
@@ -31,29 +31,28 @@ def tests_processor_nocpu():
 
         @property
         def eax(self):
-            """EAX"""
+            """EAX."""
             return registers[self._eax]["eax"]
 
         @property
         def ebx(self):
-            """EAX"""
+            """EBX."""
             return registers[self._eax]["ebx"]
 
         @property
         def ecx(self):
-            """EAX"""
+            """ECX."""
             return registers[self._eax]["ecx"]
 
         @property
         def edx(self):
-            """EAX"""
+            """EDX."""
             return registers[self._eax]["edx"]
 
     x86_cpuid = x86_32.Cpuid
     x86_32.Cpuid = Cpuid
 
     try:
-
         # Tests registers_to_str
         assert x86_32.Cpuid.registers_to_str(encoded, encoded, encoded) == string * 3
 
@@ -123,7 +122,7 @@ def tests_processor_nocpu():
 
 
 def tests_cpuid_nocpu():
-    """Tests cpuid without x86 CPU"""
+    """Tests cpuid without x86 CPU."""
     from pytest import raises
 
     # Initialize dummy testing environment
@@ -147,65 +146,65 @@ def tests_cpuid_nocpu():
         func_result = {}
 
         def dummy_system():
-            """Dummy platform.system"""
+            """Mock platform.system."""
             return system
 
         def dummy_generic(*_, **__):
-            """Dummy generic method"""
+            """Mock generic method."""
 
         def dummy_memmove(address, bytecode, size):
-            """Dummy ctypes.memmove. Store bytecode to execute"""
+            """Mock ctypes.memmove. Store bytecode to execute."""
             func_result["address"] = address
             func_result["bytecode"] = bytecode
             func_result["size"] = size
 
         class DummyValloc:
-            """Dummy valloc"""
+            """Mock valloc."""
 
             def __new__(cls, *args, **kwargs):
-                """Dummy new"""
+                """Mock new."""
                 return mem_address
 
         class DummyMprotect:
-            """Dummy mprotect"""
+            """Mock mprotect."""
 
             def __call__(self, *args, **kwargs):
-                """Dummy call"""
+                """Mock call."""
                 return mprotect_success
 
         class DummyCFuncType:
-            """Dummy ctypes.CFUNCTYPE"""
+            """Mock ctypes.CFUNCTYPE."""
 
             def __init__(self, *args, **kwargs):
-                """Dummy init"""
+                """Mock init."""
 
             def __call__(self, *args, **kwargs):
-                """Dummy call"""
+                """Mock call."""
 
                 def func(*_, **__):
-                    """Return executed bytecode"""
+                    """Return executed bytecode."""
                     return func_result
 
                 return func
 
         class DummyCDll:
-            """Dummy ctypes.cdll"""
+            """Mock ctypes.cdll."""
 
             class LoadLibrary:
-                """Dummy ctypes.cdll.LoadLibrary"""
+                """Mock ctypes.cdll.LoadLibrary."""
 
                 def __init__(self, *args, **kwargs):
-                    """Dummy init"""
+                    """Mock init."""
 
                 valloc = DummyValloc
                 mprotect = DummyMprotect()
                 free = dummy_generic
 
         class DummyWinDll:
-            """Dummy ctypes.windll"""
+            """Mock ctypes.windll."""
 
             class kernel32:
-                """Dummy ctypes.windll.kernel32"""
+                """Mock ctypes.windll.kernel32."""
 
                 VirtualAlloc = DummyValloc
                 VirtualFree = dummy_generic
@@ -282,7 +281,7 @@ def tests_cpuid_nocpu():
 
 
 def tests_cpuid():
-    """Test cpuid with a real x86 CPU"""
+    """Test cpuid with a real x86 CPU."""
     from compilertools.processors import get_arch
 
     if get_arch().split("_")[0] != "x86":
@@ -311,7 +310,6 @@ def tests_cpuid():
         (0x80000003, 0),
         (0x80000004, 0),
     ):
-
         ref = cpuid_ref(eax, ecx)
         cpuid = Cpuid(eax, ecx)
         assert cpuid.eax == ref["eax"]
@@ -321,7 +319,7 @@ def tests_cpuid():
 
 
 def tests_processor():
-    """Tests Processor methods that need a real x86 CPU"""
+    """Tests Processor methods that need a real x86 CPU."""
     # Check architecture and skip if not compatible
     from compilertools.processors import get_arch
 

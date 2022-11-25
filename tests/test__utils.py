@@ -1,8 +1,8 @@
-"""Tests for generic utilities"""
+"""Tests for generic utilities."""
 
 
 def test_baseclass():
-    """Test BaseClass"""
+    """Test BaseClass."""
     from compilertools._utils import BaseClass
     from pytest import raises
 
@@ -38,11 +38,11 @@ def test_baseclass():
 
     # Test memoization
     class TestClass(BaseClass):
-        """Base class with property"""
+        """Base class with property."""
 
         @BaseClass._memoized_property
         def to_memoize(self):
-            """Property to memoize"""
+            """Property to memoize."""
             return 1
 
     testclass = TestClass()
@@ -60,21 +60,21 @@ def test_baseclass():
 
     # Memoize with default values
     class TestClass2(BaseClass):
-        """Base class with property and default"""
+        """Base class with property and default."""
 
         def __init__(self):
-            """Default value"""
+            """Set default value."""
             BaseClass.__init__(self)
             self._default["to_memoize"] = 2
 
         @BaseClass._memoized_property
         def to_memoize(self):
-            """Property to memoize"""
+            """Property to memoize."""
             return
 
         @BaseClass._memoized_property
         def to_memoize_none(self):
-            """Property to memoize"""
+            """Property to memoize."""
             return
 
     testclass = TestClass2()
@@ -98,11 +98,11 @@ def test_baseclass():
 
 
 def tests_import_class():
-    """Test import_class"""
+    """Test import_class."""
     from compilertools._utils import import_class
 
     class Dummy:
-        """Dummy class"""
+        """Mock class."""
 
     # Return excepted class
     from compilertools.compilers._core import CompilerBase
@@ -117,7 +117,7 @@ def tests_import_class():
 
 
 def tests_always_str_list():
-    """Test always_str_list"""
+    """Test always_str_list."""
     from compilertools._utils import always_str_list
 
     # not a str

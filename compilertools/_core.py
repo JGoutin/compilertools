@@ -1,4 +1,4 @@
-"""Core functionalities"""
+"""Core functionalities."""
 
 from compilertools.compilers import get_compiler
 from compilertools._utils import always_str_list
@@ -10,8 +10,8 @@ __all__ = ["get_compile_args", "get_compiler", "suffix_from_args", "log_exceptio
 def get_compile_args(
     compiler=None, arch=None, current_machine=False, current_compiler=False
 ):
-    """Gets compiler args OrderedDict for a specific compiler and architecture
-    combination.
+    """
+    Get compiler args dict for a specific compiler and architecture combination.
 
     Parameters
     ----------
@@ -33,7 +33,8 @@ def get_compile_args(
 
 
 def suffix_from_args(args, extension="", return_empty_suffixes=False):
-    """Returns suffixes from args.
+    """
+    Return suffixes from args.
 
     Parameters
     ----------
@@ -47,7 +48,8 @@ def suffix_from_args(args, extension="", return_empty_suffixes=False):
     Returns
     -------
     list of str
-        Suffixes"""
+        Suffixes
+    """
     suffixes = []
     for suffix in args:
         if extension:
@@ -80,12 +82,16 @@ def log_exception():
         getLogger("compilertools").exception(
             "\n".join(
                 (
-                    "Compilertools: Exception when trying to enable optimization, "
-                    "Back to compatible mode.",
+                    (
+                        "Compilertools: Exception when trying to enable optimization, "
+                        "Back to compatible mode."
+                    ),
                     f"  OS: {platform.platform()}",
                     f"  CPU: {platform.processor()}",
-                    f"  Python: {platform.python_version()} "
-                    f"[{platform.python_compiler()}]",
+                    (
+                        f"  Python: {platform.python_version()} "
+                        f"[{platform.python_compiler()}]"
+                    ),
                 )
             )
         )

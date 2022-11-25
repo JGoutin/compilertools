@@ -1,4 +1,4 @@
-"""LLVM Clang"""
+"""LLVM Clang."""
 
 
 from compilertools.compilers import CompilerBase as _CompilerBase
@@ -11,28 +11,32 @@ __all__ = ["Compiler"]
 
 
 class Compiler(_CompilerBase):
-    """LLVM Clang"""
+    """LLVM Clang."""
 
     @_CompilerBase._memoized_property
     def option(self):
-        """Compatibles Options
+        """
+        Compatibles Options.
 
         Returns
         -------
         dict
             Keys are options names, values are dict of arguments with keys in
-            {'link', 'compile'}."""
+            {'link', 'compile'}.
+        """
         return {"fast_fpmath": {"compile": "-Ofast"}}
 
     @_CompilerBase._memoized_property
     def api(self):
-        """Compatibles API
+        """
+        Compatibles API.
 
         Returns
         -------
         dict
             Keys are API names, values are dict of arguments with keys in
-            {'link', 'compile'}."""
+            {'link', 'compile'}.
+        """
         api = {}
         if self.version >= 3.7:
             api["openmp"] = {"compile": "-fopenmp", "link": "-fopenmp=libomp"}
@@ -40,28 +44,33 @@ class Compiler(_CompilerBase):
 
     @_CompilerBase._memoized_property
     def version(self):
-        """Compiler version used.
+        """
+        Compiler version used.
 
         Returns
         -------
         float
-            Version."""
+            Version.
+        """
         if not self.current_compiler:
-            return
+            return None
         return _dump_version("clang")
 
     @_CompilerBase._memoized_property
     def python_build_version(self):
-        """Compiler version that was used to build Python.
+        """
+        Compiler version that was used to build Python.
 
         Returns
         -------
         float
-            Version."""
+            Version.
+        """
         return _python_version("clang")
 
     def _compile_args_matrix(self, arch, cpu):
-        """Returns available Clang compiler options for the specified CPU architecture.
+        """
+        Return available Clang compiler options for the specified CPU architecture.
 
         Parameters
         ----------
@@ -73,11 +82,12 @@ class Compiler(_CompilerBase):
         Returns
         -------
         list of CompilerBase.Arg
-            Arguments matrix."""
+            Arguments matrix.
+        """
         # Generic optimisation
         args = [[self.Arg(args=["-flto", "-O3"])]]
 
-        # Architecture specific optimisations
+        # Architecture-specific optimisations
         if arch == "x86_64":
             args += [
                 # CPU Generic optimisations
@@ -170,7 +180,8 @@ class Compiler(_CompilerBase):
         return args
 
     def _compile_args_current_machine(self, arch, cpu):
-        """Return auto-optimised Clang arguments for current machine.
+        """
+        Return auto-optimised Clang arguments for current machine.
 
         Parameters
         ----------
@@ -182,7 +193,8 @@ class Compiler(_CompilerBase):
         Returns
         -------
         str
-            Best compiler arguments for current machine."""
+            Best compiler arguments for current machine.
+        """
         args = ["-O3 -march=native -flto"]
 
         if arch == "x86_32":

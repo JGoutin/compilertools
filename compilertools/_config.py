@@ -1,6 +1,6 @@
-"""General Configuration"""
+"""General Configuration."""
 
-# Default configuration
+#: Default configuration
 CONFIG = {
     # Architectures, Key is name or alias, Value is name to use
     "architectures": {

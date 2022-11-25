@@ -1,6 +1,14 @@
 Changelog
 =========
 
+1.1.5 (2023/05/05)
+------------------
+
+Others:
+
+* Ensure Python 3.11 compatibility.
+* Drop Python 3.6 and 3.7 support.
+
 1.1.3 (2021/11/09)
 ------------------
 

@@ -1,8 +1,8 @@
-"""Tests for source file parsing utilities"""
+"""Tests for source file parsing utilities."""
 
 
 def tests_any_line_startswith():
-    """Test _any_line_startswith"""
+    """Test _any_line_startswith."""
     from tempfile import TemporaryDirectory
     from os.path import join
     from compilertools._src_files import _any_line_startswith
@@ -35,7 +35,7 @@ def tests_any_line_startswith():
 
 
 def tests_ignore_api():
-    """Test _ignore_api"""
+    """Test _ignore_api."""
     from compilertools.compilers import CompilerBase
     from compilertools._src_files import _ignore_api
 
@@ -54,7 +54,7 @@ def tests_ignore_api():
 
 
 def tests_startwith_exts():
-    """Test _startswith_exts"""
+    """Test _startswith_exts."""
     from compilertools._src_files import _startswith_exts
 
     # List arguments
@@ -72,7 +72,7 @@ def tests_startwith_exts():
 
 
 def tests_use_api_pragma():
-    """Test _use_api_pragma"""
+    """Test _use_api_pragma."""
     from tempfile import TemporaryDirectory
     from os.path import join
     from compilertools.compilers import CompilerBase
