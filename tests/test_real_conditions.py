@@ -1,6 +1,5 @@
 """Test build and import with real files and compilers."""
 
-
 C_SOURCE = """
 #include <Python.h>
 

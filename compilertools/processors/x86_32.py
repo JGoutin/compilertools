@@ -1,4 +1,5 @@
 """X86-32 Processors."""
+
 from compilertools.processors import ProcessorBase as _ProcessorBase
 
 __all__ = ["Processor", "Cpuid"]

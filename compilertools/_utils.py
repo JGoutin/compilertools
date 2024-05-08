@@ -1,4 +1,5 @@
 """Generic utilities."""
+
 import sys
 from importlib import import_module
 from collections.abc import MutableMapping

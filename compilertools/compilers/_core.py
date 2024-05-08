@@ -1,4 +1,5 @@
 """Base class and functions for compilers."""
+
 from itertools import product
 from collections import namedtuple, OrderedDict
 from compilertools._utils import import_class, BaseClass

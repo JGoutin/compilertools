@@ -1,6 +1,5 @@
 """Microsoft Visual C++ Compiler."""
 
-
 from compilertools.compilers import CompilerBase as _CompilerBase
 
 __all__ = ["Compiler"]

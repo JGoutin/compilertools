@@ -1,6 +1,5 @@
 """GNU Compiler Collection."""
 
-
 from compilertools.compilers import CompilerBase as _CompilerBase
 from compilertools._utils import (
     dump_version as _dump_version,

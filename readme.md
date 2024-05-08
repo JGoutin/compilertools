@@ -1,4 +1,4 @@
-![tests](https://github.com/JGoutin/compilertools/workflows/tests/badge.svg)
+[![Tests](https://github.com/JGoutin/compilertools/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/JGoutin/compilertools/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/JGoutin/compilertools/branch/master/graph/badge.svg)](https://codecov.io/gh/JGoutin/compilertools)
 [![PyPI](https://img.shields.io/pypi/v/compilertools.svg)](https://pypi.org/project/compilertools)
 
